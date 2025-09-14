@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🎬 Vibe Pass – Online Movie Ticket Booking Platform
 
-## Getting Started
+Vibe Pass is a modern web application that allows users to browse movies, select seats, and book tickets online.  
+It aims to provide a **convenient, secure, and responsive** ticket booking experience for movie lovers while giving theater owners an easy way to manage movies and showtimes.
 
-First, run the development server:
+---
 
+##  Project Overview
+
+### Goal
+To create a user-friendly online platform where users can easily browse movies, select seats, and book tickets digitally without waiting in physical queues.
+
+### Purpose
+Vibe Pass modernizes the ticket booking process by ensuring **convenience, security, and accessibility**.  
+Users can explore ongoing and upcoming movies, view showtimes, and purchase tickets anytime, anywhere.
+
+### Scope
+The platform will serve both **movie lovers** and **theater owners**.  
+It streamlines the ticket booking system, reduces manual work, and supports:
+- Interactive seat selection  
+- Secure online payments  
+- User registration & management  
+- Admin dashboard for theater owners  
+
+---
+
+##  Key Features
+
+- 🔑 User registration and login system  
+- 🎥 Browse movies by category, language, or theater  
+- ⏰ Real-time showtime and availability  
+- 🪑 Interactive seat selection system  
+- 💳 Secure online payment gateway  
+- 🎟️ E-ticket generation (QR code-based)  
+- 📂 Booking history and user profile  
+- 🛠️ Admin dashboard (add/manage movies, showtimes, theaters)  
+- 📧 Email confirmation notifications  
+- 📱 Multi-device responsive design  
+
+---
+
+## 🛠️ Technologies Used
+
+- **Frontend:** [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com/)  
+- **Backend:** [Node.js](https://nodejs.org/), [Express.js](https://expressjs.com/)  
+- **Database:** [MongoDB](https://www.mongodb.com/)  
+- **Authentication:** [Firebase Authentication](https://firebase.google.com/)  
+- **Deployment:** [Vercel](https://vercel.com/) (Frontend & Backend)  
+- **Version Control:** Git & GitHub  
+- **Project Management Tool:** [Jira](https://www.atlassian.com/software/jira)  
+
+---
+
+## 👥 Target Users
+
+- 🎟️ **General Users** → Movie lovers who want to book tickets online.  
+- 🎬 **Theater Owners/Admins** → Manage movies, showtimes, and bookings.  
+
+---
+
+## ✅ Conclusion
+
+Vibe Pass provides an **efficient, modern, and secure way** to book movie tickets.  
+With features like **digital tickets, real-time seat selection, and admin management**, the platform solves key user problems found in traditional ticket booking systems.
+
+---
+
+## 📌 Project Setup (Basic Instructions)
+
+### 1️⃣ Clone the Repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+git clone https://github.com/niloyahmadramjan/Vibe-Pass-.git
+cd vibe-pass
