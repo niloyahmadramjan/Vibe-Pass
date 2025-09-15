@@ -1,31 +1,79 @@
 @import "tailwindcss";
 
+/* 🌍 Global Variables */
+:root {
+  /* Brand Colors */
+  --color-primary: #CC2027;
+  /* Main brand red */
+  --color-primary-hover: #E53935;
+  /* Hover red */
 
-/* ==== don't edit or remove ===== */
-/* :root {
-  --background: #ffffff;
-  --foreground: #171717;
-} */
+  /* Backgrounds */
+  --color-bg-dark: #1A1A1A;
+  /* Dark sections, navbar, footer */
+  --color-bg-light: #F5F5F5;
+  /* Light gray sections */
+  --color-white: #FFFFFF;
+  /* Pure white */
 
-/* @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Text */
+  --color-text-dark: #1A1A1A;
+  /* Main text color */
+  --color-text-light: #FFFFFF;
+  /* Text on dark bg */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* 🌑 Dark Mode (Optional) */
+.dark {
+  --color-bg-light: #1A1A1A;
+  --color-text-dark: #F5F5F5;
 }
 
+/* Reset + Base Styles */
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-} */
+  padding: 0;
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  background-color: var(--color-bg-light);
+  color: var(--color-text-dark);
+  scroll-behavior: smooth;
+}
 
+/* Links */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
 
-/* ===== write css code here ===  */
+a:hover {
+  color: var(--color-primary-hover);
+}
+
+/* Buttons (default style) */
+button {
+  cursor: pointer;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-text-light);
+  padding: 0.5rem 1rem;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* Utility Classes */
+.text-gradient {
+  background: linear-gradient(90deg,
+      var(--color-primary) 0%,
+      var(--color-primary-hover) 100%);
+  /* -webkit-background-clip: text; */
+  -webkit-text-fill-color: transparent;
+}
