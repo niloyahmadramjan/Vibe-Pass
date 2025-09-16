@@ -76,5 +76,5 @@ export default function Footer() {
         <p className="mt-2 md:mt-0 font-semibold">© 2025 Ticket Booking Platform. All rights reserved.</p>
       </div>
     </footer>
-  );
+  )
 }
