@@ -1,7 +1,11 @@
 import React from 'react'
-// This is shaikat vai component
-export default function Hero() {
+
+function Hero() {
   return (
-    <div>Hero</div>
+    <div>
+      
+    </div>
   )
 }
+
+export default Hero
