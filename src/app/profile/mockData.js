@@ -1,8 +1,8 @@
 // mockData.js
 
 export const userProfileData = {
-  profileImage: '/images/niloy.jpg', // Replace with an actual image URL
-  name: 'niloyahmadramjan',
+  profileImage: 'https://i.ibb.co/wFjxs8XF/IMG-9196.jpg', // Replace with an actual image URL
+  name: 'MD RAMJAN ALI',
   welcomeMessage: 'Welcome Back!',
   qrCodeValue: 'https://vibepass.com/user/niloyahmadramjan', // The value for the QR code
   contact: {
