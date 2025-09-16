@@ -69,5 +69,5 @@ With features like **digital tickets, real-time seat selection, and admin manage
 
 ### 1️⃣ Clone the Repository
 ```bash
-git clone https://github.com/niloyahmadramjan/Vibe-Pass-.git
+git clone https://github.com/niloyahmadramjan/Vibe-Pass.git
 cd vibe-pass
