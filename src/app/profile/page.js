@@ -5,8 +5,9 @@
 import { useState, useEffect } from 'react'
 import QRCode from 'react-qr-code'
 import { userProfileData } from './mockData'
+import LoadingSpinner from '../hooks/LoadingSpiner'
 
-// ✅ Mock API call
+// Mock API call
 const fetchUserProfileData = () => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -66,19 +67,15 @@ const ProfilePage = () => {
 
   // ========================= LOADING STATE =========================
   if (!userData) {
-    return (
-      <div className="flex justify-center items-center h-screen bg-[var(--color-white)]">
-        <div className="animate-spin rounded-full h-16 w-16 border-4 border-[var(--color-primary)] border-t-transparent"></div>
-      </div>
-    )
+    return <LoadingSpinner />
   }
 
   return (
-    <div className="bg-[var(--color-white)] text-[var(--color-text-light)] min-h-screen">
+    <div className="bg-[var(--color-bg-dark)] text-[var(--color-text-light)] min-h-screen pt-16">
       <div className="container mx-auto p-4 md:p-6 lg:p-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-10">
           {/* ======================= Left Sidebar ======================= */}
-          <div className="md:col-span-1 bg-[var(--color-bg-light)] rounded-xl shadow-md p-6 flex flex-col items-center text-center">
+          <div className="md:col-span-1 bg-[var(--color-bg-dark)] rounded-xl shadow-lg p-6 flex flex-col items-center text-center">
             <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-2 border-[var(--color-primary)]">
               <img
                 src={userData.profileImage}
@@ -87,17 +84,17 @@ const ProfilePage = () => {
               />
             </div>
 
-            <h1 className="text-xl font-bold mb-1 text-[var(--color-text-dark)]">
+            <h1 className="text-xl font-bold mb-1 text-[var(--color-text-light)]">
               {userData.name}
             </h1>
-            <p className="text-sm text-gray-500 mb-6">
+            <p className="text-sm text-gray-400 mb-6">
               {userData.welcomeMessage}
             </p>
 
-            <div className="p-4 bg-[var(--color-white)] rounded-lg shadow-inner">
+            <div className="p-4 bg-[var(--color-bg-dark)] rounded-lg shadow-inner">
               <QRCode value={userData.qrCodeValue} size={128} />
             </div>
-            <p className="text-textDark">
+            <p className="text-gray-300 mt-3 text-sm w-50">
               Present this code at the counter to collect and redeem more
               MovieMoney!
             </p>
@@ -106,8 +103,8 @@ const ProfilePage = () => {
           {/* ======================= Right Content Area ======================= */}
           <div className="md:col-span-2 space-y-6 lg:space-y-8">
             {/* Contact Info */}
-            <div className="bg-[var(--color-bg-light)] rounded-xl shadow-md p-6">
-              <h2 className="text-lg font-semibold mb-4 text-[var(--color-text-dark)]">
+            <div className="bg-[var(--color-bg-dark)] rounded-xl shadow-lg p-6">
+              <h2 className="text-lg font-semibold mb-4 text-[var(--color-text-light)]">
                 Contact Info
               </h2>
               <p className="text-sm text-gray-400 mb-4">
@@ -120,7 +117,7 @@ const ProfilePage = () => {
                     Mobile No.
                   </span>
                   <div className="flex justify-between items-center">
-                    <p className="text-[var(--color-text-dark)] font-medium">
+                    <p className="text-[var(--color-text-light)] font-medium">
                       {userData.contact.mobile}
                     </p>
                     <button
@@ -136,7 +133,7 @@ const ProfilePage = () => {
                     Email Address
                   </span>
                   <div className="flex justify-between items-center">
-                    <p className="text-[var(--color-text-dark)] font-medium">
+                    <p className="text-[var(--color-text-light)] font-medium">
                       {userData.contact.email}
                     </p>
                     <button
@@ -151,9 +148,9 @@ const ProfilePage = () => {
             </div>
 
             {/* Profile Info */}
-            <div className="bg-[var(--color-bg-light)] rounded-xl shadow-md p-6">
+            <div className="bg-[var(--color-bg-dark)] rounded-xl shadow-lg p-6">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-[var(--color-text-dark)]">
+                <h2 className="text-lg font-semibold text-[var(--color-text-light)]">
                   Profile Info
                 </h2>
                 <button
@@ -169,16 +166,16 @@ const ProfilePage = () => {
                     <span className="text-xs font-semibold text-gray-500 uppercase">
                       {key.replace(/([A-Z])/g, ' $1')}
                     </span>
-                    <p className="text-[var(--color-text-dark)]">{value}</p>
+                    <p className="text-[var(--color-text-light)]">{value}</p>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Communication Preferences */}
-            <div className="bg-[var(--color-bg-light)] rounded-xl shadow-md p-6">
+            <div className="bg-[var(--color-bg-dark)] rounded-xl shadow-lg p-6">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-[var(--color-text-dark)]">
+                <h2 className="text-lg font-semibold text-[var(--color-text-light)]">
                   Communication Preferences
                 </h2>
                 <button
@@ -199,7 +196,7 @@ const ProfilePage = () => {
                     readOnly
                     className="mr-2 accent-[var(--color-primary)]"
                   />
-                  <span className="text-[var(--color-text-dark)]">
+                  <span className="text-[var(--color-text-light)]">
                     Updates from us, e.g. news, promotions, partner offers
                   </span>
                 </label>
@@ -210,7 +207,7 @@ const ProfilePage = () => {
                     readOnly
                     className="mr-2 accent-[var(--color-primary)]"
                   />
-                  <span className="text-[var(--color-text-dark)]">
+                  <span className="text-[var(--color-text-light)]">
                     Surveys and feedback requests
                   </span>
                 </label>
@@ -218,13 +215,13 @@ const ProfilePage = () => {
             </div>
 
             {/* Account & Security */}
-            <div className="bg-[var(--color-bg-light)] rounded-xl shadow-md p-6">
-              <h2 className="text-lg font-semibold mb-4 text-[var(--color-text-dark)]">
+            <div className="bg-[var(--color-bg-dark)] rounded-xl shadow-lg p-6">
+              <h2 className="text-lg font-semibold mb-4 text-[var(--color-text-light)]">
                 Account & Security
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex justify-between items-center border-b pb-2">
-                  <span className="font-medium text-[var(--color-text-dark)]">
+                <div className="flex justify-between items-center border-b border-gray-700 pb-2">
+                  <span className="font-medium text-[var(--color-text-light)]">
                     PIN
                   </span>
                   <button
@@ -234,8 +231,8 @@ const ProfilePage = () => {
                     CHANGE PIN
                   </button>
                 </div>
-                <div className="flex justify-between items-center border-b pb-2">
-                  <span className="font-medium text-[var(--color-text-dark)]">
+                <div className="flex justify-between items-center border-b border-gray-700 pb-2">
+                  <span className="font-medium text-[var(--color-text-light)]">
                     MOVIECLUB ACCOUNT
                   </span>
                   <button
@@ -262,12 +259,12 @@ const ProfilePage = () => {
 
       {/* ======================= Simple Modal (Reusable) ======================= */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-          <div className="bg-[var(--color-white)] text-[var(--color-text-dark)] rounded-lg p-6 w-80">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+          <div className="bg-[var(--color-bg-dark)] text-[var(--color-text-light)] rounded-lg p-6 w-80 shadow-xl">
             <h3 className="text-lg font-semibold mb-4 capitalize">
               {showModal.replace(/([A-Z])/g, ' $1')}
             </h3>
-            <p className="text-sm text-gray-600 mb-6">
+            <p className="text-sm text-gray-400 mb-6">
               This is a placeholder modal for <b>{showModal}</b> functionality.
               {/* TODO: Replace with form or API connection */}
             </p>
