@@ -2,30 +2,25 @@
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 
-export default function MovieCard() {
-  const [moviesData, setMoviesData] = useState({ nowShowing: [], trending: [] });
-  const [activeTab, setActiveTab] = useState("nowShowing");
+export default function KidsMovies() {
+  const [movies, setMovies] = useState([]);
   const [startIndex, setStartIndex] = useState(0);
   const itemsPerPage = 6;
 
-  // Fetch movies from API
+  // Fetch kids movies from API
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const res = await fetch("/api/movies");
+        const res = await fetch("/api/movies"); // এখানে API রুট থেকে কেবল kids আসবে
         const data = await res.json();
-        setMoviesData({
-          nowShowing: data.nowShowing || [],
-          trending: data.trending || [],
-        });
+        setMovies(data.kids || []);
       } catch (error) {
-        console.error("Error fetching movies:", error);
+        console.error("Error fetching kids movies:", error);
       }
     };
     fetchMovies();
   }, []);
 
-  const movies = moviesData[activeTab] || [];
   const visibleMovies = movies.slice(startIndex, startIndex + itemsPerPage);
 
   const handleNext = () => {
@@ -42,24 +37,10 @@ export default function MovieCard() {
 
   return (
     <div className="bg-black p-4 sm:p-6">
-      {/* Tab Buttons */}
-      <div className="flex flex-wrap justify-center lg:ml-15 lg:p-5 sm:justify-start gap-4 sm:gap-6 mb-6">
-        {["nowShowing", "trending"].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => {
-              setActiveTab(tab);
-              setStartIndex(0);
-            }}
-            className={`px-3 py-2 sm:px-4 sm:py-2 rounded-md text-sm sm:text-base font-semibold transition-colors duration-300 
-              ${activeTab === tab
-                ? "bg-red-600 text-white"
-                : "bg-zinc-800 text-gray-300 hover:bg-red-500 hover:text-white"}`}
-          >
-            {tab === "nowShowing" ? "Now Showing" : "Trending"}
-          </button>
-        ))}
-      </div>
+      {/* 🔥 Section Title */}
+      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-left text-red-500 mb-6 sm:mb-12 px-4 sm:px-12">
+        Kids Movies is Here 🎬
+      </h2>
 
       {/* Movie Grid */}
       <div className="relative">
@@ -68,14 +49,14 @@ export default function MovieCard() {
             <div
               key={movie.id}
               className="relative w-[150px] sm:w-[180px] md:w-[200px] lg:w-[220px] 
-                         h-[280px] sm:h-[340px] md:h-[400px] lg:h-[427px] 
+                         h-[260px] sm:h-[320px] md:h-[380px] lg:h-[427px] 
                          flex-shrink-0 border rounded-md overflow-hidden 
                          bg-zinc-900 text-white transition-all duration-300 cursor-pointer
                          border-red-400 hover:shadow-[0_0_15px_rgba(239,68,68,0.7)] group"
             >
               <div className="relative">
                 <Image
-                  src={movie.poster}
+                  src={movie.poster.replace("i.ibb.co.com", "i.ibb.co")} // domain fix
                   alt={movie.title}
                   width={220}
                   height={311}
