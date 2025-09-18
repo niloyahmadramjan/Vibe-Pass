@@ -18,7 +18,7 @@ export default function MoviesPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white px-6 py-10 pt-20">
+    <div className="min-h-screen bg-gray-950 text-white px-6 py-10 pt-20 max-w-7xl mx-auto">
       <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center">
         🎬 Popular Movies
       </h1>

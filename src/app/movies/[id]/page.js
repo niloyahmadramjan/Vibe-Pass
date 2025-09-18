@@ -165,106 +165,111 @@ export default function MovieDetailsPage() {
         );
 
     return (
-        <div className="p-6  mx-auto space-y-10 bg-[#1A1A1A] text-white">
-            {/* 🎬 Banner */}
-            <div className="relative mt-15 w-full h-96 rounded-xl overflow-hidden shadow-lg">
-                <button
-                    onClick={() => router.push("/movies")}
-                    className="absolute top-4 left-4 z-10 px-4 py-2 bg-gray-700/80 text-white rounded-lg shadow hover:bg-gray-600"
-                >
-                    ⬅ Back
-                </button>
-                <Image
-                    src={movie.poster}
-                    alt={movie.title}
-                    fill
-                    className="object-cover"
-                />
-                <div className="absolute inset-0 bg-black/50 flex flex-col justify-end p-6">
-                    <h1 className="text-3xl md:text-5xl font-bold text-red-500">
-                        {movie.title}
-                    </h1>
-                    <p className="mt-1 text-gray-200">
-                        {movie.release_date} | ⭐ {movie.vote_average} ({movie.vote_count}{" "}
-                        votes)
-                    </p>
-                </div>
-            </div>
-
-            {/* 🎥 Trailer */}
-            {showTrailer && (
-                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-                    <div className="relative bg-black rounded-xl p-4 max-w-3xl w-full">
-                        <button
-                            onClick={() => setShowTrailer(false)}
-                            className="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded-lg"
-                        >
-                            ✖ Close
-                        </button>
-                        <iframe
-                            src={movie.trailerUrl}
-                            title={`${movie.title} Trailer`}
-                            width="100%"
-                            height="500"
-                            allow="autoplay; encrypted-media"
-                            allowFullScreen
-                            className="rounded-lg"
-                        />
-                    </div>
-                </div>
-            )}
-
-            {/* 📖 Overview */}
-            <h2 className="text-2xl font-bold mb-4 text-yellow-400">Overview</h2>
-            <p className="text-gray-300 mb-8 leading-relaxed">{movie.overview}</p>
-
-            {/* 🏷️ Movie Info */}
-            <h2 className="text-2xl font-bold mb-4 text-blue-400">Movie Info</h2>
-            <div className="bg-gray-800 p-6 rounded-xl shadow-lg space-y-2">
-                <p>
-                    <strong>Original Language:</strong> {movie.language}
-                </p>
-                <p>
-                    <strong>Release Date:</strong> {movie.release_date}
-                </p>
-                <p>
-                    <strong>Duration:</strong> {movie.duration}
-                </p>
-                <p>
-                    <strong>Genres:</strong> {movie.genre?.join(", ")}
-                </p>
-                <p>
-                    <strong>Popularity:</strong> {movie.popularity}
-                </p>
-                <p>
-                    <strong>Average Rating:</strong> ⭐ {movie.vote_average} (
-                    {movie.vote_count} votes)
-                </p>
-            </div>
-
-            {/*  Location Buttons */}
-            <h2 className="text-2xl font-bold mb-4 text-green-400">Select Location</h2>
-            <div className="flex gap-3 flex-wrap mb-6">
-                {Object.keys(mapLocations).map((key) => (
-                    <button
-                        key={key}
-                        onClick={() => setSelectedPlace(key)}
-                        className={`px-4 py-2 rounded-lg ${selectedPlace === key
-                                ? "bg-blue-600 text-white"
-                                : "bg-gray-700 text-gray-200"
-                            }`}
-                    >
-                        {mapLocations[key].label}
-                    </button>
-                ))}
-            </div>
-
-            {/* Leaflet Map */}
-            <h2 className="text-2xl font-bold mb-4 text-purple-400">Location Map</h2>
-            <div
-                id="map"
-                className="w-full md:w-3/4 lg:w-1/2 h-96 rounded-xl overflow-hidden shadow-lg mx-auto"
-            />
+      <div className="p-6  mx-auto space-y-10 text-white max-w-7xl">
+        {/*  Banner */}
+        <div className="relative mt-15 w-full h-96 rounded-xl overflow-hidden shadow-lg">
+          <button
+            onClick={() => router.push('/movies')}
+            className="absolute top-4 left-4 z-10 px-4 py-2 bg-gray-700/80 text-white rounded-lg shadow hover:bg-gray-600"
+          >
+            ⬅ Back
+          </button>
+          <Image
+            src={movie.poster}
+            alt={movie.title}
+            fill
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-black/50 flex flex-col justify-end p-6">
+            <h1 className="text-3xl md:text-5xl font-bold text-red-500">
+              {movie.title}
+            </h1>
+            <p className="mt-1 text-gray-200">
+              {movie.release_date} | ⭐ {movie.vote_average} ({movie.vote_count}{' '}
+              votes)
+            </p>
+          </div>
         </div>
-    );
+
+        {/* 🎥 Trailer */}
+        {showTrailer && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+            <div className="relative bg-black rounded-xl p-4 max-w-3xl w-full">
+              <button
+                onClick={() => setShowTrailer(false)}
+                className="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded-lg"
+              >
+                ✖ Close
+              </button>
+              <iframe
+                src={movie.trailerUrl}
+                title={`${movie.title} Trailer`}
+                width="100%"
+                height="500"
+                allow="autoplay; encrypted-media"
+                allowFullScreen
+                className="rounded-lg"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* 📖 Overview */}
+        <h2 className="text-2xl font-bold mb-4 text-yellow-400">Overview</h2>
+        <p className="text-gray-300 mb-8 leading-relaxed">{movie.overview}</p>
+
+        {/* 🏷️ Movie Info */}
+        <h2 className="text-2xl font-bold mb-4 text-blue-400">Movie Info</h2>
+        <div className="bg-gray-800 p-6 rounded-xl shadow-lg space-y-2">
+          <p>
+            <strong>Original Language:</strong> {movie.language}
+          </p>
+          <p>
+            <strong>Release Date:</strong> {movie.release_date}
+          </p>
+          <p>
+            <strong>Duration:</strong> {movie.duration}
+          </p>
+          <p>
+            <strong>Genres:</strong> {movie.genre?.join(', ')}
+          </p>
+          <p>
+            <strong>Popularity:</strong> {movie.popularity}
+          </p>
+          <p>
+            <strong>Average Rating:</strong> ⭐ {movie.vote_average} (
+            {movie.vote_count} votes)
+          </p>
+        </div>
+
+        {/*  Location Buttons */}
+        <h2 className="text-2xl font-bold mb-4 text-green-400">
+          Select Location
+        </h2>
+        <div className="flex gap-3 flex-wrap mb-6">
+          {Object.keys(mapLocations).map((key) => (
+            <button
+              key={key}
+              onClick={() => setSelectedPlace(key)}
+              className={`px-4 py-2 rounded-lg ${
+                selectedPlace === key
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-700 text-gray-200'
+              }`}
+            >
+              {mapLocations[key].label}
+            </button>
+          ))}
+        </div>
+
+        {/* Leaflet Map */}
+        <h2 className="text-2xl font-bold mb-4 text-purple-400">
+          Location Map
+        </h2>
+        <div
+          id="map"
+          className="w-full md:w-3/4 lg:w-1/2 h-96 rounded-xl overflow-hidden shadow-lg mx-auto"
+        />
+      </div>
+    )
 }

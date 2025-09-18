@@ -36,7 +36,7 @@ export default function UpcomingMovie() {
   };
 
   return (
-    <div className="bg-black p-4 sm:p-6 md:p-8">
+    <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto">
       <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-red-500 mb-6 text-left px-4 sm:px-0 lg:ml-15 lg:p-5">
         Coming Soon To Theaters 🎬
       </h2>

@@ -95,7 +95,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen pt-16">
+    <div className="flex min-h-screen pt-16 max-w-7xl mx-auto">
       {/* Left Slider (hidden on mobile) */}
       <div className="hidden md:flex w-8/12 bg-black items-center justify-center relative overflow-hidden">
         {mockSlides.map((slide, index) => (
