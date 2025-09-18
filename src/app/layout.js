@@ -1,19 +1,20 @@
 // not allow to write code here
 
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+import { Geist, Geist_Mono } from 'next/font/google'
+import './globals.css'
+import Navbar from './components/Navbar'
+import Footer from './components/Footer'
+import LayoutWrapper from './components/LayoutWrapper'
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
+})
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+})
 
 export const metadata = {
   title: 'Vibe Pass | Movie Ticket Booking Platform',
@@ -27,10 +28,8 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Navbar/>
-        {children}
-        <Footer/>
+        <LayoutWrapper>{children}</LayoutWrapper>
       </body>
     </html>
-  );
+  )
 }
