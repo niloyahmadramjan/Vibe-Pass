@@ -2,9 +2,9 @@
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 
-export default function MovieCard() {
-  const [moviesData, setMoviesData] = useState({ nowShowing: [], upcoming: [], trending: [] });
-  const [activeTab, setActiveTab] = useState("nowShowing");
+export default function ChildAndFamily() {
+  const [moviesData, setMoviesData] = useState({ kids: [], family: [] });
+  const [activeTab, setActiveTab] = useState("kids");
   const [startIndex, setStartIndex] = useState(0);
   const itemsPerPage = 6;
 
@@ -12,7 +12,7 @@ export default function MovieCard() {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const res = await fetch("/api/movies"); 
+        const res = await fetch("/api/movies");
         const data = await res.json();
         setMoviesData(data);
       } catch (error) {
@@ -38,10 +38,10 @@ export default function MovieCard() {
   };
 
   return (
-    <div className="bg-black  p-6">
+    <div className="bg-black min-h-screen p-6">
       {/* Tab Buttons */}
       <div className="flex justify-center gap-6 mb-8">
-        {["nowShowing", "trending", "upcoming"].map((tab) => (
+        {["kids", "family"].map((tab) => (
           <button
             key={tab}
             onClick={() => {
@@ -53,7 +53,7 @@ export default function MovieCard() {
                 ? "bg-red-600 text-white"
                 : "bg-zinc-800 text-gray-300 hover:bg-red-500 hover:text-white"}`}
           >
-            {tab === "nowShowing" ? "Now Showing" : tab === "upcoming" ? "Upcoming" : "Trending"}
+            {tab === "kids" ? "Kids" : "Family"}
           </button>
         ))}
       </div>
@@ -70,7 +70,7 @@ export default function MovieCard() {
             >
               <div className="relative">
                 <Image
-                  src={movie.poster}
+                  src={movie.poster.replace("i.ibb.co.com", "i.ibb.co")} // 🔥 auto-fix wrong domain
                   alt={movie.title}
                   width={220}
                   height={311}
