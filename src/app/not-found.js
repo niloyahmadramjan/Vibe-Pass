@@ -18,7 +18,7 @@ export default function NotFound() {
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/"
-            className="btn-primary inline-flex items-center px-6 py-3 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-transform transform hover:scale-105"
+            className="btn-primary inline-flex items-center px-6 py-3 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-transform transform hover:scale-105 hover:!text-black"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
