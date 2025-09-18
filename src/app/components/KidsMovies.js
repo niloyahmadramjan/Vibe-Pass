@@ -2,27 +2,25 @@
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 
-export default function ChildAndFamily() {
-  const [moviesData, setMoviesData] = useState({ kids: [], family: [] });
-  const [activeTab, setActiveTab] = useState("kids");
+export default function KidsMovies() {
+  const [movies, setMovies] = useState([]);
   const [startIndex, setStartIndex] = useState(0);
   const itemsPerPage = 6;
 
-  // Fetch movies from API
+  // Fetch kids movies from API
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const res = await fetch("/api/movies");
+        const res = await fetch("/api/movies"); // এখানে API রুট থেকে কেবল kids আসবে
         const data = await res.json();
-        setMoviesData(data);
+        setMovies(data.kids || []);
       } catch (error) {
-        console.error("Error fetching movies:", error);
+        console.error("Error fetching kids movies:", error);
       }
     };
     fetchMovies();
   }, []);
 
-  const movies = moviesData[activeTab] || [];
   const visibleMovies = movies.slice(startIndex, startIndex + itemsPerPage);
 
   const handleNext = () => {
@@ -39,24 +37,10 @@ export default function ChildAndFamily() {
 
   return (
     <div className="bg-black min-h-screen p-6">
-      {/* Tab Buttons */}
-      <div className="flex justify-center gap-6 mb-8">
-        {["kids", "family"].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => {
-              setActiveTab(tab);
-              setStartIndex(0);
-            }}
-            className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors duration-300 
-              ${activeTab === tab
-                ? "bg-red-600 text-white"
-                : "bg-zinc-800 text-gray-300 hover:bg-red-500 hover:text-white"}`}
-          >
-            {tab === "kids" ? "Kids" : "Family"}
-          </button>
-        ))}
-      </div>
+      {/* 🔥 Section Title */}
+      <h2 className="text-3xl font-bold text-left text-red-500 m-20 ml-25">
+        Kids Movies is Here 🎬
+      </h2>
 
       {/* Movie Grid */}
       <div className="relative">
@@ -70,7 +54,7 @@ export default function ChildAndFamily() {
             >
               <div className="relative">
                 <Image
-                  src={movie.poster.replace("i.ibb.co.com", "i.ibb.co")} // 🔥 auto-fix wrong domain
+                  src={movie.poster.replace("i.ibb.co.com", "i.ibb.co")} // domain fix
                   alt={movie.title}
                   width={220}
                   height={311}

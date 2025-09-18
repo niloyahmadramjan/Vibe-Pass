@@ -6,16 +6,18 @@ const BASE_URL = "https://api.themoviedb.org/3";
 
 export async function GET() {
   try {
-    const [nowShowingRes, upcomingRes, trendingRes] = await Promise.all([
+    const [nowShowingRes, upcomingRes, trendingRes, kidsRes] = await Promise.all([
       fetch(`${BASE_URL}/movie/now_playing?api_key=${API_KEY}&language=en-US&page=1`),
       fetch(`${BASE_URL}/movie/upcoming?api_key=${API_KEY}&language=en-US&page=1`),
       fetch(`${BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=en-US`),
+      fetch(`${BASE_URL}/discover/movie?api_key=${API_KEY}&language=en-US&with_genres=10751&page=1`), // Family/Kids
     ]);
 
-    const [nowShowing, upcoming, trending] = await Promise.all([
+    const [nowShowing, upcoming, trending, kids] = await Promise.all([
       nowShowingRes.json(),
       upcomingRes.json(),
       trendingRes.json(),
+      kidsRes.json(),
     ]);
 
     return NextResponse.json({
@@ -30,6 +32,11 @@ export async function GET() {
         poster: `https://image.tmdb.org/t/p/w500${m.poster_path}`,
       })),
       trending: trending.results.map((m) => ({
+        id: m.id,
+        title: m.title,
+        poster: `https://image.tmdb.org/t/p/w500${m.poster_path}`,
+      })),
+      kids: kids.results.map((m) => ({
         id: m.id,
         title: m.title,
         poster: `https://image.tmdb.org/t/p/w500${m.poster_path}`,

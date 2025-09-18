@@ -3,14 +3,15 @@
 import React from 'react'
 import MovieCard from './components/MovieCard'
 import Hero from './components/Hero'
-import ChildAndFamily from './components/ChildAndFamily'
+import KidsMovies from './components/KidsMovies'
+
 
 export default function home() {
   return (
     <main>
       <Hero/>
      <MovieCard/>
-     <ChildAndFamily/>
+    <KidsMovies/>
     </main>
   )
 }
