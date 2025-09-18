@@ -6,7 +6,7 @@ export default function MovieCard() {
   const [moviesData, setMoviesData] = useState({ nowShowing: [], trending: [] });
   const [activeTab, setActiveTab] = useState("nowShowing");
   const [startIndex, setStartIndex] = useState(0);
-  const itemsPerPage = 6;
+  const itemsPerPage = 5;
 
   // Fetch movies from API
   useEffect(() => {
@@ -41,7 +41,7 @@ export default function MovieCard() {
   };
 
   return (
-    <div className="bg-black p-4 sm:p-6">
+    <div className="bg-black">
       {/* Tab Buttons */}
       <div className="flex flex-wrap justify-center lg:ml-15 lg:p-5 sm:justify-start gap-4 sm:gap-6 mb-6">
         {["nowShowing", "trending"].map((tab) => (
@@ -63,7 +63,7 @@ export default function MovieCard() {
 
       {/* Movie Grid */}
       <div className="relative">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 justify-items-center max-w-[95%] mx-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 justify-items-between">
           {visibleMovies.map((movie) => (
             <div
               key={movie.id}

@@ -1,4 +1,5 @@
 'use client'
+import Image from 'next/image';
 import { useEffect, useState } from 'react'
 
 export default function MoviesPage() {
@@ -28,10 +29,12 @@ export default function MoviesPage() {
             key={movie.id}
             className="bg-gray-900 rounded-2xl overflow-hidden shadow-lg hover:scale-105 transform transition duration-300"
           >
-            <img
+            <Image
               src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
               alt={movie.title}
-              className="w-full h-72 object-cover"
+              width={500}
+              height={750} // typical poster ratio
+              className="object-cover"
             />
             <div className="p-4">
               <h2 className="text-lg font-semibold truncate">{movie.title}</h2>

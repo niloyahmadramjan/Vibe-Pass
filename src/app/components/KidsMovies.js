@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 export default function KidsMovies() {
   const [movies, setMovies] = useState([]);
   const [startIndex, setStartIndex] = useState(0);
-  const itemsPerPage = 6;
+  const itemsPerPage = 5;
 
   // Fetch kids movies from API
   useEffect(() => {
@@ -36,7 +36,7 @@ export default function KidsMovies() {
   };
 
   return (
-    <div className="bg-black p-4 sm:p-6">
+    <div className="bg-black">
       {/* 🔥 Section Title */}
       <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-left text-red-500 mb-6 sm:mb-12 px-4 sm:px-12">
         Kids Movies is Here 🎬
@@ -44,7 +44,7 @@ export default function KidsMovies() {
 
       {/* Movie Grid */}
       <div className="relative">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 justify-items-center max-w-[95%] mx-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-10 justify-items-center ">
           {visibleMovies.map((movie) => (
             <div
               key={movie.id}
@@ -56,7 +56,7 @@ export default function KidsMovies() {
             >
               <div className="relative">
                 <Image
-                  src={movie.poster.replace("i.ibb.co.com", "i.ibb.co")} // domain fix
+                  src={movie.poster.replace('i.ibb.co.com', 'i.ibb.co')} // domain fix
                   alt={movie.title}
                   width={220}
                   height={311}
@@ -107,5 +107,5 @@ export default function KidsMovies() {
         )}
       </div>
     </div>
-  );
+  )
 }

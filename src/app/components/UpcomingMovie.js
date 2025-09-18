@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 export default function UpcomingMovie() {
   const [upcoming, setUpcoming] = useState([]);
   const [startIndex, setStartIndex] = useState(0);
-  const itemsPerPage = 6;
+  const itemsPerPage = 5;
 
   // Fetch upcoming movies from API
   useEffect(() => {
@@ -43,7 +43,7 @@ export default function UpcomingMovie() {
 
       <div className="relative">
         {/* Movie Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 sm:gap-6 justify-items-center max-w-[95%] mx-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 xl:gap-20 gap-4 sm:gap-6 justify-items-center">
           {visibleMovies.map((movie) => (
             <div
               key={movie.id}
