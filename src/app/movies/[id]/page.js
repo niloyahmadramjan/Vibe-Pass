@@ -43,7 +43,7 @@ export default function MovieDetailsPage() {
     const [loading, setLoading] = useState(true);
     const [showTrailer, setShowTrailer] = useState(false);
 
-    const api = '66fbde5079d3e3e3fe62430f8a619178';
+    const api = process.env.NEXT_PUBLIC_TMDB_API_KEY
 
     const [selectedPlace, setSelectedPlace] = useState("Dhaka, Bangladesh");
 

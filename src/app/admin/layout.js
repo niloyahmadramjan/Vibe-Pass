@@ -15,7 +15,7 @@ export default function AdminLayout({ children }) {
         {/* <AdminNavbar/> */}
 
         {/* Page Content */}
-        <main className="p-6 bg-dark min-h-full">
+        <main>
           {children}
         </main>
       </div>

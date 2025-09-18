@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { useState, useEffect } from 'react'
 
 // Mock slider data
@@ -50,7 +51,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen pt-16">
+    <div className="flex min-h-screen ">
       {/* Left Slider (hidden on mobile) */}
       <div className="hidden md:flex w-8/12 bg-black items-center justify-center relative overflow-hidden">
         {mockSlides.map((slide, index) => (
@@ -75,13 +76,13 @@ export default function LoginPage() {
       </div>
 
       {/* Right Login Form */}
-      <div className="w-full md:w-4/12 bg-[var(--color-dark)] flex flex-col justify-center px-10">
+      <div className="w-full md:w-4/12  flex flex-col justify-center px-10">
         <div className="max-w-sm mx-auto w-full">
           {/* Logo */}
-          <h1 className="text-[var(--color-white)] text-xl md:text-3xl font-bold mb-5 ">
+          <h1 className="text-[var(--color-primary)] text-3xl  font-bold mb-5 text-center">
             Welcome Back to VibePass
           </h1>
-          <h2 className="text-[var(--color-white)] text-md md:text-xl font-bold mb-10">
+          <h2 className="text-gray-400 text-md font-bold mb-10 text-center">
             Log in to book your favorite movies in seconds.
           </h2>
 
@@ -129,12 +130,12 @@ export default function LoginPage() {
 
           {/* Links */}
           <div className="flex justify-between mt-6 text-sm text-[var(--color-white)]">
-            <a href="#" className="hover:underline">
+            <Link href="#" className="hover:underline">
               Forgot Password?
-            </a>
-            <a href="/register" className="hover:underline">
+            </Link>
+            <Link href="/register" className="hover:underline">
               Register
-            </a>
+            </Link>
           </div>
 
           {/* Footer */}
