@@ -72,7 +72,7 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="bg-[var(--color-bg-dark)] text-[var(--color-text-light)] min-h-screen pt-16 max-w-7xl mx-auto">
+    <div className="text-[var(--color-text-light)] min-h-screen pt-16 max-w-7xl mx-auto">
       <div className="container mx-auto p-4 md:p-6 lg:p-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-10">
           {/* ======================= Left Sidebar ======================= */}

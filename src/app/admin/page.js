@@ -46,7 +46,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 export default function DashboardOverviewPage() {
   return (
-    <div className="p-4 pt-15 md:pt-15 lg:pt-15 md:p-6 space-y-6 md:space-y-8">
+    <div className=" p-5 mt-16 md:mt-0 space-y-6 md:space-y-8">
       {/* Title */}
       <h1 className="text-xl md:text-2xl font-bold text-[var(--color-text-dark)] dark:text-[var(--color-text-light)]">
         Dashboard Overview
