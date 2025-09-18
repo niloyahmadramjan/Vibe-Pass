@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useState, useEffect, useRef } from 'react'
 import Swal from 'sweetalert2'
 
@@ -104,7 +105,7 @@ export default function RegisterPage() {
               index === current ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <img
+            <Image
               src={slide.img}
               alt={slide.title}
               className="w-full h-full object-cover"

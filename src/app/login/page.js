@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useState, useEffect } from 'react'
 
 // Mock slider data
@@ -59,7 +60,7 @@ export default function LoginPage() {
               index === current ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <img
+            <Image
               src={slide.img}
               alt={slide.title}
               className="w-full h-full object-cover"
