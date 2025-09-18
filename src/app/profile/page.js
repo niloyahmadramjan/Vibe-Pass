@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import QRCode from 'react-qr-code'
 import { userProfileData } from './mockData'
 import LoadingSpinner from '../hooks/LoadingSpiner'
+import Image from 'next/image'
 
 // Mock API call
 const fetchUserProfileData = () => {
@@ -77,10 +78,14 @@ const ProfilePage = () => {
           {/* ======================= Left Sidebar ======================= */}
           <div className="md:col-span-1 bg-[var(--color-bg-dark)] rounded-xl shadow-lg p-6 flex flex-col items-center text-center">
             <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-2 border-[var(--color-primary)]">
-              <img
+              <Image
                 src={userData.profileImage}
                 alt="Profile"
                 className="object-cover w-full h-full"
+                placeholder="blur"
+                blurDataURL="data:image/jpeg;base64,..."
+                width={600} 
+                height={800} 
               />
             </div>
 
