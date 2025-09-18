@@ -1,132 +1,181 @@
-"use client";
-import Image from "next/image";
-import React, { useState, useEffect } from "react";
+'use client'
+import Image from 'next/image'
+import React, { useState, useEffect } from 'react'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Navigation } from 'swiper/modules'
+import 'swiper/css'
+import 'swiper/css/navigation'
+
+// 🔹 Loading Spinner
+function Spinner() {
+  return (
+    <div className="flex justify-center items-center h-60">
+      <div className="w-10 h-10 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  )
+}
 
 export default function MovieCard() {
-  const [moviesData, setMoviesData] = useState({ nowShowing: [], trending: [] });
-  const [activeTab, setActiveTab] = useState("nowShowing");
-  const [startIndex, setStartIndex] = useState(0);
-  const itemsPerPage = 5;
+  const [moviesData, setMoviesData] = useState({})
+  const [activeTab, setActiveTab] = useState('nowPlaying')
+  const [loading, setLoading] = useState(true)
 
-  // Fetch movies from API
+  const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY
+  const BASE_URL = 'https://api.themoviedb.org/3'
+  const IMG_URL = 'https://image.tmdb.org/t/p/w500'
+
+  // 🔹 TMDB categories you want to show
+  const categories = [
+    {
+      key: 'nowPlaying',
+      label: 'Now Playing',
+      url: `${BASE_URL}/movie/now_playing?api_key=${API_KEY}&language=en-US&page=1`,
+    },
+    {
+      key: 'trending',
+      label: 'Trending',
+      url: `${BASE_URL}/trending/movie/week?api_key=${API_KEY}`,
+    },
+    {
+      key: 'popular',
+      label: 'Popular',
+      url: `${BASE_URL}/movie/popular?api_key=${API_KEY}&language=en-US&page=1`,
+    },
+    {
+      key: 'topRated',
+      label: 'Top Rated',
+      url: `${BASE_URL}/movie/top_rated?api_key=${API_KEY}&language=en-US&page=1`,
+    },
+    {
+      key: 'upcoming',
+      label: 'Upcoming',
+      url: `${BASE_URL}/movie/upcoming?api_key=${API_KEY}&language=en-US&page=1`,
+    },
+  ]
+
+  // 🔹 Fetch all categories in parallel
   useEffect(() => {
-    const fetchMovies = async () => {
+    const fetchAllMovies = async () => {
+      setLoading(true)
       try {
-        const res = await fetch("/api/movies");
-        const data = await res.json();
-        setMoviesData({
-          nowShowing: data.nowShowing || [],
-          trending: data.trending || [],
-        });
+        const results = await Promise.all(
+          categories.map(async (cat) => {
+            const res = await fetch(cat.url)
+            const data = await res.json()
+            return { key: cat.key, movies: data.results || [] }
+          })
+        )
+
+        // convert into object: { nowPlaying: [...], trending: [...], ... }
+        const dataObj = results.reduce((acc, cur) => {
+          acc[cur.key] = cur.movies
+          return acc
+        }, {})
+
+        setMoviesData(dataObj)
       } catch (error) {
-        console.error("Error fetching movies:", error);
+        console.error('Error fetching movies:', error)
+      } finally {
+        setLoading(false)
       }
-    };
-    fetchMovies();
-  }, []);
-
-  const movies = moviesData[activeTab] || [];
-  const visibleMovies = movies.slice(startIndex, startIndex + itemsPerPage);
-
-  const handleNext = () => {
-    if (startIndex + itemsPerPage < movies.length) {
-      setStartIndex(startIndex + 1);
     }
-  };
 
-  const handlePrev = () => {
-    if (startIndex > 0) {
-      setStartIndex(startIndex - 1);
-    }
-  };
+    fetchAllMovies()
+  }, [])
+
+  const movies = moviesData[activeTab] || []
+
+  if (loading) return <Spinner />
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto px-4">
       {/* Tab Buttons */}
-      <div className="flex flex-wrap justify-center lg:ml-15 lg:p-5 sm:justify-start gap-4 sm:gap-6 mb-6">
-        {['nowShowing', 'trending'].map((tab) => (
+      <div className="flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-4 mb-6">
+        {categories.map((cat) => (
           <button
-            key={tab}
-            onClick={() => {
-              setActiveTab(tab)
-              setStartIndex(0)
-            }}
+            key={cat.key}
+            onClick={() => setActiveTab(cat.key)}
             className={`px-3 py-2 sm:px-4 sm:py-2 rounded-md text-sm sm:text-base font-semibold transition-colors duration-300 
               ${
-                activeTab === tab
+                activeTab === cat.key
                   ? 'bg-red-600 text-white'
                   : 'bg-zinc-800 text-gray-300 hover:bg-red-500 hover:text-white'
               }`}
           >
-            {tab === 'nowShowing' ? 'Now Showing' : 'Trending'}
+            {cat.label}
           </button>
         ))}
       </div>
 
-      {/* Movie Grid */}
-      <div className="relative">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 justify-items-between">
-          {visibleMovies.map((movie) => (
-            <div
-              key={movie.id}
-              className="relative w-[150px] sm:w-[180px] md:w-[200px] lg:w-[220px] 
-                         h-[280px] sm:h-[340px] md:h-[400px] lg:h-[427px] 
-                         flex-shrink-0 border rounded-md overflow-hidden 
-                         bg-zinc-900 text-white transition-all duration-300 cursor-pointer
-                         border-red-400 hover:shadow-[0_0_15px_rgba(239,68,68,0.7)] group"
-            >
-              <div className="relative">
-                <Image
-                  src={movie.poster}
-                  alt={movie.title}
-                  width={220}
-                  height={311}
-                  className="object-cover w-full h-[70%] sm:h-[75%]"
-                />
-                <div className="absolute inset-0 bg-red-500 opacity-0 group-hover:opacity-20 transition duration-300"></div>
-                <button
-                  onClick={() => alert(`Booking ticket for ${movie.title}`)}
-                  className="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1.5 sm:px-4 sm:py-2 
-                             bg-red-600 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-lg
-                             opacity-0 group-hover:opacity-100 
-                             transition duration-300 hover:bg-red-700"
-                >
-                  Book Now
-                </button>
-              </div>
-              <div className="p-2 text-center">
-                <p className="text-sm sm:text-base md:text-lg font-semibold truncate">
-                  {movie.title}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+      {/* Movie Slider */}
+      <Swiper
+        modules={[Navigation]}
+        navigation
+        slidesPerView={2}
+        spaceBetween={10}
+        breakpoints={{
+          640: { slidesPerView: 3, spaceBetween: 14 }, // mobile
+          768: { slidesPerView: 4, spaceBetween: 16 }, // tablet
+          1024: { slidesPerView: 6, spaceBetween: 20 }, // desktop
+        }}
+        className="pb-10"
+      >
+        {movies.length > 0 ? (
+          movies.map((movie) => (
+            <SwiperSlide key={movie.id}>
+              <div
+                className="relative w-full 
+                           h-[250px] sm:h-[320px] md:h-[380px] lg:h-[420px] 
+                           border rounded-md overflow-hidden 
+                           bg-zinc-900 text-white transition-all duration-300 cursor-pointer
+                           border-red-400 hover:shadow-[0_0_15px_rgba(239,68,68,0.7)] group"
+              >
+                {/* Poster */}
+                <div className="relative">
+                  <Image
+                    src={
+                      movie.poster_path
+                        ? IMG_URL + movie.poster_path
+                        : '/no-poster.png'
+                    }
+                    alt={movie.title || 'No title'}
+                    width={220}
+                    height={320}
+                    className="object-cover w-full h-[70%] sm:h-[75%]"
+                    // 🔹 Blur fallback if image is missing
+                    placeholder="blur"
+                    blurDataURL="/blur-placeholder.png"
+                  />
 
-        {/* Navigation Arrows */}
-        {startIndex > 0 && (
-          <button
-            onClick={handlePrev}
-            className="absolute left-2 top-1/2 -translate-y-1/2 
-                       w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-600 text-white 
-                       flex items-center justify-center 
-                       opacity-60 hover:opacity-100 transition hover:bg-red-500"
-          >
-            ◀
-          </button>
+                  <div className="absolute inset-0 bg-red-500 opacity-0 group-hover:opacity-20 transition duration-300"></div>
+
+                  {/* Book Button */}
+                  <button
+                    onClick={() => alert(`Booking ticket for ${movie.title}`)}
+                    className="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1.5 sm:px-4 sm:py-2 
+                               bg-red-600 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-lg
+                               block sm:opacity-0 sm:group-hover:opacity-100 
+                               transition duration-300 hover:bg-red-700"
+                  >
+                    Book Now
+                  </button>
+                </div>
+
+                {/* Title */}
+                <div className="p-2 text-center">
+                  <p className="text-sm sm:text-base md:text-lg font-semibold truncate">
+                    {movie.title}
+                  </p>
+                </div>
+              </div>
+            </SwiperSlide>
+          ))
+        ) : (
+          <p className="text-gray-400 text-center w-full">
+            No movies available
+          </p>
         )}
-        {startIndex + itemsPerPage < movies.length && (
-          <button
-            onClick={handleNext}
-            className="absolute right-2 top-1/2 -translate-y-1/2 
-                       w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-600 text-white 
-                       flex items-center justify-center 
-                       opacity-60 hover:opacity-100 transition hover:bg-red-500"
-          >
-            ▶
-          </button>
-        )}
-      </div>
+      </Swiper>
     </div>
   )
 }

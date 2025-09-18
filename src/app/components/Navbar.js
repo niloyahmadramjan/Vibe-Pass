@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import {
   FiMenu,
@@ -17,6 +18,7 @@ import { RiMovie2AiLine, RiMovie2Fill } from 'react-icons/ri'
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const pathname = usePathname()
 
   // detect scroll to change navbar background
   useEffect(() => {
@@ -30,6 +32,22 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  const navLinks = [
+    { href: '/', label: 'Home', icon: <FiHome className="mr-1" /> },
+    {
+      href: '/movies',
+      label: 'Movies',
+      icon: <RiMovie2Fill className="mr-1" />,
+    },
+    {
+      href: '/upcoming',
+      label: 'Upcoming',
+      icon: <FiCalendar className="mr-1" />,
+    },
+    { href: '/about', label: 'About', icon: <FiInfo className="mr-1" /> },
+    { href: '/blog', label: 'Blog', icon: <FiBook className="mr-1" /> },
+  ]
 
   return (
     <>
@@ -47,46 +65,33 @@ export default function Navbar() {
               href="/"
               className="flex-shrink-0 flex items-center space-x-2 group"
             >
-              <div className="relative group">
-                <RiMovie2AiLine className="text-red-600 text-4xl transition-opacity duration-300 group-hover:opacity-100" />
-              </div>
+              <RiMovie2AiLine className="text-red-600 text-4xl" />
               <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
                 VibePass
               </span>
             </Link>
 
             {/* Middle - Links (desktop) */}
-            <div className="hidden md:flex space-x-8">
-              {[
-                { href: '/', label: 'Home', icon: <FiHome className="mr-1" /> },
-                {
-                  href: '/movies',
-                  label: 'Movies',
-                  icon: <RiMovie2Fill className="mr-1" />,
-                },
-                {
-                  href: '/upcoming',
-                  label: 'Upcoming',
-                  icon: <FiCalendar className="mr-1" />,
-                },
-                {
-                  href: '/about',
-                  label: 'About',
-                  icon: <FiInfo className="mr-1" />,
-                },
-                {
-                  href: '/blog',
-                  label: 'Blog',
-                  icon: <FiBook className="mr-1" />,
-                },
-              ].map(({ href, label, icon }) => (
+            <div className="hidden md:flex space-x-8 justify-center items-center">
+              {navLinks.map(({ href, label, icon }) => (
                 <Link
                   key={href}
                   href={href}
-                  className="relative flex items-center font-semibold transition-colors duration-200 hover:text-red-400"
+                  className={`relative flex items-center font-bold transition-colors duration-200 ${
+                    pathname === href
+                      ? 'text-red-400'
+                      : 'hover:text-red-900 text-blue-500'
+                  }`}
                 >
                   {icon} {label}
-                  <span className="absolute bottom-0 left-1/2 w-0 h-[2px] bg-red-400 transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
+                  {/* underline animation */}
+                  <span
+                    className={`absolute bottom-0 left-0 w-0 h-[2px] bg-blue-600 transition-all duration-300 ${
+                      pathname === href
+                        ? 'w-full left-0'
+                        : 'group-hover:w-full group-hover:left-0'
+                    }`}
+                  ></span>
                 </Link>
               ))}
             </div>
@@ -113,10 +118,10 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Slide Menu */}
+        {/* Mobile Slide Menu (Right side now) */}
         <div
-          className={`fixed top-0 left-0 h-full w-64 bg-gray-900 transform ${
-            open ? 'translate-x-0' : '-translate-x-full'
+          className={`fixed top-0 right-0 h-full w-64 bg-gray-900 transform ${
+            open ? 'translate-x-0' : 'translate-x-full'
           } transition-transform duration-300 ease-in-out z-40 shadow-xl flex flex-col`}
         >
           {/* Close Button & Logo */}
@@ -146,34 +151,16 @@ export default function Navbar() {
 
           {/* Links */}
           <div className="flex-1 flex flex-col space-y-2 p-4">
-            {[
-              { href: '/', label: 'Home', icon: <FiHome className="mr-3" /> },
-              {
-                href: '/movies',
-                label: 'Movies',
-                icon: <RiMovie2Fill className="mr-3" />,
-              },
-              {
-                href: '/upcoming',
-                label: 'Upcoming',
-                icon: <FiCalendar className="mr-3" />,
-              },
-              {
-                href: '/about',
-                label: 'About',
-                icon: <FiInfo className="mr-3" />,
-              },
-              {
-                href: '/blog',
-                label: 'Blog',
-                icon: <FiBook className="mr-3" />,
-              },
-            ].map(({ href, label, icon }) => (
+            {navLinks.map(({ href, label, icon }) => (
               <Link
                 key={href}
                 href={href}
                 onClick={() => setOpen(false)}
-                className="flex items-center font-semibold px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-red-400 rounded-md transition-all duration-200"
+                className={`flex items-center font-semibold px-4 py-3 rounded-md transition-all duration-200 ${
+                  pathname === href
+                    ? '!bg-black !text-white'
+                    : '!text-gray-300 !hover:bg-gray-800 !hover:text-red-400'
+                }`}
               >
                 {icon} {label}
               </Link>
