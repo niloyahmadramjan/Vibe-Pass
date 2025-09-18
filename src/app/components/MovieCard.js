@@ -44,19 +44,21 @@ export default function MovieCard() {
     <div className="bg-black">
       {/* Tab Buttons */}
       <div className="flex flex-wrap justify-center lg:ml-15 lg:p-5 sm:justify-start gap-4 sm:gap-6 mb-6">
-        {["nowShowing", "trending"].map((tab) => (
+        {['nowShowing', 'trending'].map((tab) => (
           <button
             key={tab}
             onClick={() => {
-              setActiveTab(tab);
-              setStartIndex(0);
+              setActiveTab(tab)
+              setStartIndex(0)
             }}
             className={`px-3 py-2 sm:px-4 sm:py-2 rounded-md text-sm sm:text-base font-semibold transition-colors duration-300 
-              ${activeTab === tab
-                ? "bg-red-600 text-white"
-                : "bg-zinc-800 text-gray-300 hover:bg-red-500 hover:text-white"}`}
+              ${
+                activeTab === tab
+                  ? 'bg-red-600 text-white'
+                  : 'bg-zinc-800 text-gray-300 hover:bg-red-500 hover:text-white'
+              }`}
           >
-            {tab === "nowShowing" ? "Now Showing" : "Trending"}
+            {tab === 'nowShowing' ? 'Now Showing' : 'Trending'}
           </button>
         ))}
       </div>
@@ -126,5 +128,5 @@ export default function MovieCard() {
         )}
       </div>
     </div>
-  );
+  )
 }

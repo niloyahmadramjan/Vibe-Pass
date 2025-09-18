@@ -78,10 +78,10 @@ export default function LoginPage() {
       <div className="w-full md:w-4/12 bg-[var(--color-dark)] flex flex-col justify-center px-10">
         <div className="max-w-sm mx-auto w-full">
           {/* Logo */}
-          <h1 className="text-[var(--color-white)] text-3xl font-bold mb-5">
+          <h1 className="text-[var(--color-white)] text-xl md:text-3xl font-bold mb-5 ">
             Welcome Back to VibePass
           </h1>
-          <h2 className="text-[var(--color-white)] text-xl font-bold mb-10">
+          <h2 className="text-[var(--color-white)] text-md md:text-xl font-bold mb-10">
             Log in to book your favorite movies in seconds.
           </h2>
 
