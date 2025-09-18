@@ -72,7 +72,7 @@ export default function Navbar() {
             <div className="hidden md:flex items-center">
               <Link
                 href="/login"
-                className="flex items-center rounded-md font-medium   transition-colors duration-200 btn-primary"
+                className="flex items-center rounded-md font-medium   transition-colors duration-200 btn-primary "
               >
                 <FiUser className="mr-2" /> Login
               </Link>
