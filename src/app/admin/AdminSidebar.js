@@ -1,90 +1,63 @@
 'use client';
 
 import React, { useState } from 'react';
+import { FiMenu, FiX } from 'react-icons/fi';
 
 export default function AdminLayout() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
+  const toggleSidebar = () => setIsOpen(!isOpen);
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-[var(--color-bg-light)] text-[var(--color-text-dark)]">
 
-      {/* Mobile Hamburger Menu Button */}
+      {/* Mobile Hamburger Button */}
       <button
         onClick={toggleSidebar}
-        className={`fixed top-4 left-4 z-[60] text-[var(--color-text-dark)] bg-[var(--color-bg-light)] p-2 rounded-md shadow-lg
-                   ${isOpen ? 'hidden' : 'lg:hidden'}`}
+        className={`fixed top-4 left-4 z-[60] p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-800
+                    focus:outline-none transition-colors duration-200 ${isOpen ? 'hidden' : 'lg:hidden'}`}
       >
-        <span className="text-xl font-bold">&#9776;</span> {/* Hamburger Icon */}
+        <FiMenu size={26} />
       </button>
 
-      {/* Sidebar Container (Responsive) */}
+      {/* Sidebar */}
       <aside
         className={`fixed lg:relative z-50 top-0 left-0 w-64 h-screen bg-[var(--color-bg-dark)] text-[var(--color-text-light)] p-4
-                   transform transition-transform duration-300 ease-in-out
-                   lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-                   lg:flex-shrink-0 lg:shadow-xl`}
+                    transform transition-transform duration-300 ease-in-out
+                    lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+                    lg:flex-shrink-0 lg:shadow-xl`}
       >
-        {/* Close button for mobile sidebar */}
+        {/* Close Button */}
         <button
           onClick={toggleSidebar}
-          className="absolute top-4 right-4 text-[var(--color-text-light)] lg:hidden"
+          className="absolute top-4 right-4 p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-800
+                     focus:outline-none transition-colors duration-200 lg:hidden"
         >
-          <span className="text-xl font-bold">&#10005;</span> {/* Close Icon */}
+          <FiX size={26} />
         </button>
 
         <h2 className="text-2xl font-bold mb-8 text-center border-b border-[var(--color-primary)] pb-4">
           Admin Panel
         </h2>
+
         <ul className="space-y-4">
-          <li>
-            <a
-              href="/admin"
-              onClick={toggleSidebar}
-              className="block p-3 rounded-lg hover:bg-[var(--color-primary-hover)] hover:!text-black transition-colors"
-            >
-              Dashboard
-            </a>
-          </li>
-          <li>
-            <a
-              href="/admin/movies"
-              onClick={toggleSidebar}
-              className="block p-3 rounded-lg hover:bg-[var(--color-primary-hover)] hover:!text-black transition-colors"
-            >
-              Movies
-            </a>
-          </li>
-          <li>
-            <a
-              href="/admin/bookings"
-              onClick={toggleSidebar}
-              className="block p-3 rounded-lg hover:bg-[var(--color-primary-hover)] hover:!text-black transition-colors"
-            >
-              Bookings
-            </a>
-          </li>
-          <li>
-            <a
-              href="/admin/users"
-              onClick={toggleSidebar}
-              className="block p-3 rounded-lg hover:bg-[var(--color-primary-hover)] hover:!text-black transition-colors"
-            >
-              Users
-            </a>
-          </li>
-          <li>
-            <a
-              href="/admin/reports"
-              onClick={toggleSidebar}
-              className="block p-3 rounded-lg hover:bg-[var(--color-primary-hover)] hover:!text-black transition-colors"
-            >
-              Reports
-            </a>
-          </li>
+          {[
+            { name: 'Dashboard', path: '/admin' },
+            { name: 'Movies', path: '/admin/movies' },
+            { name: 'Bookings', path: '/admin/bookings' },
+            { name: 'Users', path: '/admin/users' },
+            { name: 'Reports', path: '/admin/reports' },
+          ].map((item) => (
+            <li key={item.path}>
+              <a
+                href={item.path}
+                onClick={toggleSidebar}
+                className="block p-3 rounded-lg hover:bg-[var(--color-primary-hover)] hover:!text-black transition-colors"
+              >
+                {item.name}
+              </a>
+            </li>
+          ))}
         </ul>
       </aside>
     </div>
