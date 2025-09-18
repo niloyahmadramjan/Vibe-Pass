@@ -37,11 +37,14 @@ const mapLocations = {
 export default function MovieDetailsPage() {
     const params = useParams();
     const router = useRouter();
-    const id = parseInt(params.id, 10);
+    const id = parseInt(params.id, 10); // Get movie ID from URL
 
     const [movie, setMovie] = useState(null);
     const [loading, setLoading] = useState(true);
     const [showTrailer, setShowTrailer] = useState(false);
+
+    const api = '66fbde5079d3e3e3fe62430f8a619178';
+
     const [selectedPlace, setSelectedPlace] = useState("Dhaka, Bangladesh");
 
     const mapRef = useRef(null);
@@ -53,75 +56,28 @@ export default function MovieDetailsPage() {
         // router.push("add booking Ticket page");
     }
 
-    // 🎥 Sample Movies
-    const moviesData = [
-        {
-            id: 1,
-            title: "War of the Worlds",
-            language: "English",
-            genre: ["Sci-Fi", "Thriller"],
-            duration: "1h 56m",
-            overview:
-                "As alien machines rise from beneath the ground, humanity faces its greatest challenge: survival against an overwhelming extraterrestrial force.",
-            release_date: "2005-06-29",
-            poster:
-                "https://i.ibb.co/XfvkDKMG/the-conjuring-last-rites-movie-poster.webp",
-            backdrop:
-                "https://image.tmdb.org/t/p/original/iZLqwEwUViJdSkGVjePGhxYzbDb.jpg",
-            vote_average: 6.7,
-            vote_count: 6200,
-            popularity: 554.7,
-            trailerUrl: "https://www.youtube.com/embed/TcMBFSGVi1c",
-        },
-        {
-            id: 2,
-            title: "Avengers: Infinity War",
-            language: "English",
-            genre: ["Action", "Adventure", "Fantasy"],
-            duration: "2h 29m",
-            overview:
-                "The Avengers and their allies must sacrifice everything in a final stand to defeat the powerful Thanos before his devastating snap ends half the universe.",
-            release_date: "2018-04-27",
-            poster: "https://i.ibb.co/rXxPBBs/A4223810-1.jpg",
-            backdrop:
-                "https://image.tmdb.org/t/p/original/bOGkgRGdhrBYJSLpXaxhXVstddV.jpg",
-            vote_average: 8.5,
-            vote_count: 26000,
-            popularity: 980.1,
-            trailerUrl: "https://www.youtube.com/embed/6ZfuNTqbHE8",
-        },
-        {
-            id: 3,
-            title: "Avengers: Endgame",
-            language: "English",
-            genre: ["Action", "Adventure", "Sci-Fi"],
-            duration: "3h 1m",
-            overview:
-                "The remaining Avengers assemble once more to reverse the chaos caused by Thanos and restore balance to the universe.",
-            release_date: "2019-04-26",
-            poster:
-                "https://i.ibb.co/XfvkDKMG/the-conjuring-last-rites-movie-poster.webp",
-            backdrop:
-                "https://image.tmdb.org/t/p/original/or06FN3Dka5tukK1e9sl16pB3iy.jpg",
-            vote_average: 8.8,
-            vote_count: 34000,
-            popularity: 1200.4,
-            trailerUrl: "https://www.youtube.com/embed/TcMBFSGVi1c",
-        },
-    ];
-
+  
     // 🎬 Load Movie
-    useEffect(() => {
-        setLoading(true);
-        const timer = setTimeout(() => {
-            const found = moviesData.find((m) => m.id === id);
-            setMovie(found || null);
-            setLoading(false);
-        }, 500);
-        return () => clearTimeout(timer);
-    }, [id]);
+     useEffect(() => {
+    async function fetchMovie() {
+      try {
+        const res = await fetch(
+            `https://api.themoviedb.org/3/movie/${id}?api_key=${api}&language=en-US&page=1`
+         
+        );
+        if (!res.ok) throw new Error("Failed to fetch movie");
+        const data = await res.json();
+        setMovie(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
 
-    // 🗺️ Init Leaflet Map
+    if (id) fetchMovie();
+  }, [id]);
+    
     // 🗺️ Init Leaflet Map
     useEffect(() => {
         // Only run on client
@@ -198,7 +154,7 @@ export default function MovieDetailsPage() {
                     transition={{ duration: 0.5 }}
                 >
                     <Image
-                        src={movie.poster}
+                        src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                         alt={movie.title}
                         fill
                         className="object-cover"
@@ -285,7 +241,7 @@ export default function MovieDetailsPage() {
             <h2 className="text-2xl font-bold mb-4 text-blue-400">Movie Info</h2>
             <div className="bg-gray-800 p-6 rounded-xl shadow-lg space-y-3">
                 {[
-                    { label: "Original Language", value: movie.language },
+                    { label: "Original Language", value: movie.original_language },
                     { label: "Release Date", value: movie.release_date },
                     { label: "Duration", value: movie.duration },
                     { label: "Genres", value: movie.genre?.join(", ") },
