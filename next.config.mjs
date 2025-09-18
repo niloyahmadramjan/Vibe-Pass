@@ -1,8 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["i.ibb.co"],
+    domains: ['image.tmdb.org', 'i.ibb.co'],
   },
-};
+}
 
-export default nextConfig;
+export default nextConfig

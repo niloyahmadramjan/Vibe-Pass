@@ -1,14 +1,18 @@
 // not allow to write code here
 
 import React from 'react'
-import Hero from './components/Hero'
 import MovieCard from './components/MovieCard'
+import Hero from './components/Hero'
+import KidsMovies from './components/KidsMovies'
+import UpcomingMovie from './components/UpcomingMovie'
 
 export default function home() {
   return (
     <main>
      <Hero/>
       <MovieCard/>
+      <KidsMovies/>
+     <UpcomingMovie></UpcomingMovie>
     </main>
   )
 }
