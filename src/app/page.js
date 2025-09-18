@@ -6,14 +6,13 @@ import Hero from './components/Hero'
 import KidsMovies from './components/KidsMovies'
 import UpcomingMovie from './components/UpcomingMovie'
 
-
 export default function home() {
   return (
     <main>
-      <Hero/>
-     <MovieCard/>
-    <KidsMovies/>
-    <UpcomingMovie/>
+      <Hero />
+      <MovieCard />
+      <KidsMovies />
+      <UpcomingMovie />
     </main>
   )
 }
