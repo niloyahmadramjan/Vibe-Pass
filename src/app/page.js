@@ -4,6 +4,7 @@ import React from 'react'
 import MovieCard from './components/MovieCard'
 import Hero from './components/Hero'
 import KidsMovies from './components/KidsMovies'
+import UpcomingMovie from './components/UpcomingMovie'
 
 
 export default function home() {
@@ -12,6 +13,7 @@ export default function home() {
       <Hero/>
      <MovieCard/>
     <KidsMovies/>
+    <UpcomingMovie/>
     </main>
   )
 }

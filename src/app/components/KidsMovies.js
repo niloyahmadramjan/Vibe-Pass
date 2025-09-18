@@ -36,7 +36,7 @@ export default function KidsMovies() {
   };
 
   return (
-    <div className="bg-black min-h-screen p-6">
+    <div className="bg-black p-6">
       {/* 🔥 Section Title */}
       <h2 className="text-3xl font-bold text-left text-red-500 m-20 ml-25">
         Kids Movies is Here 🎬

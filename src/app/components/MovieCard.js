@@ -3,24 +3,27 @@ import Image from "next/image";
 import React, { useState, useEffect } from "react";
 
 export default function MovieCard() {
-  const [moviesData, setMoviesData] = useState({ nowShowing: [], upcoming: [], trending: [] });
+  const [moviesData, setMoviesData] = useState({ nowShowing: [], trending: [] });
   const [activeTab, setActiveTab] = useState("nowShowing");
   const [startIndex, setStartIndex] = useState(0);
   const itemsPerPage = 6;
 
   // Fetch movies from API
   useEffect(() => {
-  const fetchMovies = async () => {
-    try {
-      const res = await fetch("/api/movies");
-      const data = await res.json();
-      setMoviesData(data);
-    } catch (error) {
-      console.error("Error fetching movies:", error);
-    }
-  };
-  fetchMovies();
-}, []);
+    const fetchMovies = async () => {
+      try {
+        const res = await fetch("/api/movies");
+        const data = await res.json();
+        setMoviesData({
+          nowShowing: data.nowShowing || [],
+          trending: data.trending || [],
+        });
+      } catch (error) {
+        console.error("Error fetching movies:", error);
+      }
+    };
+    fetchMovies();
+  }, []);
 
   const movies = moviesData[activeTab] || [];
   const visibleMovies = movies.slice(startIndex, startIndex + itemsPerPage);
@@ -38,10 +41,10 @@ export default function MovieCard() {
   };
 
   return (
-    <div className="bg-black  p-6">
+    <div className="bg-black p-6">
       {/* Tab Buttons */}
-      <div className="flex justify-center gap-6 mb-8">
-        {["nowShowing", "trending", "upcoming"].map((tab) => (
+      <div className="flex justify-start gap-6 m-12 ml-25">
+        {["nowShowing", "trending"].map((tab) => (
           <button
             key={tab}
             onClick={() => {
@@ -53,7 +56,7 @@ export default function MovieCard() {
                 ? "bg-red-600 text-white"
                 : "bg-zinc-800 text-gray-300 hover:bg-red-500 hover:text-white"}`}
           >
-            {tab === "nowShowing" ? "Now Showing" : tab === "upcoming" ? "Upcoming" : "Trending"}
+            {tab === "nowShowing" ? "Now Showing" : "Trending"}
           </button>
         ))}
       </div>
