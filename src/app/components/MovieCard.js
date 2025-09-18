@@ -10,17 +10,17 @@ export default function MovieCard() {
 
   // Fetch movies from API
   useEffect(() => {
-    const fetchMovies = async () => {
-      try {
-        const res = await fetch("/api/movies"); 
-        const data = await res.json();
-        setMoviesData(data);
-      } catch (error) {
-        console.error("Error fetching movies:", error);
-      }
-    };
-    fetchMovies();
-  }, []);
+  const fetchMovies = async () => {
+    try {
+      const res = await fetch("/api/movies");
+      const data = await res.json();
+      setMoviesData(data);
+    } catch (error) {
+      console.error("Error fetching movies:", error);
+    }
+  };
+  fetchMovies();
+}, []);
 
   const movies = moviesData[activeTab] || [];
   const visibleMovies = movies.slice(startIndex, startIndex + itemsPerPage);
