@@ -7,8 +7,8 @@ import MovieCard from './components/MovieCard'
 export default function home() {
   return (
     <main>
-      <Hero />
-      <MovieCard />
+      <Hero/>
+      <MovieCard/>
     </main>
   )
 }
