@@ -77,7 +77,23 @@ export default function AboutSection() {
                 </div>
             </motion.div>
 
-
+            {/* Heading */}
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true }}
+                className="text-center max-w-3xl mx-auto mb-12"
+            >
+                <h2 className="text-4xl font-bold mb-4">
+                    🎬 Vibe Pass – The Future of Movie Booking
+                </h2>
+                <p className="text-gray-300">
+                    Vibe Pass is your one-stop digital hub for movies. Explore films,
+                    select seats, and book tickets instantly – all from the comfort of
+                    your home.
+                </p>
+            </motion.div>
 
 
             {/* Features Grid */}
