@@ -1,3 +1,5 @@
+"use client";
+
 export default function AdminDashboard() {
   return (
     <div className="pt-15 pr-20">
