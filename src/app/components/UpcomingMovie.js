@@ -95,7 +95,7 @@ export default function UpcomingMovie() {
           <button
             onClick={handleNext}
             className="absolute right-2 top-1/2 -translate-y-1/2 
-                       w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-600 text-white 
+                       w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-500 text-white 
                        flex items-center justify-center 
                        opacity-60 hover:opacity-100 transition hover:bg-red-500 z-10"
           >
