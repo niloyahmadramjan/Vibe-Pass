@@ -8,7 +8,7 @@ import UpcomingMovie from './components/UpcomingMovie'
 
 export default function home() {
   return (
-    <main className="max-w-7xl mx-auto">
+    <main>
       <Hero />
       <MovieCard />
       <KidsMovies />

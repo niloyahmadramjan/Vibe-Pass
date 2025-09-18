@@ -108,7 +108,9 @@ export default function RegisterPage() {
             <Image
               src={slide.img}
               alt={slide.title}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              priority
             />
           </div>
         ))}

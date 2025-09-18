@@ -32,7 +32,9 @@ export default function MoviesPage() {
             <Image
               src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
               alt={movie.title}
-              className="w-full h-72 object-cover"
+              width={500}
+              height={750} // typical poster ratio
+              className="object-cover"
             />
             <div className="p-4">
               <h2 className="text-lg font-semibold truncate">{movie.title}</h2>

@@ -63,7 +63,9 @@ export default function LoginPage() {
             <Image
               src={slide.img}
               alt={slide.title}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              priority
             />
             {/* <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white p-4">
               <h2 className="text-xl font-bold">{slide.title}</h2>
