@@ -11,12 +11,13 @@ export default function AdminLayout() {
 
   return (
     <div className="flex flex-col lg:flex-row h-screen bg-[var(--color-bg-dark)] text-[var(--color-text-dark)]">
-
       {/* Mobile Hamburger Button */}
       <button
         onClick={toggleSidebar}
         className={`fixed top-4 left-4 z-[60] p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-800
-                    focus:outline-none transition-colors duration-200 ${isOpen ? 'hidden' : 'lg:hidden'}`}
+                    focus:outline-none transition-colors duration-200 ${
+                      isOpen ? 'hidden' : 'lg:hidden'
+                    }`}
       >
         <FiMenu size={26} />
       </button>
@@ -25,7 +26,9 @@ export default function AdminLayout() {
       <aside
         className={`fixed lg:relative z-50 top-0 left-0 w-64 h-screen bg-[var(--color-bg-dark)] text-[var(--color-text-light)] p-4
                     transform transition-transform duration-300 ease-in-out
-                    lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+                    lg:translate-x-0 ${
+                      isOpen ? 'translate-x-0' : '-translate-x-full'
+                    }
                     lg:flex-shrink-0 lg:shadow-xl`}
       >
         {/* Close Button */}
@@ -48,10 +51,11 @@ export default function AdminLayout() {
             { name: 'Add-showtime', path: '/admin/add-showtimes' },
             { name: 'Showtimes', path: '/admin/showtimes' },
             { name: 'Cupons', path: '/admin/coupons' },
-            
+
             { name: 'Bookings', path: '/admin/bookings' },
             { name: 'Users', path: '/admin/users' },
             { name: 'Reports', path: '/admin/reports' },
+            { name: 'Go Back Home', path: '/' },
           ].map((item) => (
             <li key={item.path}>
               <Link
@@ -66,5 +70,5 @@ export default function AdminLayout() {
         </ul>
       </aside>
     </div>
-  );
+  )
 }

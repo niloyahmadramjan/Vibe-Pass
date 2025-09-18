@@ -11,7 +11,7 @@ export default function LayoutWrapper({ children }) {
   )
 
   return (
-    <div className='max-w-7xl mx-auto'>
+    <div className="bottom-0 left-0 w-full h-full bg-gradient-to-t to-black/50 from-red-500/20">
       {!hideNavFooter && <Navbar />}
       {children}
       {!hideNavFooter && <Footer />}

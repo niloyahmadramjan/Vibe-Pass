@@ -41,7 +41,7 @@ export default function MovieCard() {
   };
 
   return (
-    <div className="bg-black">
+    <div className="max-w-7xl mx-auto">
       {/* Tab Buttons */}
       <div className="flex flex-wrap justify-center lg:ml-15 lg:p-5 sm:justify-start gap-4 sm:gap-6 mb-6">
         {['nowShowing', 'trending'].map((tab) => (
