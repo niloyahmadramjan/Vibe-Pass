@@ -62,8 +62,10 @@ export default function MovieDetailsPage() {
     async function fetchMovie() {
       try {
         const res = await fetch(
-            `https://api.themoviedb.org/3/movie/${id}?api_key=${api}&language=en-US&page=1`
+            `https://api.themoviedb.org/3/movie/${id}?api_key=${api}&language=en-US`
          
+            // https://api.themoviedb.org/3/movie/${id}?api_key=${api}&language=en-US
+
         );
         if (!res.ok) throw new Error("Failed to fetch movie");
         const data = await res.json();
