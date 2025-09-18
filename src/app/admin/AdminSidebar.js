@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import React, { useState } from 'react';
 import { FiMenu, FiX } from 'react-icons/fi';
 
@@ -9,7 +10,7 @@ export default function AdminLayout() {
   const toggleSidebar = () => setIsOpen(!isOpen);
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-[var(--color-bg-light)] text-[var(--color-text-dark)]">
+    <div className="flex flex-col lg:flex-row h-screen bg-[var(--color-bg-dark)] text-[var(--color-text-dark)]">
 
       {/* Mobile Hamburger Button */}
       <button
@@ -43,19 +44,23 @@ export default function AdminLayout() {
         <ul className="space-y-4">
           {[
             { name: 'Dashboard', path: '/admin' },
-            { name: 'Movies', path: '/admin/movies' },
+            { name: 'Add-Movies', path: '/admin/add-movies' },
+            { name: 'Add-showtime', path: '/admin/add-showtimes' },
+            { name: 'Showtimes', path: '/admin/showtimes' },
+            { name: 'Cupons', path: '/admin/coupons' },
+            
             { name: 'Bookings', path: '/admin/bookings' },
             { name: 'Users', path: '/admin/users' },
             { name: 'Reports', path: '/admin/reports' },
           ].map((item) => (
             <li key={item.path}>
-              <a
+              <Link
                 href={item.path}
                 onClick={toggleSidebar}
                 className="block p-3 rounded-lg hover:bg-[var(--color-primary-hover)] hover:!text-black transition-colors"
               >
                 {item.name}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
