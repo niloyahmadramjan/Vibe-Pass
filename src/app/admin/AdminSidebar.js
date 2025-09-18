@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import React, { useState } from 'react';
 import { FiMenu, FiX } from 'react-icons/fi';
 
@@ -9,7 +10,7 @@ export default function AdminLayout() {
   const toggleSidebar = () => setIsOpen(!isOpen);
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-[var(--color-bg-dark)] text-[var(--color-text-dark)]">
+    <div className="flex flex-col lg:flex-row h-screen bg-[var(--color-bg-dark)] text-[var(--color-text-dark)]">
 
       {/* Mobile Hamburger Button */}
       <button
@@ -53,13 +54,13 @@ export default function AdminLayout() {
             { name: 'Reports', path: '/admin/reports' },
           ].map((item) => (
             <li key={item.path}>
-              <a
+              <Link
                 href={item.path}
                 onClick={toggleSidebar}
                 className="block p-3 rounded-lg hover:bg-[var(--color-primary-hover)] hover:!text-black transition-colors"
               >
                 {item.name}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
