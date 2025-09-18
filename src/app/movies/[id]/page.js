@@ -7,14 +7,31 @@ import "leaflet/dist/leaflet.css";
 
 // 📍 Map Locations in Bangladesh
 const mapLocations = {
-    dhaka: { coords: [23.8103, 90.4125], label: "Dhaka, Bangladesh" },
-    chattogram: { coords: [22.3419, 91.8155], label: "Chattogram, Bangladesh" },
-    khulna: { coords: [22.82, 89.55], label: "Khulna, Bangladesh" },
-    gazipur: { coords: [23.9999, 90.4203], label: "Gazipur, Bangladesh" },
-    nandanPark: { coords: [24.030012, 90.23909], label: "Nandan Park, Dhaka" },
-    hatirjheel: { coords: [23.745, 90.4188], label: "Hatirjheel, Dhaka" },
-    mirpur: { coords: [23.82235, 90.365417], label: "Mirpur, Dhaka" },
-    uttara: { coords: [23.876263, 90.379631], label: "Uttara, Dhaka" },
+    dhaka: {
+        coords: [23.8103, 90.4125],
+        label: "Dhaka, Bangladesh",
+        img: "https://media.istockphoto.com/id/1387289497/photo/the-crowded-street-in-old-dhaka-bangladesh.jpg?s=2048x2048&w=is&k=20&c=-zoUYi0Y3oh6aiyBqCQr57wnQOq_ombZ-TnfSpGgHjs=", // replace with your image
+    },
+    chattogram: {
+        coords: [22.3419, 91.8155],
+        label: "Chattogram, Bangladesh",
+        img: "https://media.istockphoto.com/id/666047648/photo/city-life-main-bazar-by-night-paharganj-new-delhi-india.jpg?s=2048x2048&w=is&k=20&c=qj5Pf-ZslUXZiVaCMtzPRqc330wVfFO1Y-lKzNd8Msg=",
+    },
+    khulna: {
+        coords: [22.8184, 89.5682],
+        label: "Khulna, Bangladesh",
+        img: "/khulna.png",
+    },
+    gazipur: {
+        coords: [23.9999, 90.4203],
+        label: "Gazipur, Bangladesh",
+        img: "/gazipur.png",
+    },
+    uttara: {
+        coords: [23.8763, 90.3796],
+        label: "Uttara, Dhaka, Bangladesh",
+        img: "/uttara.png",
+    },
 };
 
 export default function MovieDetailsPage() {
@@ -98,35 +115,48 @@ export default function MovieDetailsPage() {
     }, [id]);
 
     // 🗺️ Init Leaflet Map
+    // 🗺️ Init Leaflet Map
     useEffect(() => {
         if (typeof window === "undefined") return;
 
-        const loadLeaflet = async () => {
-            const L = await import("leaflet");
+        import("leaflet").then((leaflet) => {
+            const L = leaflet;
 
-            if (!mapRef.current) {
-                const { coords, label } = mapLocations[selectedPlace];
-                const map = L.map("map").setView(coords, 12);
-                mapRef.current = map;
+            const mapElement = document.getElementById("map");
+            if (!mapElement) return;
 
-                L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-                    attribution:
-                        '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a>',
-                }).addTo(map);
-
-                L.marker(coords).addTo(map).bindPopup(label).openPopup();
-            } else {
-                const { coords, label } = mapLocations[selectedPlace];
-                mapRef.current.setView(coords, 12);
-                L.marker(coords)
-                    .addTo(mapRef.current)
-                    .bindPopup(label)
-                    .openPopup();
+            // Remove previous map if exists
+            if (mapRef.current) {
+                mapRef.current.remove();
             }
-        };
 
-        loadLeaflet();
+            const { coords, label, img } = mapLocations[selectedPlace];
+
+            const map = L.map(mapElement).setView(coords, 12);
+            mapRef.current = map;
+
+            // Add tile layer
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a>',
+            }).addTo(map);
+
+            // Create custom icon with image
+            const customIcon = L.icon({
+                iconUrl: img,      // your image
+                iconSize: [40, 40], // adjust size
+                iconAnchor: [20, 40], // point of the icon which will correspond to marker's location
+                popupAnchor: [0, -40], // point from which popup opens
+            });
+
+            // Add marker with custom icon
+            L.marker(coords, { icon: customIcon })
+                .addTo(map)
+                .bindPopup(label)
+                .openPopup();
+        });
     }, [selectedPlace]);
+
+
 
     if (loading) return <LoadingSpinner />;
     if (!movie)
@@ -212,7 +242,7 @@ export default function MovieDetailsPage() {
                 </p>
             </div>
 
-            {/* 📍 Location Buttons */}
+            {/*  Location Buttons */}
             <h2 className="text-2xl font-bold mb-4 text-green-400">Select Location</h2>
             <div className="flex gap-3 flex-wrap mb-6">
                 {Object.keys(mapLocations).map((key) => (
@@ -229,7 +259,7 @@ export default function MovieDetailsPage() {
                 ))}
             </div>
 
-            {/* 🗺️ Leaflet Map */}
+            {/* Leaflet Map */}
             <h2 className="text-2xl font-bold mb-4 text-purple-400">Location Map</h2>
             <div
                 id="map"
