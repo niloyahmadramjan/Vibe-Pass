@@ -37,13 +37,13 @@ export default function UpcomingMovie() {
 
   return (
     <div className="bg-black p-4 sm:p-6 md:p-8">
-      <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-red-500 mb-6 text-left px-4 sm:px-0">
+      <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-red-500 mb-6 text-left px-4 sm:px-0 lg:ml-15 lg:p-5">
         Coming Soon To Theaters 🎬
       </h2>
 
       <div className="relative">
         {/* Movie Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 justify-items-center max-w-[95%] mx-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 sm:gap-6 justify-items-center max-w-[95%] mx-auto">
           {visibleMovies.map((movie) => (
             <div
               key={movie.id}
@@ -95,7 +95,7 @@ export default function UpcomingMovie() {
           <button
             onClick={handleNext}
             className="absolute right-2 top-1/2 -translate-y-1/2 
-                       w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-600 text-white 
+                       w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-500 text-white 
                        flex items-center justify-center 
                        opacity-60 hover:opacity-100 transition hover:bg-red-500 z-10"
           >
