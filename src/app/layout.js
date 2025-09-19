@@ -17,6 +17,9 @@ export const metadata = {
   title: 'Vibe Pass | Movie Ticket Booking Platform',
   description:
     'Vibe Pass is a modern movie ticket booking platform where users can browse movies, check showtimes, select seats, and book tickets online with ease.',
+  icons: {
+    icon: '/favicon.png',
+  },
 }
 
 export default function RootLayout({ children }) {
