@@ -79,6 +79,7 @@ button {
 
 .btn-primary:hover {
   background-color: var(--color-primary-hover);
+   color: var(--color-text-light);
 }
 
 /* Utility Classes */
