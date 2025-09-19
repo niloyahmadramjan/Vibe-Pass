@@ -14,6 +14,7 @@ import {
 } from 'react-icons/fi'
 import { BiCameraMovie, BiSolidCameraMovie } from 'react-icons/bi'
 import { RiMovie2AiLine, RiMovie2Fill } from 'react-icons/ri'
+import Image from 'next/image'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
@@ -61,15 +62,24 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Left - Logo */}
-            <Link
-              href="/"
-              className="flex-shrink-0 flex items-center space-x-2 group"
-            >
-              <RiMovie2AiLine className="text-red-600 text-4xl" />
-              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
-                VibePass
-              </span>
-            </Link>
+            <div className="flex-shrink-0">
+              <Link
+                href="/"
+                className="flex-shrink-0 flex items-center space-x-2 group"
+              >
+                <div className="relative group">
+                  <Image
+                    src="/favicon.png"
+                    width={50}
+                    height={40}
+                    alt="Picture of the author"
+                  />
+                </div>
+                <span className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
+                  VibePass
+                </span>
+              </Link>
+            </div>
 
             {/* Middle - Links (desktop) */}
             <div className="hidden md:flex space-x-8 justify-center items-center">
