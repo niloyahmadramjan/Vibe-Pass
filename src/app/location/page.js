@@ -95,7 +95,7 @@ export default function LocationPage() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-10">
           <h1 className="text-4xl font-bold text-gray-900 mb-3">
-            Find Cinemas And Setup Location
+            Find Cinemas And Setup Your Location
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Select your division and district to discover cinema locations and
@@ -168,7 +168,7 @@ export default function LocationPage() {
                 disabled={!selectedLocation || isLoading}
                 className="w-full bg-[#CC2027] disabled:bg-[#da7276] text-white py-3 px-6 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:bg-[#E53935]"
               >
-                {isLoading ? "Loading..." : "Find Cinemas"}
+                {isLoading ? "Loading..." : "Set Your Location"}
               </button>
             </div>
           </div>

@@ -8,17 +8,17 @@ export default function NotFound() {
           404
         </h1>
         <h2 className="mt-6 text-4xl sm:text-5xl font-bold tracking-tight leading-tight text-[--color-text-light]">
-          Whoops! Looks like you've gone off the beaten path.
+          Whoops! Looks like you&apos;ve gone off the beaten path.
         </h2>
         <p className="mt-4 text-lg text-gray-400">
-          The page you're looking for might have been moved, deleted, or never
-          existed. Don't worry, there's a showtime waiting for you back at the
-          main cinema.
+          The page you&apos;re looking for might have been moved, deleted, or
+          never existed. Don&apos;t worry, there&apos;s a showtime waiting for
+          you back at the main cinema.
         </p>
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/"
-            className="btn-primary inline-flex items-center px-6 py-3 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-transform transform hover:scale-105"
+            className="btn-primary inline-flex items-center px-6 py-3 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-transform transform hover:scale-105 hover:!text-black"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

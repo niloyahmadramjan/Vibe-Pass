@@ -1,5 +1,7 @@
 'use client'
 
+import Image from 'next/image'
+import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
 import Swal from 'sweetalert2'
 
@@ -94,9 +96,9 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen pt-16">
+    <div className="flex min-h-screen">
       {/* Left Slider (hidden on mobile) */}
-      <div className="hidden md:flex w-8/12 bg-black items-center justify-center relative overflow-hidden">
+      <div className="hidden md:flex w-8/12 items-center justify-center relative overflow-hidden">
         {mockSlides.map((slide, index) => (
           <div
             key={slide.id}
@@ -104,23 +106,25 @@ export default function RegisterPage() {
               index === current ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <img
+            <Image
               src={slide.img}
               alt={slide.title}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              priority
             />
           </div>
         ))}
       </div>
 
       {/* Right Register Form */}
-      <div className="w-full md:w-4/12 bg-[var(--color-bg-dark)] flex flex-col justify-center px-10">
+      <div className="w-full md:w-4/12  flex flex-col justify-center px-10">
         <div className="max-w-sm mx-auto w-full">
           {/* Logo */}
-          <h1 className="text-[var(--color-white)] text-3xl font-bold mb-5">
+          <h1 className="text-[var(--color-primary)] text-4xl text-center font-bold mb-5">
             Join VibePass Today!
           </h1>
-          <p className="text-[var(--color-white)] text-xl font-bold mb-10">{`Create your account and enjoy a seamless movie
+          <p className="text-gray-400 text-md font-bold mb-10 text-center">{`Create your account and enjoy a seamless movie
 booking experience.`}</p>
 
           {/* Step Indicator */}
@@ -229,6 +233,15 @@ booking experience.`}</p>
               </button>
             </form>
           )}
+
+          <div className="flex justify-between mt-6 text-sm text-[var(--color-white)]">
+            <Link href="#" className="hover:underline">
+              Forgot Password?
+            </Link>
+            <Link href="/login" className="hover:underline">
+              Login
+            </Link>
+          </div>
 
           {/* Footer */}
           <p className="mt-8 text-xs text-[var(--color-white)]/70 text-center">
