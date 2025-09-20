@@ -14,6 +14,7 @@ import {
 } from 'react-icons/fi'
 import { BiCameraMovie, BiSolidCameraMovie } from 'react-icons/bi'
 import { RiMovie2AiLine, RiMovie2Fill } from 'react-icons/ri'
+import Image from 'next/image'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
@@ -54,22 +55,31 @@ export default function Navbar() {
       <nav
         className={`fixed w-full z-50 transition-all duration-300 ${
           scrolled
-            ? 'bg-gray-950 text-white shadow-lg border-b border-stone-700'
-            : 'bg-transparent text-white'
+            ? "bg-gray-950 text-white shadow-lg border-b border-stone-700"
+            : "bg-transparent text-white"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Left - Logo */}
-            <Link
-              href="/"
-              className="flex-shrink-0 flex items-center space-x-2 group"
-            >
-              <RiMovie2AiLine className="text-red-600 text-4xl" />
-              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
-                VibePass
-              </span>
-            </Link>
+            <div className="flex-shrink-0">
+              <Link
+                href="/"
+                className="flex-shrink-0 flex items-center space-x-2 group"
+              >
+                <div className="relative group">
+                  <Image
+                    src="/favicon.png"
+                    width={50}
+                    height={40}
+                    alt="Picture of the author"
+                  />
+                </div>
+                <span className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
+                  VibePass
+                </span>
+              </Link>
+            </div>
 
             {/* Middle - Links (desktop) */}
             <div className="hidden md:flex space-x-8 justify-center items-center">
@@ -79,8 +89,8 @@ export default function Navbar() {
                   href={href}
                   className={`relative flex items-center font-bold transition-colors duration-200 ${
                     pathname === href
-                      ? 'text-red-400'
-                      : 'hover:text-red-900 text-blue-500'
+                      ? "text-red-400"
+                      : "hover:text-red-900 text-blue-500"
                   }`}
                 >
                   {icon} {label}
@@ -88,8 +98,8 @@ export default function Navbar() {
                   <span
                     className={`absolute bottom-0 left-0 w-0 h-[2px] bg-blue-600 transition-all duration-300 ${
                       pathname === href
-                        ? 'w-full left-0'
-                        : 'group-hover:w-full group-hover:left-0'
+                        ? "w-full left-0"
+                        : "group-hover:w-full group-hover:left-0"
                     }`}
                   ></span>
                 </Link>
@@ -100,7 +110,7 @@ export default function Navbar() {
             <div className="hidden md:flex items-center">
               <Link
                 href="/login"
-                className="flex items-center rounded-md font-bold hover:!text-black transition-colors duration-200 btn-primary"
+                className="flex items-center rounded-md font-medium   transition-colors duration-200 btn-primary "
               >
                 <FiUser className="mr-2" /> Login
               </Link>
@@ -121,7 +131,7 @@ export default function Navbar() {
         {/* Mobile Slide Menu (Right side now) */}
         <div
           className={`fixed top-0 right-0 h-full w-64 bg-gray-900 transform ${
-            open ? 'translate-x-0' : 'translate-x-full'
+            open ? "translate-x-0" : "translate-x-full"
           } transition-transform duration-300 ease-in-out z-40 shadow-xl flex flex-col`}
         >
           {/* Close Button & Logo */}
@@ -131,9 +141,13 @@ export default function Navbar() {
               className="flex items-center space-x-2 group"
               onClick={() => setOpen(false)}
             >
-              <div className="relative h-10 w-10">
-                <BiSolidCameraMovie className="text-red-600 text-4xl absolute opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <BiCameraMovie className="text-red-500 text-4xl group-hover:opacity-0 transition-opacity duration-300" />
+              <div className="relative group">
+                <Image
+                  src="/favicon.png"
+                  width={35}
+                  height={40}
+                  alt="Picture of the author"
+                />
               </div>
               <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
                 VibePass
@@ -158,8 +172,8 @@ export default function Navbar() {
                 onClick={() => setOpen(false)}
                 className={`flex items-center font-semibold px-4 py-3 rounded-md transition-all duration-200 ${
                   pathname === href
-                    ? '!bg-black !text-white'
-                    : '!text-gray-300 !hover:bg-gray-800 !hover:text-red-400'
+                    ? "!bg-black !text-white"
+                    : "!text-gray-300 !hover:bg-gray-800 !hover:text-red-400"
                 }`}
               >
                 {icon} {label}
@@ -180,5 +194,5 @@ export default function Navbar() {
         </div>
       </nav>
     </>
-  )
+  );
 }
