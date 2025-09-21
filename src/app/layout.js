@@ -1,9 +1,7 @@
 // not allow to write code here
-
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
-import Navbar from './components/Navbar'
-import Footer from './components/Footer'
+import LayoutWrapper from './components/LayoutWrapper'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -19,6 +17,9 @@ export const metadata = {
   title: 'Vibe Pass | Movie Ticket Booking Platform',
   description:
     'Vibe Pass is a modern movie ticket booking platform where users can browse movies, check showtimes, select seats, and book tickets online with ease.',
+  icons: {
+    icon: '/favicon.png',
+  },
 }
 
 export default function RootLayout({ children }) {
@@ -27,12 +28,7 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Navbar />
-        <div className="max-w-7xl mx-auto">
-          {children}
-
-          <Footer />
-        </div>
+        <LayoutWrapper>{children}</LayoutWrapper>
       </body>
     </html>
   )

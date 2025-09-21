@@ -1,108 +1,127 @@
-"use client";
-import Image from "next/image";
-import React, { useEffect, useState } from "react";
+'use client'
+import Image from 'next/image'
+import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+
+// Import Swiper
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Navigation } from 'swiper/modules'
+import 'swiper/css'
+import 'swiper/css/navigation'
+
+// Simple Loading Spinner Component
+function Spinner() {
+  return (
+    <div className="flex justify-center items-center h-60">
+      <div className="w-10 h-10 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  )
+}
 
 export default function UpcomingMovie() {
-  const [upcoming, setUpcoming] = useState([]);
-  const [startIndex, setStartIndex] = useState(0);
-  const itemsPerPage = 5;
+  const [upcoming, setUpcoming] = useState([])
+  const [loading, setLoading] = useState(true)
+  const router = useRouter()
 
-  // Fetch upcoming movies from API
+  // TMDB API config
+  const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY
+  const BASE_URL = 'https://api.themoviedb.org/3'
+  const IMG_URL = 'https://image.tmdb.org/t/p/w500'
+
+  /**
+   * Fetch upcoming movies from TMDB
+   */
   useEffect(() => {
     const fetchUpcoming = async () => {
       try {
-        const res = await fetch("/api/movies");
-        const data = await res.json();
-        setUpcoming(data.upcoming || []);
+        // 🔹 Call TMDB upcoming API (page=1 means first set of movies)
+        const res = await fetch(
+          `${BASE_URL}/movie/upcoming?api_key=${API_KEY}&language=en-US&page=1`
+        )
+
+        // 🔹 Convert response into JSON
+        const data = await res.json()
+
+        // 🔹 Store results (movies list) in state
+        setUpcoming(data.results || [])
       } catch (error) {
-        console.error("Error fetching upcoming movies:", error);
+        console.error('Error fetching upcoming movies:', error)
+      } finally {
+        // 🔹 Stop loading spinner whether success or fail
+        setLoading(false)
       }
-    };
-    fetchUpcoming();
-  }, []);
-
-  const visibleMovies = upcoming.slice(startIndex, startIndex + itemsPerPage);
-
-  const handleNext = () => {
-    if (startIndex + itemsPerPage < upcoming.length) {
-      setStartIndex(startIndex + 1);
     }
-  };
 
-  const handlePrev = () => {
-    if (startIndex > 0) {
-      setStartIndex(startIndex - 1);
-    }
-  };
+    // Call fetch function when component loads
+    fetchUpcoming()
+  }, [])
+
+  if (loading) return <Spinner />
 
   return (
-    <div className="bg-black p-4 sm:p-6 md:p-8">
-      <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-red-500 mb-6 text-left px-4 sm:px-0 lg:ml-15 lg:p-5">
-        Coming Soon To Theaters 🎬
+    <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto">
+      <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-3xl font-bold text-red-500 mb-6 text-left">
+        Coming Soon To Theaters
       </h2>
 
-      <div className="relative">
-        {/* Movie Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 xl:gap-20 gap-4 sm:gap-6 justify-items-center">
-          {visibleMovies.map((movie) => (
+      {/* Swiper Slider */}
+      <Swiper
+        modules={[Navigation]}
+        navigation
+        loop={false}
+        spaceBetween={20}
+        slidesPerView={2} // default (mobile small screens)
+        slidesPerGroup={2} // move 2 cards at a time on very small screens
+        breakpoints={{
+          640: { slidesPerView: 3, slidesPerGroup: 3 }, // mobile landscape
+          768: { slidesPerView: 4, slidesPerGroup: 4 }, // tablet
+          1024: { slidesPerView: 6, slidesPerGroup: 6 }, // desktop
+        }}
+      >
+        {upcoming.map((movie) => (
+          <SwiperSlide key={movie.id}>
             <div
-              key={movie.id}
-              className="relative w-[150px] sm:w-[180px] md:w-[200px] lg:w-[220px] xl:w-[240px]
-                         flex-shrink-0 border rounded-lg overflow-hidden 
+              className="relative border rounded-lg overflow-hidden 
                          bg-zinc-900 text-white transition-all duration-300 cursor-pointer
                          border-red-400 hover:shadow-[0_0_20px_rgba(239,68,68,0.7)] group"
             >
-              <div className="relative w-full h-[240px] sm:h-[300px] md:h-[360px] lg:h-[420px] xl:h-[460px]">
+              {/* Poster */}
+              <div className="relative w-full h-[240px] sm:h-[300px] md:h-[360px] lg:h-[420px]">
                 <Image
-                  src={movie.poster}
+                  src={
+                    movie.poster_path
+                      ? IMG_URL + movie.poster_path
+                      : '/no-poster.png'
+                  }
                   alt={movie.title}
                   width={240}
                   height={360}
                   className="object-cover w-full h-full"
                 />
                 <div className="absolute inset-0 bg-red-500 opacity-0 group-hover:opacity-20 transition duration-300"></div>
+
+                {/* Release Date Top Right */}
+                <span className="absolute top-2 right-2 bg-red-600 text-white text-xs sm:text-sm px-2 py-1 rounded-md shadow-md">
+                  {movie.release_date || 'TBA'}
+                </span>
               </div>
 
-              {/* Title + Release Date */}
-              <div className="p-3 text-center">
-                <p className="text-sm sm:text-base md:text-lg lg:text-xl font-bold truncate">
+              {/* Title + Button */}
+              <div className="p-3 text-center flex flex-col items-center">
+                <p className="text-sm sm:text-base md:text-lg font-bold truncate mb-2">
                   {movie.title}
                 </p>
-                <p className="text-xs sm:text-sm md:text-base text-gray-400 mt-2">
-                  Release:{" "}
-                  <span className="text-red-400 font-semibold">
-                    {movie.release_date || "TBA"}
-                  </span>
-                </p>
+                <button
+                  onClick={() => router.push(`/movies/${movie.id}`)}
+                  className="px-3 py-1.5 sm:px-4 sm:py-2 bg-red-600 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-lg transition duration-300 hover:bg-red-700"
+                >
+                  Details
+                </button>
               </div>
             </div>
-          ))}
-        </div>
-
-        {/* Navigation Arrows */}
-        {startIndex > 0 && (
-          <button
-            onClick={handlePrev}
-            className="absolute left-2 top-1/2 -translate-y-1/2 
-                       w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-600 text-white 
-                       flex items-center justify-center 
-                       opacity-60 hover:opacity-100 transition hover:bg-red-500 z-10"
-          >
-            ◀
-          </button>
-        )}
-        {startIndex + itemsPerPage < upcoming.length && (
-          <button
-            onClick={handleNext}
-            className="absolute right-2 top-1/2 -translate-y-1/2 
-                       w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-500 text-white 
-                       flex items-center justify-center 
-                       opacity-60 hover:opacity-100 transition hover:bg-red-500 z-10"
-          >
-            ▶
-          </button>
-        )}
-      </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
     </div>
-  );
+  )
 }

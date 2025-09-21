@@ -29,6 +29,18 @@
   --color-text-dark: #F5F5F5;
 }
 
+.custom-swiper .swiper-pagination-bullet {
+  background-color: white !important;
+  /* normal state */
+  opacity: 0.7;
+}
+
+.custom-swiper .swiper-pagination-bullet-active {
+  background-color: blue !important;
+  /* active dot */
+  opacity: 1;
+}
+
 /* Reset + Base Styles */
 html,
 body {
@@ -67,6 +79,7 @@ button {
 
 .btn-primary:hover {
   background-color: var(--color-primary-hover);
+   color: var(--color-text-light);
 }
 
 /* Utility Classes */
