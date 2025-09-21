@@ -9,10 +9,10 @@ import UpcomingMovie from './components/UpcomingMovie'
 export default function home() {
   return (
     <main>
-      <Hero />
-      <MovieCard />
-      <KidsMovies />
-      <UpcomingMovie />
+     <Hero/>
+      <MovieCard/>
+      <KidsMovies/>
+     <UpcomingMovie></UpcomingMovie>
     </main>
   )
 }
