@@ -49,7 +49,7 @@ useEffect(() => {
     }
   }
   fetchMovies()
-}, [])
+}, [API_KEY])
 
 async function fetchTrailer(movieId) {
   const res = await fetch(
