@@ -18,7 +18,9 @@ export default function PaymentPage() {
 
   return (
     <Elements stripe={stripePromise}>
-      <PaymentForm session={session} />
+      <div className=" pb-10 ">
+        <PaymentForm session={session} />
+      </div>
     </Elements>
   );
 }
