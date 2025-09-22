@@ -1,37 +1,52 @@
-// app/api/auth/[...nextauth]/route.js
 import NextAuth from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
-import CredentialsProvider from 'next-auth/providers/credentials'
+import GitHubProvider from 'next-auth/providers/github'
 
-export const authOptions = {
+const handler = NextAuth({
   providers: [
-    // Google Login
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
-
-    // Email + Password (Credentials)
-    CredentialsProvider({
-      name: 'Credentials',
-      credentials: {
-        email: { label: 'Email', type: 'text' },
-        password: { label: 'Password', type: 'password' },
-      },
-      async authorize(credentials) {
-        // এখানে আপনার ডাটাবেজ চেক করবেন
-        if (
-          credentials.email === 'test@gmail.com' &&
-          credentials.password === '123456'
-        ) {
-          return { id: 1, name: 'Test User', email: 'test@gmail.com' }
-        }
-        return null
-      },
+    GitHubProvider({
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
     }),
   ],
+  callbacks: {
+    async signIn({ user }) {
+      // Send user data to backend for persistence
+      try {
+        await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/social-login`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: user.email,
+              name: user.name,
+              image: user.image,
+              provider: user.provider ?? 'social',
+            }),
+          }
+        )
+      } catch (error) {
+        console.error('Failed to sync user with backend:', error)
+      }
+      return true
+    },
+    async jwt({ token, account, profile }) {
+      if (account) {
+        token.accessToken = account.access_token
+      }
+      return token
+    },
+    async session({ session, token }) {
+      session.accessToken = token.accessToken
+      return session
+    },
+  },
   secret: process.env.NEXTAUTH_SECRET,
-}
+})
 
-const handler = NextAuth(authOptions)
 export { handler as GET, handler as POST }

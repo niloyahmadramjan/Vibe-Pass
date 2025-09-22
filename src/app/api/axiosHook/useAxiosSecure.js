@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // Main Axios instance
 const useAxiosSecure = axios.create({
-  baseURL: 'http://localhost:5000',
+  baseURL: `${process.env.NEXT_PUBLIC_BACKEND_URL}`,
   headers: {
     'Content-Type': 'application/json',
   },
