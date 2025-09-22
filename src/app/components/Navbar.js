@@ -117,7 +117,7 @@ export default function Navbar() {
                 </div>
               ) : (
                 <Link
-                 href='/login'
+                  href="/login"
                   className="flex btn btn-primary items-center rounded-md font-medium bg-red-600 hover:bg-red-700 px-4 py-2 transition-colors duration-200 text-white"
                 >
                   <FiUser className="mr-2" /> Login
@@ -186,15 +186,7 @@ export default function Navbar() {
           <div className="mt-auto p-4 border-t border-gray-800">
             {session ? (
               <div className="flex items-center gap-3">
-                {session.user?.image && (
-                  <Image
-                    src={session.user.image}
-                    alt={session.user?.name || 'User'}
-                    width={30}
-                    height={30}
-                    className="rounded-full"
-                  />
-                )}
+               
                 <span className="text-white font-medium">
                   {session.user?.name}
                 </span>
@@ -206,15 +198,12 @@ export default function Navbar() {
                 </button>
               </div>
             ) : (
-              <button
-                onClick={() => {
-                  setOpen(false)
-                  signIn()
-                }}
-                className="w-full flex items-center justify-center px-4 py-2 rounded-md font-bold bg-red-600 hover:bg-red-700 text-white"
+              <Link
+                href="/login"
+                className="w-full btn btn-primary flex items-center justify-center px-4 py-2 rounded-md font-bold bg-red-600 hover:bg-red-700 text-white"
               >
                 <FiUser className="mr-2" /> Login
-              </button>
+              </Link>
             )}
           </div>
         </div>

@@ -80,7 +80,13 @@ export default function RegisterPage() {
     },
     onSuccess: (data) => {
       login(data) // store token + user in context
-      Swal.fire('Registered!', 'Redirecting...', 'success').then(() => {
+      Swal.fire({
+        icon: 'success',
+        title: '🎉 Registration Successful!',
+        text: 'Welcome to VibePass. Redirecting...',
+        timer: 2000,
+        showConfirmButton: false,
+      }).then(() => {
         window.location.href = '/profile'
       })
     },
@@ -205,9 +211,14 @@ export default function RegisterPage() {
               />
               <button
                 type="submit"
-                className="w-full bg-red-600 hover:bg-red-700 transition rounded-lg py-3 font-semibold text-white"
+                disabled={sendOtpMutation.isPending}
+                className="w-full bg-red-600 hover:bg-red-700 transition rounded-lg py-3 font-semibold text-white flex items-center justify-center"
               >
-                Next
+                {sendOtpMutation.isPending ? (
+                  <span className="loader border-2 border-white border-t-transparent rounded-full w-5 h-5 animate-spin"></span>
+                ) : (
+                  'Next'
+                )}
               </button>
             </form>
           )}
@@ -232,10 +243,15 @@ export default function RegisterPage() {
               </div>
               <button
                 type="button"
+                disabled={verifyOtpMutation.isPending}
                 onClick={handleVerifyOtp}
-                className="w-full bg-red-600 hover:bg-red-700 transition rounded-lg py-3 font-semibold text-white"
+                className="w-full bg-red-600 hover:bg-red-700 transition rounded-lg py-3 font-semibold text-white flex items-center justify-center"
               >
-                Verify OTP
+                {verifyOtpMutation.isPending ? (
+                  <span className="loader border-2 border-white border-t-transparent rounded-full w-5 h-5 animate-spin"></span>
+                ) : (
+                  'Verify OTP'
+                )}
               </button>
             </div>
           )}
@@ -251,9 +267,14 @@ export default function RegisterPage() {
               />
               <button
                 type="submit"
-                className="w-full bg-red-600 hover:bg-red-700 transition rounded-lg py-3 font-semibold text-white"
+                disabled={registerMutation.isPending}
+                className="w-full bg-red-600 hover:bg-red-700 transition rounded-lg py-3 font-semibold text-white flex items-center justify-center"
               >
-                Register
+                {registerMutation.isPending ? (
+                  <span className="loader border-2 border-white border-t-transparent rounded-full w-5 h-5 animate-spin"></span>
+                ) : (
+                  'Register'
+                )}
               </button>
             </form>
           )}
