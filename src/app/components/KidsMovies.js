@@ -1,111 +1,95 @@
-"use client";
-import Image from "next/image";
-import React, { useState, useEffect } from "react";
+'use client'
+import Image from 'next/image'
+import React, { useState, useEffect } from 'react'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Navigation } from 'swiper/modules'
+import 'swiper/css'
+import 'swiper/css/navigation'
+import Link from 'next/link'
 
 export default function KidsMovies() {
-  const [movies, setMovies] = useState([]);
-  const [startIndex, setStartIndex] = useState(0);
-  const itemsPerPage = 6;
+  const [movies, setMovies] = useState([])
 
-  // Fetch kids movies from API
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const res = await fetch("/api/movies"); // এখানে API রুট থেকে কেবল kids আসবে
-        const data = await res.json();
-        setMovies(data.kids || []);
+        const res = await fetch(
+          `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&language=en-US&sort_by=popularity.desc&with_genres=16,10751&page=1`
+        )
+        const data = await res.json()
+        setMovies(data.results || [])
       } catch (error) {
-        console.error("Error fetching kids movies:", error);
+        console.error('Error fetching kids movies:', error)
       }
-    };
-    fetchMovies();
-  }, []);
-
-  const visibleMovies = movies.slice(startIndex, startIndex + itemsPerPage);
-
-  const handleNext = () => {
-    if (startIndex + itemsPerPage < movies.length) {
-      setStartIndex(startIndex + 1);
     }
-  };
-
-  const handlePrev = () => {
-    if (startIndex > 0) {
-      setStartIndex(startIndex - 1);
-    }
-  };
+    fetchMovies()
+  }, [])
 
   return (
-    <div className="bg-black p-4 sm:p-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
       {/* 🔥 Section Title */}
-      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-left text-red-500 mb-6 sm:mb-12 px-4 sm:px-12">
-        Kids Movies is Here 🎬
+      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-left text-red-500 mb-8">
+        Kids Movies is Here
       </h2>
 
-      {/* Movie Grid */}
-      <div className="relative">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 justify-items-center max-w-[95%] mx-auto">
-          {visibleMovies.map((movie) => (
-            <div
-              key={movie.id}
-              className="relative w-[150px] sm:w-[180px] md:w-[200px] lg:w-[220px] 
-                         h-[260px] sm:h-[320px] md:h-[380px] lg:h-[427px] 
-                         flex-shrink-0 border rounded-md overflow-hidden 
-                         bg-zinc-900 text-white transition-all duration-300 cursor-pointer
-                         border-red-400 hover:shadow-[0_0_15px_rgba(239,68,68,0.7)] group"
-            >
-              <div className="relative">
+      {/* Slider */}
+      <Swiper
+        modules={[Navigation]}
+        spaceBetween={20}
+        navigation
+        breakpoints={{
+          320: { slidesPerView: 2 },
+          480: { slidesPerView: 2.3 },
+          640: { slidesPerView: 3 },
+          768: { slidesPerView: 3.5 },
+          1024: { slidesPerView: 4.2 },
+          1280: { slidesPerView: 5 },
+        }}
+        className="pb-10"
+      >
+        {movies.map((movie) => (
+          <SwiperSlide key={movie.id}>
+            <Link href={`/movies/${movie.id}`}>
+              <div
+                className="relative w-full h-[280px] sm:h-[330px] md:h-[380px] lg:h-[420px] 
+                         border border-red-500/40 rounded-xl overflow-hidden bg-zinc-900 
+                         group shadow-lg hover:shadow-[0_0_25px_rgba(239,68,68,0.6)] 
+                         transition-all duration-300 cursor-pointer"
+              >
+                {/* Poster */}
                 <Image
-                  src={movie.poster.replace("i.ibb.co.com", "i.ibb.co")} // domain fix
+                  src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                   alt={movie.title}
-                  width={220}
-                  height={311}
-                  className="object-cover w-full h-[70%] sm:h-[75%]"
+                  fill
+                  className="object-cover"
                 />
-                <div className="absolute inset-0 bg-red-500 opacity-0 group-hover:opacity-20 transition duration-300"></div>
+
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-90"></div>
+
+                {/* Title */}
+                <div className="absolute bottom-16 w-full text-center px-3">
+                  <p className="text-sm sm:text-base md:text-lg font-bold text-white truncate drop-shadow-md">
+                    {movie.title}
+                  </p>
+                </div>
+
+                {/* Book Button */}
                 <button
                   onClick={() => alert(`Booking ticket for ${movie.title}`)}
-                  className="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1.5 sm:px-4 sm:py-2 
-                             bg-red-600 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-lg
-                             opacity-0 group-hover:opacity-100 
-                             transition duration-300 hover:bg-red-700"
+                  className="absolute bottom-4 left-1/2 -translate-x-1/2 
+                            py-1 px-2 bg-red-600 hover:bg-red-700 text-white 
+                           text-xs sm:text-sm md:text-base font-semibold rounded-lg shadow-lg
+                           transition duration-300
+                           opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                 >
                   Book Now
                 </button>
               </div>
-              <div className="p-2 text-center">
-                <p className="text-sm sm:text-base md:text-lg font-semibold truncate">
-                  {movie.title}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Navigation Arrows */}
-        {startIndex > 0 && (
-          <button
-            onClick={handlePrev}
-            className="absolute left-2 top-1/2 -translate-y-1/2 
-                       w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-600 text-white 
-                       flex items-center justify-center 
-                       opacity-60 hover:opacity-100 transition hover:bg-red-500"
-          >
-            ◀
-          </button>
-        )}
-        {startIndex + itemsPerPage < movies.length && (
-          <button
-            onClick={handleNext}
-            className="absolute right-2 top-1/2 -translate-y-1/2 
-                       w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-600 text-white 
-                       flex items-center justify-center 
-                       opacity-60 hover:opacity-100 transition hover:bg-red-500"
-          >
-            ▶
-          </button>
-        )}
-      </div>
+            </Link>
+          </SwiperSlide>
+        ))}
+      </Swiper>
     </div>
-  );
+  )
 }

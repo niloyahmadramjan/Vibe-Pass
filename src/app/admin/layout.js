@@ -5,7 +5,7 @@ import AdminSidebar from "./AdminSidebar";
 
 export default function AdminLayout({ children }) {
   return (
-    <div className="flex">
+    <div className="flex max-w-7xl mx-auto">
       {/* Sidebar */}
       <AdminSidebar/>
 
@@ -15,7 +15,7 @@ export default function AdminLayout({ children }) {
         {/* <AdminNavbar/> */}
 
         {/* Page Content */}
-        <main className="p-6 bg-dark min-h-screen">
+        <main>
           {children}
         </main>
       </div>
