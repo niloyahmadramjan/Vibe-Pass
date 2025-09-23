@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useRef, useState } from 'react';
 import { FiMenu, FiX } from 'react-icons/fi';
@@ -40,7 +41,7 @@ export default function AdminLayout() {
 
         {/* Right: User */}
         <div className="relative" ref={dropdownRef}>
-          <img
+          <Image
             src="https://i.pravatar.cc/40"
             alt="User"
             className="w-10 h-10 rounded-full cursor-pointer border-2 border-white"

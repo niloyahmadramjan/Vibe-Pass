@@ -8,6 +8,8 @@ const nextConfig = {
       'images-na.ssl-images-amazon.com',
       'm.media-amazon.com',
       'images-na.ssl-images-amazon.com',
+      'avatars.githubusercontent.com',
+      'lh3.googleusercontent.com',
     ],
   },
 }

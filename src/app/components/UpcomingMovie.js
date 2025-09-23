@@ -54,7 +54,7 @@ export default function UpcomingMovie() {
 
     // Call fetch function when component loads
     fetchUpcoming()
-  }, [])
+  }, [API_KEY])
 
   if (loading) return <Spinner />
 
