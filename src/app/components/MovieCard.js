@@ -1,6 +1,6 @@
 'use client'
 import Image from 'next/image'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation } from 'swiper/modules'
 import 'swiper/css'
@@ -15,6 +15,10 @@ function Spinner() {
     </div>
   )
 }
+const BASE_URL = 'https://api.themoviedb.org/3'
+const IMG_URL = 'https://image.tmdb.org/t/p/w500'
+
+
 
 export default function MovieCard() {
   const [moviesData, setMoviesData] = useState({})
@@ -22,39 +26,39 @@ export default function MovieCard() {
   const [loading, setLoading] = useState(true)
 
   const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY
-  const BASE_URL = 'https://api.themoviedb.org/3'
-  const IMG_URL = 'https://image.tmdb.org/t/p/w500'
 
-  // 🔹 TMDB categories you want to show
-  const categories = [
-    {
-      key: 'nowPlaying',
-      label: 'Now Playing',
-      url: `${BASE_URL}/movie/now_playing?api_key=${API_KEY}&language=en-US&page=1`,
-    },
-    {
-      key: 'trending',
-      label: 'Trending',
-      url: `${BASE_URL}/trending/movie/week?api_key=${API_KEY}`,
-    },
-    {
-      key: 'popular',
-      label: 'Popular',
-      url: `${BASE_URL}/movie/popular?api_key=${API_KEY}&language=en-US&page=1`,
-    },
-    {
-      key: 'topRated',
-      label: 'Top Rated',
-      url: `${BASE_URL}/movie/top_rated?api_key=${API_KEY}&language=en-US&page=1`,
-    },
-    {
-      key: 'upcoming',
-      label: 'Upcoming',
-      url: `${BASE_URL}/movie/upcoming?api_key=${API_KEY}&language=en-US&page=1`,
-    },
-  ]
 
-  // 🔹 Fetch all categories in parallel
+  const categories = useMemo(
+    () => [
+      {
+        key: 'nowPlaying',
+        label: 'Now Playing',
+        url: `${BASE_URL}/movie/now_playing?api_key=${API_KEY}&language=en-US&page=1`,
+      },
+      {
+        key: 'trending',
+        label: 'Trending',
+        url: `${BASE_URL}/trending/movie/week?api_key=${API_KEY}`,
+      },
+      {
+        key: 'popular',
+        label: 'Popular',
+        url: `${BASE_URL}/movie/popular?api_key=${API_KEY}&language=en-US&page=1`,
+      },
+      {
+        key: 'topRated',
+        label: 'Top Rated',
+        url: `${BASE_URL}/movie/top_rated?api_key=${API_KEY}&language=en-US&page=1`,
+      },
+      {
+        key: 'upcoming',
+        label: 'Upcoming',
+        url: `${BASE_URL}/movie/upcoming?api_key=${API_KEY}&language=en-US&page=1`,
+      },
+    ],
+    [API_KEY] 
+  )
+
   useEffect(() => {
     const fetchAllMovies = async () => {
       setLoading(true)
@@ -67,7 +71,6 @@ export default function MovieCard() {
           })
         )
 
-        // convert into object: { nowPlaying: [...], trending: [...], ... }
         const dataObj = results.reduce((acc, cur) => {
           acc[cur.key] = cur.movies
           return acc
@@ -82,7 +85,7 @@ export default function MovieCard() {
     }
 
     fetchAllMovies()
-  }, [])
+  }, [categories]) 
 
   const movies = moviesData[activeTab] || []
 

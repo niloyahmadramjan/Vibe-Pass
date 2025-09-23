@@ -3,6 +3,11 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import { signIn, useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import LoadingSpinner from '../hooks/LoadingSpiner'
+import { useAuth } from '@/app/context/AuthContext'
+import axiosSecure from '../api/axiosHook/useAxiosSecure'
 
 // Mock slider data
 const mockSlides = [
@@ -23,18 +28,15 @@ const mockSlides = [
   },
 ]
 
-// Example function to fetch from backend (commented out)
-// const fetchSlides = async () => {
-//   const res = await fetch('/api/movies')
-//   return res.json()
-// }
-
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [current, setCurrent] = useState(0)
+  const { status } = useSession()
+  const router = useRouter()
+  const { login } = useAuth() // custom AuthContext for JWT
 
   // Auto slide every 3s
   useEffect(() => {
@@ -46,12 +48,46 @@ export default function LoginPage() {
 
   const handleLogin = async (e) => {
     e.preventDefault()
-    console.log('Login with', email, password)
-    // Later connect with NextAuth signIn here
+    setLoading(true)
+    setError('')
+
+    try {
+      const res = await axiosSecure.post('/auth/login', {
+        email,
+        password,
+      })
+
+      // save user + token in context/localStorage
+      login(res.data)
+
+      // redirect after login
+      router.push('/')
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // redirect when authenticated (via social login)
+  useEffect(() => {
+    if (status === 'authenticated') {
+      router.push('/')
+    }
+  }, [status, router])
+
+  // 🔹 show spinner if session is loading
+  if (status === 'loading') {
+    return <LoadingSpinner />
+  }
+
+  // 🔹 show spinner while redirecting (authenticated)
+  if (status === 'authenticated') {
+    return <LoadingSpinner />
   }
 
   return (
-    <div className="flex min-h-screen ">
+    <div className="flex min-h-screen">
       {/* Left Slider (hidden on mobile) */}
       <div className="hidden md:flex w-8/12 bg-black items-center justify-center relative overflow-hidden">
         {mockSlides.map((slide, index) => (
@@ -68,18 +104,15 @@ export default function LoginPage() {
               className="object-cover"
               priority
             />
-            {/* <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white p-4">
-              <h2 className="text-xl font-bold">{slide.title}</h2>
-            </div> */}
           </div>
         ))}
       </div>
 
       {/* Right Login Form */}
-      <div className="w-full md:w-4/12  flex flex-col justify-center px-10">
+      <div className="w-full md:w-4/12 flex flex-col justify-center px-10">
         <div className="max-w-sm mx-auto w-full">
           {/* Logo */}
-          <h1 className="text-[var(--color-primary)] text-3xl  font-bold mb-5 text-center">
+          <h1 className="text-[var(--color-primary)] text-3xl font-bold mb-5 text-center">
             Welcome Back to VibePass
           </h1>
           <h2 className="text-gray-400 text-md font-bold mb-10 text-center">
@@ -127,6 +160,34 @@ export default function LoginPage() {
               {loading ? 'Logging in...' : 'Login'}
             </button>
           </form>
+
+          {/* Social Logins */}
+          <div className="mt-6 space-y-3">
+            <button
+              onClick={() => signIn('google')}
+              className="w-full flex items-center justify-center gap-2 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] transition rounded-lg py-3 font-semibold text-[var(--color-white)] shadow-md"
+            >
+              <Image
+                src="https://www.svgrepo.com/show/475656/google-color.svg"
+                alt="Google"
+                width={20}
+                height={20}
+              />
+              Continue with Google
+            </button>
+            <button
+              onClick={() => signIn('github')}
+              className="w-full flex items-center justify-center gap-2 bg-black hover:bg-gray-800 transition rounded-lg py-3 font-semibold text-white shadow-md"
+            >
+              <Image
+                src="https://www.svgrepo.com/show/475654/github-color.svg"
+                alt="GitHub"
+                width={20}
+                height={20}
+              />
+              Continue with GitHub
+            </button>
+          </div>
 
           {/* Links */}
           <div className="flex justify-between mt-6 text-sm text-[var(--color-white)]">
