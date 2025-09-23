@@ -10,6 +10,7 @@ const nextConfig = {
       'images-na.ssl-images-amazon.com',
       'avatars.githubusercontent.com',
       'lh3.googleusercontent.com',
+      'i.pravatar.cc',
     ],
   },
 }

@@ -14,17 +14,16 @@ import {
   FaLock,
   FaCheckCircle,
   FaSpinner,
-  FaInfoCircle,
   FaCalendarAlt,
-  FaFingerprint,
   FaStar,
   FaBolt,
 } from "react-icons/fa";
-
+import { MdOutlinePassword } from "react-icons/md";
+import { useRouter } from "next/navigation";
 export default function PaymentForm({ session }) {
   const stripe = useStripe();
   const elements = useElements();
-
+  const router = useRouter();
   const [clientSecret, setClientSecret] = useState("");
   const [processing, setProcessing] = useState(false);
   const [balance, setBalance] = useState(session.balance);
@@ -37,7 +36,7 @@ export default function PaymentForm({ session }) {
 
   // ✅ Create PaymentIntent on load
   useEffect(() => {
-    fetch("http://localhost:5000/api/create-payment-intent", {
+    fetch("http://localhost:5000/api/payments", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ amount: session.registrationFee * 100 }),
@@ -138,7 +137,7 @@ export default function PaymentForm({ session }) {
         setBalance((prev) => prev - session.registrationFee);
 
         // Save payment to DB
-        await fetch("http://localhost:5000/api/save-payment", {
+        await fetch("http://localhost:5000/api/payments/confirm-payment", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -147,22 +146,22 @@ export default function PaymentForm({ session }) {
             status: paymentIntent.status,
             sessionId: session._id,
             sessionTitle: session.title,
+            userEmail: "zubaedhasan46@gmail.com",
           }),
         });
-
+        router.push(`/ticket-Details?tx=${paymentIntent.id}`);
         Swal.fire({
           icon: "success",
           title: "🎉 Payment Successful!",
           html: `
             <div class="text-center">
               <div class="text-green-400 text-4xl mb-2">✓</div>
-              <div class="text-lg font-semibold mb-1">৳${
-                session.registrationFee
-              } Paid</div>
+              <div class="text-lg font-semibold mb-1">৳${session.registrationFee
+            } Paid</div>
               <div class="text-gray-300">${session.title}</div>
               <div class="mt-3 text-sm text-gray-400">Transaction ID: ${paymentIntent.id.slice(
-                -8
-              )}</div>
+              -8
+            )}</div>
             </div>
           `,
           timer: 4000,
@@ -207,7 +206,6 @@ export default function PaymentForm({ session }) {
       <div className="max-w-md mx-auto">
         {/* Enhanced Header */}
         <div className="text-center mb-8 mt-10">
-         
           <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-3">
             Secure Payment
           </h1>
@@ -312,19 +310,17 @@ export default function PaymentForm({ session }) {
                   )}
                 </div>
                 <div
-                  className={`relative border-2 rounded-xl p-4 transition-all duration-300 ${
-                    cardComplete.cardNumber
+                  className={`relative border-2 rounded-xl p-4 transition-all duration-300 ${cardComplete.cardNumber
                       ? "border-green-500 bg-green-50 shadow-sm"
                       : "border-gray-300 bg-gray-50 hover:border-gray-400"
-                  }`}
+                    }`}
                 >
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <FaCreditCard
-                      className={`h-5 w-5 ${
-                        cardComplete.cardNumber
+                      className={`h-5 w-5 ${cardComplete.cardNumber
                           ? "text-green-500"
                           : "text-gray-400"
-                      }`}
+                        }`}
                     />
                   </div>
                   <CardNumberElement
@@ -359,19 +355,17 @@ export default function PaymentForm({ session }) {
                     Expiry Date
                   </label>
                   <div
-                    className={`relative border-2 rounded-xl p-4 transition-all duration-300 ${
-                      cardComplete.cardExpiry
+                    className={`relative border-2 rounded-xl p-4 transition-all duration-300 ${cardComplete.cardExpiry
                         ? "border-green-500 bg-green-50 shadow-sm"
                         : "border-gray-300 bg-gray-50 hover:border-gray-400"
-                    }`}
+                      }`}
                   >
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                       <FaCalendarAlt
-                        className={`h-4 w-4 ${
-                          cardComplete.cardExpiry
+                        className={`h-4 w-4 ${cardComplete.cardExpiry
                             ? "text-green-500"
                             : "text-gray-400"
-                        }`}
+                          }`}
                       />
                     </div>
                     <CardExpiryElement
@@ -403,19 +397,17 @@ export default function PaymentForm({ session }) {
                     CVC Code
                   </label>
                   <div
-                    className={`relative border-2 rounded-xl p-4 transition-all duration-300 ${
-                      cardComplete.cardCvc
+                    className={`relative border-2 rounded-xl p-4 transition-all duration-300 ${cardComplete.cardCvc
                         ? "border-green-500 bg-green-50 shadow-sm"
                         : "border-gray-300 bg-gray-50 hover:border-gray-400"
-                    }`}
+                      }`}
                   >
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <FaFingerprint
-                        className={`h-4 w-4 ${
-                          cardComplete.cardCvc
+                      <MdOutlinePassword
+                        className={`h-4 w-4 ${cardComplete.cardCvc
                             ? "text-green-500"
                             : "text-gray-400"
-                        }`}
+                          }`}
                       />
                     </div>
                     <CardCvcElement
@@ -453,10 +445,9 @@ export default function PaymentForm({ session }) {
                   w-full py-4 px-6 rounded-2xl font-bold text-lg transition-all duration-300 
                   transform hover:scale-[1.02] active:scale-[0.98] mt-6
                   flex items-center justify-center space-x-3 shadow-lg
-                  ${
-                    !stripe || !clientSecret || processing || !isFormValid
-                      ? "bg-gray-200 text-gray-500 cursor-not-allowed shadow-none"
-                      : "bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 hover:shadow-xl"
+                  ${!stripe || !clientSecret || processing || !isFormValid
+                    ? "bg-gray-200 text-gray-500 cursor-not-allowed shadow-none"
+                    : "bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 hover:shadow-xl"
                   }
                 `}
               >
