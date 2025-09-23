@@ -404,7 +404,8 @@ export default function PaymentForm({ session }) {
                   >
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                       <MdOutlinePassword
-                        className={`h-4 w-4 ${cardComplete.cardCvc
+                        className={`h-4 w-4 ${
+                          cardComplete.cardCvc
                             ? "text-green-500"
                             : "text-gray-400"
                           }`}
