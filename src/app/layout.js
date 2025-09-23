@@ -4,7 +4,6 @@ import './globals.css'
 import LayoutWrapper from './components/LayoutWrapper'
 import ReactQueryProvider from './providers/ReactQueryProvider'
 import { AuthProvider } from './context/AuthContext'
-import { SessionProvider } from 'next-auth/react'
 import SessionProviderWrapper from './providers/SessionProviderWrapper'
 
 const geistSans = Geist({
@@ -32,13 +31,13 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>
-          <SessionProviderWrapper>
+        <SessionProviderWrapper>
+          <AuthProvider>
             <ReactQueryProvider>
               <LayoutWrapper>{children}</LayoutWrapper>
             </ReactQueryProvider>
-          </SessionProviderWrapper>
-        </AuthProvider>
+          </AuthProvider>
+        </SessionProviderWrapper>
       </body>
     </html>
   )

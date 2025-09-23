@@ -6,6 +6,8 @@ import { useState, useEffect } from 'react'
 import { signIn, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import LoadingSpinner from '../hooks/LoadingSpiner'
+import { useAuth } from '@/app/context/AuthContext'
+import axiosSecure from '../api/axiosHook/useAxiosSecure'
 
 // Mock slider data
 const mockSlides = [
@@ -34,6 +36,7 @@ export default function LoginPage() {
   const [current, setCurrent] = useState(0)
   const { status } = useSession()
   const router = useRouter()
+  const { login } = useAuth() // custom AuthContext for JWT
 
   // Auto slide every 3s
   useEffect(() => {
@@ -45,11 +48,28 @@ export default function LoginPage() {
 
   const handleLogin = async (e) => {
     e.preventDefault()
-    console.log('Login with', email, password)
-    // Later connect with NextAuth signIn here
+    setLoading(true)
+    setError('')
+
+    try {
+      const res = await axiosSecure.post('/auth/login', {
+        email,
+        password,
+      })
+
+      // save user + token in context/localStorage
+      login(res.data)
+
+      // redirect after login
+      router.push('/')
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  // redirect when authenticated
+  // redirect when authenticated (via social login)
   useEffect(() => {
     if (status === 'authenticated') {
       router.push('/')
