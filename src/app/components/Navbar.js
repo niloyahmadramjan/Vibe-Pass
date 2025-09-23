@@ -15,14 +15,16 @@ import {
 import { RiMovie2Fill } from 'react-icons/ri'
 import Image from 'next/image'
 
-// 👇 NextAuth imports
-import { useSession, signIn, signOut } from 'next-auth/react'
+// 👇 NextAuth + custom auth
+import { useSession, signOut } from 'next-auth/react'
+import { useAuth } from '@/app/context/AuthContext'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
   const { data: session, status } = useSession()
+  const { user, logout } = useAuth()
 
   // detect scroll to change navbar background
   useEffect(() => {
@@ -94,22 +96,22 @@ export default function Navbar() {
             <div className="hidden md:flex items-center">
               {status === 'loading' ? (
                 <div className="animate-spin h-6 w-6 rounded-full border-2 border-red-500 border-t-transparent"></div>
-              ) : session ? (
+              ) : session || user ? (
                 <div className="flex items-center gap-3">
-                  {session.user?.image && (
+                  {(session?.user?.image || user?.image) && (
                     <Image
-                      src={session.user.image}
-                      alt={session.user?.name || 'User'}
+                      src={session?.user?.image || user?.image}
+                      alt={session?.user?.name || user?.name || 'User'}
                       width={32}
                       height={32}
                       className="rounded-full"
                     />
                   )}
                   <span className="text-white font-medium">
-                    {session.user?.name}
+                    {session?.user?.name || user?.name}
                   </span>
                   <button
-                    onClick={() => signOut()}
+                    onClick={() => (session ? signOut() : logout())}
                     className="ml-3 bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-white text-sm"
                   >
                     Logout
@@ -117,7 +119,7 @@ export default function Navbar() {
                 </div>
               ) : (
                 <Link
-                 href='/login'
+                  href="/login"
                   className="flex btn btn-primary items-center rounded-md font-medium bg-red-600 hover:bg-red-700 px-4 py-2 transition-colors duration-200 text-white"
                 >
                   <FiUser className="mr-2" /> Login
@@ -184,37 +186,25 @@ export default function Navbar() {
 
           {/* Auth Section (mobile bottom) */}
           <div className="mt-auto p-4 border-t border-gray-800">
-            {session ? (
+            {session || user ? (
               <div className="flex items-center gap-3">
-                {session.user?.image && (
-                  <Image
-                    src={session.user.image}
-                    alt={session.user?.name || 'User'}
-                    width={30}
-                    height={30}
-                    className="rounded-full"
-                  />
-                )}
                 <span className="text-white font-medium">
-                  {session.user?.name}
+                  {session?.user?.name || user?.name}
                 </span>
                 <button
-                  onClick={() => signOut()}
+                  onClick={() => (session ? signOut() : logout())}
                   className="ml-auto bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-white text-sm"
                 >
                   Logout
                 </button>
               </div>
             ) : (
-              <button
-                onClick={() => {
-                  setOpen(false)
-                  signIn()
-                }}
-                className="w-full flex items-center justify-center px-4 py-2 rounded-md font-bold bg-red-600 hover:bg-red-700 text-white"
+              <Link
+                href="/login"
+                className="w-full btn btn-primary flex items-center justify-center px-4 py-2 rounded-md font-bold bg-red-600 hover:bg-red-700 text-white"
               >
                 <FiUser className="mr-2" /> Login
-              </button>
+              </Link>
             )}
           </div>
         </div>
