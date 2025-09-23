@@ -12,23 +12,22 @@ import {
   FiBook,
   FiUser,
 } from 'react-icons/fi'
-import { BiCameraMovie, BiSolidCameraMovie } from 'react-icons/bi'
-import { RiMovie2AiLine, RiMovie2Fill } from 'react-icons/ri'
+import { RiMovie2Fill } from 'react-icons/ri'
 import Image from 'next/image'
+
+// 👇 NextAuth imports
+import { useSession, signIn, signOut } from 'next-auth/react'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
+  const { data: session, status } = useSession()
 
   // detect scroll to change navbar background
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setScrolled(true)
-      } else {
-        setScrolled(false)
-      }
+      setScrolled(window.scrollY > 20)
     }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
@@ -55,8 +54,8 @@ export default function Navbar() {
       <nav
         className={`fixed w-full z-50 transition-all duration-300 ${
           scrolled
-            ? "bg-gray-950 text-white shadow-lg border-b border-stone-700"
-            : "bg-transparent text-white"
+            ? 'bg-gray-950 text-white shadow-lg border-b border-stone-700'
+            : 'bg-transparent text-white'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -67,14 +66,7 @@ export default function Navbar() {
                 href="/"
                 className="flex-shrink-0 flex items-center space-x-2 group"
               >
-                <div className="relative group">
-                  <Image
-                    src="/favicon.png"
-                    width={50}
-                    height={40}
-                    alt="Picture of the author"
-                  />
-                </div>
+                <Image src="/favicon.png" width={50} height={40} alt="Logo" />
                 <span className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
                   VibePass
                 </span>
@@ -89,31 +81,48 @@ export default function Navbar() {
                   href={href}
                   className={`relative flex items-center font-bold transition-colors duration-200 ${
                     pathname === href
-                      ? "text-red-400"
-                      : "hover:text-red-900 text-blue-500"
+                      ? 'text-red-400'
+                      : 'hover:text-red-900 text-blue-500'
                   }`}
                 >
                   {icon} {label}
-                  {/* underline animation */}
-                  <span
-                    className={`absolute bottom-0 left-0 w-0 h-[2px] bg-blue-600 transition-all duration-300 ${
-                      pathname === href
-                        ? "w-full left-0"
-                        : "group-hover:w-full group-hover:left-0"
-                    }`}
-                  ></span>
                 </Link>
               ))}
             </div>
 
             {/* Right - Auth (desktop) */}
             <div className="hidden md:flex items-center">
-              <Link
-                href="/login"
-                className="flex items-center rounded-md font-medium   transition-colors duration-200 btn-primary "
-              >
-                <FiUser className="mr-2" /> Login
-              </Link>
+              {status === 'loading' ? (
+                <div className="animate-spin h-6 w-6 rounded-full border-2 border-red-500 border-t-transparent"></div>
+              ) : session ? (
+                <div className="flex items-center gap-3">
+                  {session.user?.image && (
+                    <Image
+                      src={session.user.image}
+                      alt={session.user?.name || 'User'}
+                      width={32}
+                      height={32}
+                      className="rounded-full"
+                    />
+                  )}
+                  <span className="text-white font-medium">
+                    {session.user?.name}
+                  </span>
+                  <button
+                    onClick={() => signOut()}
+                    className="ml-3 bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-white text-sm"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  href="/login"
+                  className="flex btn btn-primary items-center rounded-md font-medium bg-red-600 hover:bg-red-700 px-4 py-2 transition-colors duration-200 text-white"
+                >
+                  <FiUser className="mr-2" /> Login
+                </Link>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -128,10 +137,10 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Slide Menu (Right side now) */}
+        {/* Mobile Slide Menu */}
         <div
           className={`fixed top-0 right-0 h-full w-64 bg-gray-900 transform ${
-            open ? "translate-x-0" : "translate-x-full"
+            open ? 'translate-x-0' : 'translate-x-full'
           } transition-transform duration-300 ease-in-out z-40 shadow-xl flex flex-col`}
         >
           {/* Close Button & Logo */}
@@ -141,14 +150,7 @@ export default function Navbar() {
               className="flex items-center space-x-2 group"
               onClick={() => setOpen(false)}
             >
-              <div className="relative group">
-                <Image
-                  src="/favicon.png"
-                  width={35}
-                  height={40}
-                  alt="Picture of the author"
-                />
-              </div>
+              <Image src="/favicon.png" width={35} height={40} alt="Logo" />
               <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
                 VibePass
               </span>
@@ -157,7 +159,6 @@ export default function Navbar() {
             <button
               onClick={() => setOpen(false)}
               className="p-2 rounded-full text-gray-400 hover:text-white hover:bg-red-600 transition-all duration-200"
-              aria-label="Close menu"
             >
               <FiX size={24} />
             </button>
@@ -172,8 +173,8 @@ export default function Navbar() {
                 onClick={() => setOpen(false)}
                 className={`flex items-center font-semibold px-4 py-3 rounded-md transition-all duration-200 ${
                   pathname === href
-                    ? "!bg-black !text-white"
-                    : "!text-gray-300 !hover:bg-gray-800 !hover:text-red-400"
+                    ? '!bg-black !text-white'
+                    : '!text-gray-300 !hover:bg-gray-800 !hover:text-red-400'
                 }`}
               >
                 {icon} {label}
@@ -183,16 +184,30 @@ export default function Navbar() {
 
           {/* Auth Section (mobile bottom) */}
           <div className="mt-auto p-4 border-t border-gray-800">
-            <Link
-              href="/login"
-              onClick={() => setOpen(false)}
-              className="w-full flex items-center justify-center px-4 py-2 rounded-md font-bold transition-colors duration-200"
-            >
-              <FiUser className="mr-2" /> Login
-            </Link>
+            {session ? (
+              <div className="flex items-center gap-3">
+               
+                <span className="text-white font-medium">
+                  {session.user?.name}
+                </span>
+                <button
+                  onClick={() => signOut()}
+                  className="ml-auto bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-white text-sm"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="w-full btn btn-primary flex items-center justify-center px-4 py-2 rounded-md font-bold bg-red-600 hover:bg-red-700 text-white"
+              >
+                <FiUser className="mr-2" /> Login
+              </Link>
+            )}
           </div>
         </div>
       </nav>
     </>
-  );
+  )
 }

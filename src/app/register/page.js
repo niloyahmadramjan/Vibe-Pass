@@ -4,8 +4,12 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
 import Swal from 'sweetalert2'
+import { useForm } from 'react-hook-form'
+import { useMutation } from '@tanstack/react-query'
+import { useAuth } from '@/app/context/AuthContext'
+import useAxiosSecure from '@/app/api/axiosHook/useAxiosSecure'
 
-// Mock slider data (same design as login page)
+// Mock slider data
 const mockSlides = [
   {
     id: 1,
@@ -24,30 +28,72 @@ const mockSlides = [
   },
 ]
 
-// Example backend functions (commented out)
-// const sendOtp = async (email) => {
-//   const res = await fetch('/api/send-otp', { method: 'POST', body: JSON.stringify({ email }) })
-//   return res.json()
-// }
-// const verifyOtp = async (email, otp) => {
-//   const res = await fetch('/api/verify-otp', { method: 'POST', body: JSON.stringify({ email, otp }) })
-//   return res.json()
-// }
-// const registerUser = async (data) => {
-//   const res = await fetch('/api/register', { method: 'POST', body: JSON.stringify(data) })
-//   return res.json()
-// }
-
 export default function RegisterPage() {
   const [step, setStep] = useState(1)
-  const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
-  const [password, setPassword] = useState('')
-  const [otp, setOtp] = useState(['', '', '', ''])
-  const [generatedOtp, setGeneratedOtp] = useState(null)
+  const [otp, setOtp] = useState(Array(6).fill(''))
   const [current, setCurrent] = useState(0)
-
+  const [emailData, setEmailData] = useState(null)
   const otpRefs = useRef([])
+  const { login } = useAuth()
+
+  // React Hook Form
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    formState: { errors },
+  } = useForm()
+
+  // --- React Query Mutations ---
+  const sendOtpMutation = useMutation({
+    mutationFn: async (data) => {
+      const res = await useAxiosSecure.post('/auth/send-otp', data)
+      return res.data
+    },
+    onSuccess: () => {
+      Swal.fire('OTP Sent!', 'Check your email for the code.', 'success')
+      setStep(2)
+    },
+    onError: () => {
+      Swal.fire('Error', 'Failed to send OTP', 'error')
+    },
+  })
+
+  const verifyOtpMutation = useMutation({
+    mutationFn: async (data) => {
+      const res = await useAxiosSecure.post('/auth/verify-otp', data)
+      return res.data
+    },
+    onSuccess: () => {
+      Swal.fire('Success!', 'OTP Verified', 'success')
+      setStep(3)
+    },
+    onError: () => {
+      Swal.fire('Error', 'Invalid OTP', 'error')
+    },
+  })
+
+  const registerMutation = useMutation({
+    mutationFn: async (data) => {
+      const res = await useAxiosSecure.post('/auth/register', data)
+      return res.data
+    },
+    onSuccess: (data) => {
+      login(data) // store token + user in context
+      Swal.fire({
+        icon: 'success',
+        title: '🎉 Registration Successful!',
+        text: 'Welcome to VibePass. Redirecting...',
+        timer: 2000,
+        showConfirmButton: false,
+      }).then(() => {
+        window.location.href = '/profile'
+      })
+    },
+    onError: () => {
+      Swal.fire('Error', 'Registration failed', 'error')
+    },
+  })
 
   // Auto slider
   useEffect(() => {
@@ -57,47 +103,49 @@ export default function RegisterPage() {
     return () => clearInterval(interval)
   }, [])
 
-  const handleNextStep = () => {
-    if (step === 1) {
-      // Step 1 → generate OTP
-      const randomOtp = Math.floor(1000 + Math.random() * 9000).toString()
-      setGeneratedOtp(randomOtp)
-      Swal.fire('OTP Sent!', `Your OTP is: ${randomOtp}`, 'success')
-      setStep(2)
-    } else if (step === 2) {
-      // Step 2 → check OTP
-      const enteredOtp = otp.join('')
-      if (enteredOtp === generatedOtp) {
-        Swal.fire('Success!', 'OTP Verified', 'success')
-        setStep(3)
-      } else {
-        Swal.fire('Error', 'Invalid OTP', 'error')
-      }
-    } else if (step === 3) {
-      // Step 3 → Register user
-      console.log({ email, phone, password })
-      // Later integrate NextAuth + backend
-      Swal.fire('Registered!', 'Redirecting to Home...', 'success').then(() => {
-        window.location.href = '/'
-      })
-    }
-  }
-
   // Handle OTP input
   const handleOtpChange = (value, index) => {
     if (/^[0-9]?$/.test(value)) {
       const newOtp = [...otp]
       newOtp[index] = value
       setOtp(newOtp)
-      if (value && index < 3) {
-        otpRefs.current[index + 1].focus()
-      }
+      if (value && index < 5) otpRefs.current[index + 1].focus()
     }
+  }
+
+  // Allow paste (6 digits at once)
+  const handleOtpPaste = (e) => {
+    const paste = e.clipboardData.getData('text')
+    if (/^\d{6}$/.test(paste)) {
+      setOtp(paste.split(''))
+    }
+  }
+
+  // Step 1 → Send OTP
+  const onStep1Submit = (data) => {
+    setEmailData(data) // save info
+    sendOtpMutation.mutate(data)
+  }
+
+  // Step 2 → Verify OTP
+  const handleVerifyOtp = () => {
+    verifyOtpMutation.mutate({
+      email: getValues('email'),
+      otp: otp.join(''),
+    })
+  }
+
+  // Step 3 → Register
+  const onStep3Submit = (data) => {
+    registerMutation.mutate({
+      ...emailData,
+      password: data.password,
+    })
   }
 
   return (
     <div className="flex min-h-screen">
-      {/* Left Slider (hidden on mobile) */}
+      {/* Left Slider */}
       <div className="hidden md:flex w-8/12 items-center justify-center relative overflow-hidden">
         {mockSlides.map((slide, index) => (
           <div
@@ -117,17 +165,17 @@ export default function RegisterPage() {
         ))}
       </div>
 
-      {/* Right Register Form */}
-      <div className="w-full md:w-4/12  flex flex-col justify-center px-10">
+      {/* Right Form */}
+      <div className="w-full md:w-4/12 flex flex-col justify-center px-10">
         <div className="max-w-sm mx-auto w-full">
-          {/* Logo */}
           <h1 className="text-[var(--color-primary)] text-4xl text-center font-bold mb-5">
             Join VibePass Today!
           </h1>
-          <p className="text-gray-400 text-md font-bold mb-10 text-center">{`Create your account and enjoy a seamless movie
-booking experience.`}</p>
+          <p className="text-gray-400 text-md font-bold mb-10 text-center">
+            Create your account and enjoy a seamless movie booking experience.
+          </p>
 
-          {/* Step Indicator */}
+          {/* Step indicator */}
           <div className="flex justify-between mb-6 text-sm text-[var(--color-white)]">
             <span className={step === 1 ? 'font-bold' : 'opacity-50'}>
               INFORMATION
@@ -142,39 +190,35 @@ booking experience.`}</p>
 
           {/* Step 1 */}
           {step === 1 && (
-            <form className="space-y-6">
-              <div>
-                <label className="block text-[var(--color-white)] text-sm mb-2">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="w-full border-b border-[var(--color-white)] bg-transparent text-[var(--color-white)] focus:outline-none py-2 placeholder:text-white/70"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-[var(--color-white)] text-sm mb-2">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Enter your phone number"
-                  className="w-full border-b border-[var(--color-white)] bg-transparent text-[var(--color-white)] focus:outline-none py-2 placeholder:text-white/70"
-                  required
-                />
-              </div>
+            <form className="space-y-6" onSubmit={handleSubmit(onStep1Submit)}>
+              <input
+                {...register('name', { required: true })}
+                type="text"
+                placeholder="Enter your name"
+                className="w-full border-b border-white bg-transparent text-white py-2 placeholder:text-white/70"
+              />
+              <input
+                {...register('email', { required: true })}
+                type="email"
+                placeholder="Enter your email"
+                className="w-full border-b border-white bg-transparent text-white py-2 placeholder:text-white/70"
+              />
+              <input
+                {...register('phone', { required: true })}
+                type="tel"
+                placeholder="Enter your phone number"
+                className="w-full border-b border-white bg-transparent text-white py-2 placeholder:text-white/70"
+              />
               <button
-                type="button"
-                onClick={handleNextStep}
-                className="w-full bg-[var(--color-primary-hover)] hover:bg-red-700 transition rounded-lg py-3 font-semibold text-[var(--color-white)]"
+                type="submit"
+                disabled={sendOtpMutation.isPending}
+                className="w-full bg-red-600 hover:bg-red-700 transition rounded-lg py-3 font-semibold text-white flex items-center justify-center"
               >
-                Next
+                {sendOtpMutation.isPending ? (
+                  <span className="loader border-2 border-white border-t-transparent rounded-full w-5 h-5 animate-spin"></span>
+                ) : (
+                  'Next'
+                )}
               </button>
             </form>
           )}
@@ -182,71 +226,67 @@ booking experience.`}</p>
           {/* Step 2 */}
           {step === 2 && (
             <div>
-              <p className="text-[var(--color-white)] mb-4">
-                Enter the 4-digit OTP sent to your email
-              </p>
-              <div className="flex justify-between space-x-3 mb-6">
+              <p className="text-white mb-4">Enter the 6-digit OTP</p>
+              <div className="flex justify-between space-x-2 mb-6">
                 {otp.map((digit, index) => (
                   <input
                     key={index}
                     ref={(el) => (otpRefs.current[index] = el)}
                     type="text"
-                    maxLength="1"
+                    maxLength={1}
                     value={digit}
                     onChange={(e) => handleOtpChange(e.target.value, index)}
-                    className="w-12 h-12 text-center border-b border-[var(--color-white)] bg-transparent text-[var(--color-white)] focus:outline-none text-xl"
+                    onPaste={handleOtpPaste}
+                    className="w-12 h-12 text-center border-b border-white bg-transparent text-white focus:outline-none text-xl"
                   />
                 ))}
               </div>
               <button
                 type="button"
-                onClick={handleNextStep}
-                className="w-full bg-[var(--color-primary-hover)] hover:bg-red-700 transition rounded-lg py-3 font-semibold text-[var(--color-white)]"
+                disabled={verifyOtpMutation.isPending}
+                onClick={handleVerifyOtp}
+                className="w-full bg-red-600 hover:bg-red-700 transition rounded-lg py-3 font-semibold text-white flex items-center justify-center"
               >
-                Verify OTP
+                {verifyOtpMutation.isPending ? (
+                  <span className="loader border-2 border-white border-t-transparent rounded-full w-5 h-5 animate-spin"></span>
+                ) : (
+                  'Verify OTP'
+                )}
               </button>
             </div>
           )}
 
           {/* Step 3 */}
           {step === 3 && (
-            <form className="space-y-6">
-              <div>
-                <label className="block text-[var(--color-white)] text-sm mb-2">
-                  Set Password
-                </label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Create a password"
-                  className="w-full border-b border-[var(--color-white)] bg-transparent text-[var(--color-white)] focus:outline-none py-2 placeholder:text-white/70"
-                  required
-                />
-              </div>
+            <form className="space-y-6" onSubmit={handleSubmit(onStep3Submit)}>
+              <input
+                {...register('password', { required: true })}
+                type="password"
+                placeholder="Create a password"
+                className="w-full border-b border-white bg-transparent text-white py-2 placeholder:text-white/70"
+              />
               <button
-                type="button"
-                onClick={handleNextStep}
-                className="w-full bg-[var(--color-primary-hover)] hover:bg-red-700 transition rounded-lg py-3 font-semibold text-[var(--color-white)]"
+                type="submit"
+                disabled={registerMutation.isPending}
+                className="w-full bg-red-600 hover:bg-red-700 transition rounded-lg py-3 font-semibold text-white flex items-center justify-center"
               >
-                Register
+                {registerMutation.isPending ? (
+                  <span className="loader border-2 border-white border-t-transparent rounded-full w-5 h-5 animate-spin"></span>
+                ) : (
+                  'Register'
+                )}
               </button>
             </form>
           )}
 
-          <div className="flex justify-between mt-6 text-sm text-[var(--color-white)]">
-            <Link href="#" className="hover:underline">
+          <div className="flex justify-between mt-6 text-sm text-white">
+            <Link href="/forgot-password" className="hover:underline">
               Forgot Password?
             </Link>
             <Link href="/login" className="hover:underline">
               Login
             </Link>
           </div>
-
-          {/* Footer */}
-          <p className="mt-8 text-xs text-[var(--color-white)]/70 text-center">
-            VibePass v1.0.0 <br /> All Rights Reserved.
-          </p>
         </div>
       </div>
     </div>
