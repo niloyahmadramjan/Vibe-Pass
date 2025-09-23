@@ -5,6 +5,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
+import Link from 'next/link'
 
 // 🔹 Loading Spinner
 function Spinner() {
@@ -126,6 +127,7 @@ export default function MovieCard() {
         {movies.length > 0 ? (
           movies.map((movie) => (
             <SwiperSlide key={movie.id}>
+                <Link href={`/movies/${movie.id}`}>
               <div
                 className="relative w-full 
                            h-[250px] sm:h-[320px] md:h-[380px] lg:h-[420px] 
@@ -171,6 +173,7 @@ export default function MovieCard() {
                   </p>
                 </div>
               </div>
+              </Link>
             </SwiperSlide>
           ))
         ) : (
@@ -180,5 +183,5 @@ export default function MovieCard() {
         )}
       </Swiper>
     </div>
-  )
+  );
 }

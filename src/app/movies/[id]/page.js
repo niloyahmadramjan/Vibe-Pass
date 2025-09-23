@@ -1,4 +1,3 @@
-
 'use client'
 import { useEffect, useState, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
@@ -113,6 +112,27 @@ export default function MovieDetailsPage() {
     (vid) => vid.type === 'Trailer' && vid.site === 'YouTube'
   )
 
+
+    // Book Now handler function
+  const handleBookNow = () => {
+    // Movie er data pass kore seat booking page e jao
+    router.push(`/movies/${id}/seat-booking?movie=${encodeURIComponent(JSON.stringify({
+      id: movie.id,
+      title: movie.title,
+      backdrop_path: movie.backdrop_path,
+      release_date: movie.release_date,
+      runtime: movie.runtime,
+      vote_average: movie.vote_average,
+      vote_count: movie.vote_count,
+      genres: movie.genres
+    }))}`)
+  }
+
+  if (loading) return <LoadingSpinner />
+  if (!movie)
+    return (
+      <div className="p-6 text-center text-red-500">❌ Movie not found!</div>
+    )
   return (
     <div className="p-4 md:p-6 mx-auto space-y-10 text-white max-w-7xl">
       {/*  Banner */}
@@ -196,14 +216,24 @@ export default function MovieDetailsPage() {
       </div>
 
       {/* Trailer Button */}
-      {trailer && (
+      <div className="flex gap-4 flex-wrap">
+        {trailer && (
+          <button
+            onClick={() => setShowTrailer(true)}
+            className="px-6 py-3 rounded-lg bg-red-600 hover:bg-red-700 transition flex items-center gap-2"
+          >
+            ▶ Watch Trailer
+          </button>
+        )}
+        
+        {/* Book Now Button */}
         <button
-          onClick={() => setShowTrailer(true)}
-          className="px-6 py-3 rounded-lg bg-red-600 hover:bg-red-700 transition"
+          onClick={handleBookNow}
+          className="px-8 py-3 rounded-lg bg-green-600 hover:bg-green-700 transition-all duration-300 transform hover:scale-105 flex items-center gap-2 shadow-lg"
         >
-          ▶ Watch Trailer
+          🎫 Book Now
         </button>
-      )}
+      </div>
 
       {/*  Location Buttons */}
       <h2 className="text-xl md:text-2xl font-bold mb-4 text-green-400">
