@@ -14,17 +14,16 @@ import {
   FaLock,
   FaCheckCircle,
   FaSpinner,
-  FaInfoCircle,
   FaCalendarAlt,
-  FaFingerprint,
   FaStar,
   FaBolt,
 } from "react-icons/fa";
-
+import { MdOutlinePassword } from "react-icons/md";
+import { useRouter } from "next/navigation";
 export default function PaymentForm({ session }) {
   const stripe = useStripe();
   const elements = useElements();
-
+  const router = useRouter();
   const [clientSecret, setClientSecret] = useState("");
   const [processing, setProcessing] = useState(false);
   const [balance, setBalance] = useState(session.balance);
@@ -147,9 +146,10 @@ export default function PaymentForm({ session }) {
             status: paymentIntent.status,
             sessionId: session._id,
             sessionTitle: session.title,
+            userEmail: "zubaedhasan46@gmail.com",
           }),
         });
-
+        router.push(`/ticket-Details?tx=${paymentIntent.id}`);
         Swal.fire({
           icon: "success",
           title: "🎉 Payment Successful!",
@@ -207,7 +207,6 @@ export default function PaymentForm({ session }) {
       <div className="max-w-md mx-auto">
         {/* Enhanced Header */}
         <div className="text-center mb-8 mt-10">
-         
           <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-3">
             Secure Payment
           </h1>
@@ -410,7 +409,7 @@ export default function PaymentForm({ session }) {
                     }`}
                   >
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <FaFingerprint
+                      <MdOutlinePassword
                         className={`h-4 w-4 ${
                           cardComplete.cardCvc
                             ? "text-green-500"
