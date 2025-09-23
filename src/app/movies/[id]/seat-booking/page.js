@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
+import { useParams, useSearchParams, useRouter } from 'next/navigation';
 
-// React Hot Toast (simulated since we can't import external libraries)
+// Toast notification system
 const toast = {
   success: (message) => {
-    // Create a toast element
     const toastEl = document.createElement('div');
     toastEl.innerHTML = `
       <div style="
@@ -29,7 +29,11 @@ const toast = {
     document.body.appendChild(toastEl);
     setTimeout(() => {
       toastEl.style.animation = 'slideOut 0.3s ease-in';
-      setTimeout(() => document.body.removeChild(toastEl), 300);
+      setTimeout(() => {
+        if (document.body.contains(toastEl)) {
+          document.body.removeChild(toastEl);
+        }
+      }, 300);
     }, 3000);
   },
   error: (message) => {
@@ -56,86 +60,104 @@ const toast = {
     document.body.appendChild(toastEl);
     setTimeout(() => {
       toastEl.style.animation = 'slideOut 0.3s ease-in';
-      setTimeout(() => document.body.removeChild(toastEl), 300);
+      setTimeout(() => {
+        if (document.body.contains(toastEl)) {
+          document.body.removeChild(toastEl);
+        }
+      }, 300);
     }, 3000);
   }
 };
 
-// Add CSS animations
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes slideIn {
-    from {
-      transform: translateX(100%);
-      opacity: 0;
+// CSS styles injection (only once)
+if (typeof window !== 'undefined' && !document.getElementById('seat-booking-styles')) {
+  const style = document.createElement('style');
+  style.id = 'seat-booking-styles';
+  style.textContent = `
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
     }
-    to {
-      transform: translateX(0);
-      opacity: 1;
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(100%);
+        opacity: 0;
+      }
     }
-  }
-  @keyframes slideOut {
-    from {
-      transform: translateX(0);
-      opacity: 1;
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #CC2027, #E53935);
+      color: white;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      border-radius: 9999px;
     }
-    to {
-      transform: translateX(100%);
-      opacity: 0;
+    
+    .btn-primary:hover:not(:disabled) {
+      background: linear-gradient(135deg, #E53935, #B71C1C);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(204, 32, 39, 0.3);
     }
-  }
-  
-  .btn-primary {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
-    color: var(--color-text-light);
-    transition: all 0.3s ease;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .btn-primary:hover:not(:disabled) {
-    background: linear-gradient(135deg, var(--color-primary-hover), #B71C1C);
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(204, 32, 39, 0.3);
-  }
-  
-  :root {
-    --color-primary: #CC2027;
-    --color-primary-hover: #E53935;
-    --color-bg-dark: #1A1A1A;
-    --color-bg-light: #F5F5F5;
-    --color-white: #FFFFFF;
-    --color-text-dark: #1A1A1A;
-    --color-text-light: #FFFFFF;
-  }
-`;
-document.head.appendChild(style);
+    
+    .btn-primary:disabled {
+      background: #4a5568;
+      color: #a0aec0;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    :root {
+      --color-primary: #CC2027;
+      --color-primary-hover: #E53935;
+      --color-bg-dark: #1A1A1A;
+      --color-bg-light: #F5F5F5;
+      --color-white: #FFFFFF;
+      --color-text-dark: #1A1A1A;
+      --color-text-light: #FFFFFF;
+    }
+    
+    .seat-btn {
+      transition: all 0.2s ease;
+    }
+    
+    .seat-btn:hover:not(:disabled) {
+      transform: scale(1.1);
+    }
+    
+    .modal-backdrop {
+      backdrop-filter: blur(8px);
+    }
+  `;
+  document.head.appendChild(style);
+}
 
-// Inline SVG icons
+// SVG Icons
 const Clock = (props) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="10" />
     <polyline points="12 6 12 12 16 14" />
   </svg>
 );
-const Users = (props) => (
-  <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-    <circle cx="9" cy="7" r="4" />
-    <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-  </svg>
-);
-const Star = (props) => (
-  <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-  </svg>
-);
+
 const CreditCard = (props) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
     <line x1="1" y1="10" x2="23" y2="10" />
   </svg>
 );
+
 const Calendar = (props) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -144,12 +166,14 @@ const Calendar = (props) => (
     <line x1="3" y1="10" x2="21" y2="10" />
   </svg>
 );
+
 const MapPin = (props) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 21.75l-7.75-7.75a8.25 8.25 0 1 1 15.5 0L12 21.75z" />
     <circle cx="12" cy="10.25" r="3.25" />
   </svg>
 );
+
 const Ticket = (props) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
@@ -157,18 +181,29 @@ const Ticket = (props) => (
     <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
   </svg>
 );
+
 const Film = (props) => (
-  <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+    <line x1="8" y1="21" x2="16" y2="21"/>
+    <line x1="12" y1="17" x2="12" y2="21"/>
+  </svg>
 );
 
-// Enhanced showtime data
+const ArrowLeft = (props) => (
+  <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M19 12H5M12 19l-7-7 7-7"/>
+  </svg>
+);
+
+// Showtime data
 const showtimes = [
   { id: "showtime-1", time: "03:00 PM", price: 150, available: 45 },
   { id: "showtime-2", time: "06:00 PM", price: 200, available: 23 },
   { id: "showtime-3", time: "09:00 PM", price: 180, available: 31 }
 ];
 
-// Enhanced seat layout with pricing tiers
+// Seat layout with pricing tiers
 const seatSections = [
   {
     id: "platinum",
@@ -218,12 +253,59 @@ const seatSections = [
 const reservedSeats = ["A3", "B5", "C8", "D1", "E4", "F7", "G3", "H5", "I2", "J8", "C4", "D9"];
 
 export default function MovieSeatBooking() {
+  const params = useParams();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const movieId = params.id;
+
+  // States
+  const [movieData, setMovieData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [selectedTime, setSelectedTime] = useState(null);
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [hoveredSeat, setHoveredSeat] = useState(null);
   const [showBookingConfirm, setShowBookingConfirm] = useState(false);
 
-  // Helper function to find seat section based on seat ID - FIXED
+  // Load movie data from URL params or fetch from API
+  useEffect(() => {
+    const loadMovieData = async () => {
+      try {
+        setLoading(true);
+        
+        // Try to get data from URL params first
+        const movieParam = searchParams.get('movie');
+        if (movieParam) {
+          const movie = JSON.parse(decodeURIComponent(movieParam));
+          setMovieData(movie);
+        } else {
+          // Fallback: fetch from TMDB API
+          const res = await fetch(
+            `https://api.themoviedb.org/3/movie/${movieId}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
+          );
+          if (res.ok) {
+            const movie = await res.json();
+            setMovieData(movie);
+          } else {
+            throw new Error('Failed to fetch movie data');
+          }
+        }
+      } catch (error) {
+        console.error('Error loading movie data:', error);
+        toast.error('Error loading movie data. Redirecting...');
+        setTimeout(() => {
+          router.push(`/movies/${movieId}`);
+        }, 2000);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (movieId) {
+      loadMovieData();
+    }
+  }, [searchParams, movieId, router]);
+
+  // Helper function to find seat section
   const getSeatSection = (seat) => {
     for (const section of seatSections) {
       for (const row of section.rows) {
@@ -235,26 +317,24 @@ export default function MovieSeatBooking() {
     return null;
   };
 
-  // Calculate total price based on selected seats
+  // Calculate total price
   const totalPrice = selectedSeats.reduce((total, seat) => {
     const section = getSeatSection(seat);
     return total + (section ? section.price : 0);
   }, 0);
 
+  // Handle seat selection
   const handleSeatClick = (seat) => {
     try {
-      // Prevent selection if the seat is already reserved
       if (reservedSeats.includes(seat)) {
         toast.error("This seat is already booked!");
         return;
       }
 
-      // Toggle seat selection
       if (selectedSeats.includes(seat)) {
         setSelectedSeats(selectedSeats.filter((s) => s !== seat));
         toast.success(`Seat ${seat} deselected`);
       } else {
-        // Limit to a maximum of 8 seats
         if (selectedSeats.length < 8) {
           setSelectedSeats([...selectedSeats, seat]);
           toast.success(`Seat ${seat} selected`);
@@ -268,9 +348,9 @@ export default function MovieSeatBooking() {
     }
   };
 
+  // Handle booking
   const handleBooking = () => {
     try {
-      // Show alerts if showtime or seats are not selected
       if (!selectedTime) {
         toast.error("Please select a showtime first!");
         return;
@@ -286,34 +366,75 @@ export default function MovieSeatBooking() {
     }
   };
 
+  // Confirm booking
   const confirmBooking = () => {
     try {
-      // Reset state after successful booking
       setShowBookingConfirm(false);
       
-      // Show success message with booking details
-      const bookingDetails = `🎉 Booking Confirmed!\nMovie: Avengers: Endgame\nTime: ${selectedTime.time}\nSeats: ${selectedSeats.join(", ")}\nTotal: ৳${totalPrice}`;
+      // Show success message
+      toast.success("Booking confirmed successfully! 🎬");
       
-      toast.success("Booking confirmed successfully! 🎬✨");
-      
-      // Reset selections
-      setSelectedSeats([]);
-      setSelectedTime(null);
+      // Reset selections after a delay to show success
+      setTimeout(() => {
+        setSelectedSeats([]);
+        setSelectedTime(null);
+        // Optionally redirect to a confirmation page
+        // router.push(`/booking-confirmation?id=${Date.now()}`);
+      }, 2000);
     } catch (error) {
       console.error("Error confirming booking:", error);
       toast.error("Error confirming booking. Please try again.");
     }
   };
 
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-red-500 mx-auto mb-4"></div>
+          <div className="text-white text-xl">Loading seat booking...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // If no movie data, show error
+  if (!movieData) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="text-red-500 text-xl mb-4">❌ Movie data not found!</div>
+          <button
+            onClick={() => router.push('/movies')}
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Go Back to Movies
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="pt-20 min-h-screen bg-[var(--color-bg-dark)] text-[var(--color-text-light)] p-4 font-sans">
+    <div className="min-h-screen bg-gray-900 text-white p-4 font-sans">
       <div className="max-w-7xl mx-auto py-8">
+        
+        {/* Back Button */}
+        <button
+          onClick={() => router.push(`/movies/${movieId}`)}
+          className="mb-6 px-4 py-2 bg-gray-700/80 text-white rounded-lg shadow hover:bg-gray-600 transition-colors flex items-center gap-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Movie Details
+        </button>
+
         {/* Header */}
         <div className="text-center mb-10">
-          <h1 className="text-4xl md:text-6xl font-extrabold text-[var(--color-primary)] mb-2">
-            CINEMATIC EXPERIENCE
+          <h1 className="text-4xl md:text-6xl font-extrabold text-red-500 mb-2">
+            BOOK YOUR SEATS
           </h1>
-          <p className="text-[var(--color-text-light)] text-lg">Choose your perfect seats for the ultimate movie experience</p>
+          <p className="text-gray-300 text-lg">Choose your perfect seats for {movieData.title}</p>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
@@ -321,31 +442,47 @@ export default function MovieSeatBooking() {
           <div className="lg:col-span-1 space-y-6">
 
             {/* Movie Card */}
-            <div className="bg-[var(--color-bg-dark)] rounded-2xl p-6 border border-gray-700/50 shadow-xl">
+            <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700/50 shadow-xl">
+              {movieData.backdrop_path && (
+                <div className="relative h-32 rounded-lg overflow-hidden mb-4">
+                  <img
+                    src={`https://image.tmdb.org/t/p/w500${movieData.backdrop_path}`}
+                    alt={movieData.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/50"></div>
+                </div>
+              )}
+              
               <div className="flex items-center gap-4 mb-4">
                 <div className="flex-shrink-0">
-                  <Film className="w-12 h-12 text-[var(--color-primary)]" />
+                  <Film className="w-12 h-12 text-red-500" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-2xl text-[var(--color-text-light)]">Avengers: Endgame</h3>
-                  <p className="text-sm text-gray-400">Action | 3h 1m | PG-13</p>
+                  <h3 className="font-bold text-2xl text-white">{movieData.title}</h3>
+                  <p className="text-sm text-gray-400">
+                    {movieData.genres?.map(g => g.name).join(', ')} | 
+                    {movieData.runtime && ` ${movieData.runtime}m`} | 
+                    ⭐ {movieData.vote_average}
+                  </p>
                 </div>
               </div>
+              
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400 mb-4">
                 <div className="flex items-center gap-1">
-                  <MapPin className="w-4 h-4 text-[var(--color-primary)]" />
+                  <MapPin className="w-4 h-4 text-red-500" />
                   <span>Star Cineplex</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Calendar className="w-4 h-4 text-[var(--color-primary)]" />
-                  <span>Today, Sep 22</span>
+                  <Calendar className="w-4 h-4 text-red-500" />
+                  <span>Today, {new Date().toLocaleDateString()}</span>
                 </div>
               </div>
             </div>
 
             {/* Showtimes */}
-            <div className="bg-[var(--color-bg-dark)] rounded-2xl p-6 border border-gray-700/50 shadow-xl">
-              <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-[var(--color-primary)]">
+            <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700/50 shadow-xl">
+              <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-red-500">
                 <Clock className="w-5 h-5" />
                 Showtimes
               </h3>
@@ -359,7 +496,7 @@ export default function MovieSeatBooking() {
                     }}
                     className={`w-full p-4 rounded-xl transition-all duration-300 border-2 ${
                       selectedTime?.id === show.id
-                        ? "bg-[var(--color-primary)] border-[var(--color-primary-hover)] shadow-lg"
+                        ? "bg-red-600 border-red-500 shadow-lg"
                         : "bg-gray-700/50 border-gray-600/50 hover:bg-gray-600/50"
                     }`}
                   >
@@ -379,8 +516,8 @@ export default function MovieSeatBooking() {
             </div>
 
             {/* Legend */}
-            <div className="bg-[var(--color-bg-dark)] rounded-2xl p-6 border border-gray-700/50 shadow-xl">
-              <h3 className="font-bold mb-4 text-[var(--color-primary)] flex items-center gap-2">
+            <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700/50 shadow-xl">
+              <h3 className="font-bold mb-4 text-red-500 flex items-center gap-2">
                 <Ticket className="w-5 h-5" />
                 Seat Types
               </h3>
@@ -415,7 +552,7 @@ export default function MovieSeatBooking() {
 
           {/* Right Panel - Seat Selection */}
           <div className="lg:col-span-2">
-            <div className="bg-[var(--color-bg-dark)] rounded-2xl p-6 md:p-8 border border-gray-700/50 shadow-xl">
+            <div className="bg-gray-800 rounded-2xl p-6 md:p-8 border border-gray-700/50 shadow-xl">
 
               {/* Screen */}
               <div className="text-center mb-12">
@@ -453,7 +590,7 @@ export default function MovieSeatBooking() {
                                   onMouseEnter={() => setHoveredSeat(seat)}
                                   onMouseLeave={() => setHoveredSeat(null)}
                                   disabled={isReserved}
-                                  className={`relative w-8 h-8 md:w-10 md:h-10 rounded-lg font-bold text-xs transition-all duration-200 transform border-2
+                                  className={`relative w-8 h-8 md:w-10 md:h-10 rounded-lg font-bold text-xs seat-btn border-2
                                     ${isReserved
                                       ? "bg-red-800 border-red-700 cursor-not-allowed text-red-300"
                                       : isSelected
@@ -467,7 +604,7 @@ export default function MovieSeatBooking() {
 
                                   {/* Tooltip */}
                                   {isHovered && !isReserved && seatSection && (
-                                    <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-[var(--color-bg-dark)] text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10 border border-gray-700 shadow-md">
+                                    <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10 border border-gray-700 shadow-md">
                                       {seatSection.name} - ৳{seatSection.price}
                                     </div>
                                   )}
@@ -484,19 +621,19 @@ export default function MovieSeatBooking() {
                 ))}
               </div>
 
-              {/* Selection Summary & Checkout */}
+              {/* Selection Summary */}
               {selectedSeats.length > 0 && (
-                <div className="mt-12 p-6 bg-[var(--color-bg-dark)] rounded-2xl border border-gray-700 shadow-lg">
+                <div className="mt-12 p-6 bg-gray-700 rounded-2xl border border-gray-600 shadow-lg">
                   <div className="flex flex-wrap justify-between items-center gap-4">
                     <div>
-                      <h4 className="font-bold text-lg mb-1 text-[var(--color-primary)]">Selected Seats</h4>
-                      <p className="text-[var(--color-text-light)]">
+                      <h4 className="font-bold text-lg mb-1 text-red-500">Selected Seats</h4>
+                      <p className="text-white">
                         {selectedSeats.join(", ")} ({selectedSeats.length} seat{selectedSeats.length > 1 ? 's' : ''})
                       </p>
                     </div>
                     <div className="text-right">
                       <div className="text-3xl font-bold text-green-400">৳{totalPrice}</div>
-                      <div className="text-sm text-[var(--color-text-light)]">Total Amount</div>
+                      <div className="text-sm text-gray-300">Total Amount</div>
                     </div>
                   </div>
                 </div>
@@ -507,13 +644,13 @@ export default function MovieSeatBooking() {
                 <button
                   onClick={handleBooking}
                   disabled={!selectedTime || selectedSeats.length === 0}
-                  className={`w-full px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 transform
-                    ${selectedTime && selectedSeats.length > 0
+                  className={`w-full px-8 py-4 font-bold text-lg transition-all duration-300 transform flex items-center justify-center gap-2 ${
+                    selectedTime && selectedSeats.length > 0
                       ? "btn-primary hover:scale-105"
                       : "bg-gray-700 text-gray-400 cursor-not-allowed"
-                    }`}
+                  }`}
                 >
-                  <CreditCard className="inline w-5 h-5 mr-2" />
+                  <CreditCard className="w-5 h-5" />
                   Book Now - ৳{totalPrice}
                 </button>
               </div>
@@ -523,24 +660,24 @@ export default function MovieSeatBooking() {
 
         {/* Booking Confirmation Modal */}
         {showBookingConfirm && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-[var(--color-bg-dark)] rounded-2xl p-8 border border-gray-700 max-w-md w-full shadow-2xl">
-              <h3 className="text-3xl font-bold mb-4 text-center text-[var(--color-primary)]">Confirm Booking</h3>
+          <div className="fixed inset-0 bg-black/80 modal-backdrop flex items-center justify-center z-50 p-4">
+            <div className="bg-gray-800 rounded-2xl p-8 border border-gray-700 max-w-md w-full shadow-2xl">
+              <h3 className="text-3xl font-bold mb-4 text-center text-red-500">Confirm Booking</h3>
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-400">Movie:</span>
-                  <span className="font-bold text-lg text-[var(--color-text-light)]">Avengers: Endgame</span>
+                  <span className="font-bold text-lg text-white">{movieData.title}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-400">Time:</span>
-                  <span className="font-bold text-lg text-[var(--color-text-light)]">{selectedTime?.time}</span>
+                  <span className="font-bold text-lg text-white">{selectedTime?.time}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-400">Seats:</span>
-                  <span className="font-bold text-lg text-[var(--color-text-light)]">{selectedSeats.join(", ")}</span>
+                  <span className="font-bold text-lg text-white">{selectedSeats.join(", ")}</span>
                 </div>
                 <div className="flex justify-between text-2xl items-center mt-4 pt-4 border-t border-gray-700">
-                  <span className="font-semibold text-[var(--color-primary)]">Total:</span>
+                  <span className="font-semibold text-red-500">Total:</span>
                   <span className="font-bold text-green-400">৳{totalPrice}</span>
                 </div>
               </div>
@@ -550,13 +687,13 @@ export default function MovieSeatBooking() {
                     setShowBookingConfirm(false);
                     toast.error("Booking cancelled");
                   }}
-                  className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 rounded-xl transition-colors font-semibold"
+                  className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 rounded-xl transition-colors font-semibold text-white"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={confirmBooking}
-                  className="flex-1 py-3 btn-primary"
+                  className="flex-1 py-3 btn-primary font-semibold"
                 >
                   Confirm
                 </button>
