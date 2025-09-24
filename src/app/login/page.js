@@ -52,7 +52,7 @@ export default function LoginPage() {
     setLoading(true) //  start loading when login begins
 
     try {
-      const res = await axiosSecure.post('/auth/login', {
+      const res = await axiosSecure.post('api/auth/login', {
         email,
         password,
       })

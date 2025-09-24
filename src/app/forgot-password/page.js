@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { FaUser, FaLock, FaEnvelope, FaKey, FaArrowLeft } from 'react-icons/fa'
 import { CgSpinner } from 'react-icons/cg'
+import { Router } from 'next/router'
 
 export default function ForgotPassword() {
   const [step, setStep] = useState(1)
@@ -22,7 +23,7 @@ export default function ForgotPassword() {
     setLoading(true)
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API}/auth/forgot-password`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/forgot-password`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -45,7 +46,7 @@ export default function ForgotPassword() {
     setLoading(true)
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API}/auth/verify-otp`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/verify-otp`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -68,7 +69,7 @@ export default function ForgotPassword() {
     setLoading(true)
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API}/auth/reset-password`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/reset-password`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -78,10 +79,12 @@ export default function ForgotPassword() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.message)
       toast.success('Password reset successful ')
+
       setStep(1)
       setEmail('')
       setOtp('')
       setPassword('')
+      Router.push('/login')
     } catch (err) {
       toast.error(err.message)
     } finally {
@@ -172,7 +175,7 @@ export default function ForgotPassword() {
           {/* Step 2: OTP */}
           {step === 2 && (
             <div className="relative">
-              <FaKey className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400" />
+              <FaKey className="absolute top-6 left-3 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
                 placeholder="Enter OTP"
@@ -197,7 +200,7 @@ export default function ForgotPassword() {
           {/* Step 3: Reset Password */}
           {step === 3 && (
             <div className="relative">
-              <FaLock className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400" />
+              <FaLock className="absolute top-6 left-3  transform -translate-y-1/2 text-gray-400" />
               <input
                 type="password"
                 placeholder="Enter new password"
