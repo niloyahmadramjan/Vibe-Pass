@@ -2,13 +2,8 @@
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import { Autoplay, Navigation, Pagination } from 'swiper/modules'
-import 'swiper/css'
-import 'swiper/css/navigation'
-import 'swiper/css/pagination'
 
-// ✅ Loading spinner
+// ✅ Loading spinner (fixed)
 function LoadingSpinner() {
   return (
     <div className="flex items-center justify-center h-screen">
@@ -34,7 +29,6 @@ export default function UpcomingMoviesPage() {
         setLoading(true)
         const res = await fetch(
           `https://api.themoviedb.org/3/movie/upcoming?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&page=${page}`
-          // https://api.themoviedb.org/3/movie/upcoming?api_key=API_KEY&page=1
         )
         const data = await res.json()
         setMovies(data.results || [])
@@ -59,7 +53,7 @@ export default function UpcomingMoviesPage() {
         (v) => v.type === 'Trailer' && v.site === 'YouTube'
       )
       if (trailer) {
-        setTrailerUrl(`https://www.youtube.com/embed/${trailer.key}`)
+        setTrailerUrl(`https://www.youtube.com/embed/${trailer.key}?autoplay=1`)
         setShowTrailer(true)
       } else {
         alert('Trailer not available!')
@@ -71,65 +65,15 @@ export default function UpcomingMoviesPage() {
 
   if (loading) return <LoadingSpinner />
 
-  const heroMovies = movies.slice(0, 6)
-
   return (
-    <div className="min-h-screen text-white">
-      {/* 🎬 Hero Slider */}
-      <div className="relative w-full h-[500px] md:h-[650px]">
-        <Swiper
-          modules={[Autoplay, Navigation, Pagination]}
-          autoplay={{ delay: 4000, disableOnInteraction: false }}
-          navigation
-          pagination={{ clickable: true }}
-          loop
-          className="h-full"
-        >
-          {heroMovies.map((movie) => (
-            <SwiperSlide key={movie.id}>
-              <div className="relative w-full h-[500px] md:h-[650px]">
-                <Image
-                  src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
-                  alt={movie.title}
-                  fill
-                  priority
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent flex flex-col justify-end p-8 md:p-14">
-                  <h1 className="text-3xl md:text-5xl font-extrabold mb-4 text-red-500 drop-shadow-lg">
-                    {movie.title}
-                  </h1>
-                  <p className="max-w-2xl text-gray-200 mb-6 line-clamp-3">
-                    {movie.overview}
-                  </p>
-                  <div className="flex gap-4">
-                    <button
-                      onClick={() => router.push(`/movies/${movie.id}`)}
-                      className="px-5 py-2 bg-red-600 hover:bg-red-700 rounded-lg font-semibold shadow-lg transition"
-                    >
-                      🎟 View Details
-                    </button>
-                    <button
-                      onClick={() => handleWatchTrailer(movie.id)}
-                      className="px-5 py-2 bg-gray-800/70 hover:bg-gray-700 rounded-lg font-semibold shadow-lg transition"
-                    >
-                      ▶ Watch Trailer
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </div>
-
+    <div className="min-h-screen text-white pt-20">
       {/* 🔥 Section Title */}
-      <div className="max-w-7xl mx-auto px-4 md:px-6 mt-12">
+      <div className="max-w-7xl mx-auto px-4 md:px-6">
         <h2 className="text-2xl md:text-3xl font-bold mb-8 text-red-500">
           🎬 Upcoming Movies
         </h2>
 
-        {/* 🃏 Movie Cards - 4 per row */}
+        {/* 🃏 Movie Cards (4 per row on large screens) */}
         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {movies.map((movie) => (
             <div
@@ -138,7 +82,11 @@ export default function UpcomingMoviesPage() {
             >
               <div className="relative w-full h-[280px]">
                 <Image
-                  src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                  src={
+                    movie.poster_path
+                      ? `https://image.tmdb.org/t/p/w500${movie.backdrop_path}`    
+                      : '/placeholder.jpg'
+                  }
                   alt={movie.title}
                   fill
                   className="object-cover group-hover:scale-110 transition-transform duration-500"
@@ -152,12 +100,20 @@ export default function UpcomingMoviesPage() {
                 <h3 className="text-lg font-semibold truncate">{movie.title}</h3>
                 <p className="text-sm text-gray-400 mb-3">{movie.release_date}</p>
 
-                <button
-                  onClick={() => router.push(`/movies/${movie.id}`)}
-                  className="mt-auto px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg shadow-md transition"
-                >
-                  Details
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => router.push(`/movies/${movie.id}`)}
+                    className="mt-auto flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg shadow-md transition"
+                  >
+                    Details
+                  </button>
+                  <button
+                    onClick={() => handleWatchTrailer(movie.id)}
+                    className="mt-auto flex-1 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-semibold rounded-lg shadow-md transition"
+                  >
+                    ▶ Trailer
+                  </button>
+                </div>
               </div>
             </div>
           ))}
