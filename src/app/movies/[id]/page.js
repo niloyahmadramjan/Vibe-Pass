@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import LoadingSpinner from '@/app/hooks/LoadingSpiner'
 import 'leaflet/dist/leaflet.css'
+import { FaArrowLeft } from 'react-icons/fa'
 
 // 📍 Map Locations in Bangladesh
 const mapLocations = {
@@ -138,10 +139,11 @@ export default function MovieDetailsPage() {
       {/*  Banner */}
       <div className="relative mt-10 w-full h-72 md:h-96 rounded-xl overflow-hidden shadow-lg">
         <button
-          onClick={() => router.push('/movies')}
-          className="absolute top-4 left-4 z-10 px-4 py-2 bg-gray-700/80 text-white rounded-lg shadow hover:bg-gray-600"
+          onClick={() => router.back()}
+          className="flex  absolute top-4 left-4 z-10 items-center gap-2 px-3 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition"
         >
-          ⬅ Back
+          <FaArrowLeft />
+          <span>Back</span>
         </button>
         <Image
           src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
