@@ -47,7 +47,7 @@ export default function RegisterPage() {
   // --- React Query Mutations ---
   const sendOtpMutation = useMutation({
     mutationFn: async (data) => {
-      const res = await axiosSecure.post('/auth/send-otp', data)
+      const res = await axiosSecure.post('api/auth/send-otp', data)
       return res.data
     },
     onSuccess: () => {
@@ -61,7 +61,7 @@ export default function RegisterPage() {
 
   const verifyOtpMutation = useMutation({
     mutationFn: async (data) => {
-      const res = await axiosSecure.post('/auth/verify-otp', data)
+      const res = await axiosSecure.post('api/auth/verify-otp', data)
       return res.data
     },
     onSuccess: () => {
@@ -75,7 +75,7 @@ export default function RegisterPage() {
 
   const registerMutation = useMutation({
     mutationFn: async (data) => {
-      const res = await axiosSecure.post('/auth/register', data)
+      const res = await axiosSecure.post('api/auth/register', data)
       return res.data
     },
     onSuccess: (data) => {

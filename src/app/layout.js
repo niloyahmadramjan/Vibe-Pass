@@ -5,6 +5,7 @@ import LayoutWrapper from './components/LayoutWrapper'
 import ReactQueryProvider from './providers/ReactQueryProvider'
 import { AuthProvider } from './context/AuthContext'
 import SessionProviderWrapper from './providers/SessionProviderWrapper'
+import { Toaster } from 'react-hot-toast'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -35,6 +36,7 @@ export default function RootLayout({ children }) {
           <AuthProvider>
             <ReactQueryProvider>
               <LayoutWrapper>{children}</LayoutWrapper>
+              <Toaster position="top-center" reverseOrder={false} />
             </ReactQueryProvider>
           </AuthProvider>
         </SessionProviderWrapper>

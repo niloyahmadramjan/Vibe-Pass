@@ -18,7 +18,7 @@ const handler = NextAuth({
       // Send user data to backend for persistence
       try {
         await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/social-login`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}api/auth/social-login`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
