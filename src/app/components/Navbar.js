@@ -15,9 +15,11 @@ import {
 import { RiMovie2Fill } from 'react-icons/ri'
 import Image from 'next/image'
 
-// 👇 NextAuth + custom auth
+//  NextAuth + custom auth
 import { useSession, signOut } from 'next-auth/react'
 import { useAuth } from '@/app/context/AuthContext'
+import toast from 'react-hot-toast'
+import { Router } from 'next/router'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
@@ -34,6 +36,17 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  const handleLogout = async () => {
+    if (session) {
+      await signOut({ redirect: false })
+    }
+    if (user) {
+      await logout({ redirect: false })
+      toast.success('Logged out successfully!')
+    }
+    Router.refresh()
+  }
 
   const navLinks = [
     { href: '/', label: 'Home', icon: <FiHome className="mr-1" /> },
@@ -111,7 +124,7 @@ export default function Navbar() {
                     {session?.user?.name || user?.name}
                   </span>
                   <button
-                    onClick={() => (session ? signOut() : logout())}
+                    onClick={handleLogout}
                     className="ml-3 bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-white text-sm"
                   >
                     Logout
@@ -192,7 +205,7 @@ export default function Navbar() {
                   {session?.user?.name || user?.name}
                 </span>
                 <button
-                  onClick={() => (session ? signOut() : logout())}
+                  onClick={handleLogout}
                   className="ml-auto bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-white text-sm"
                 >
                   Logout
