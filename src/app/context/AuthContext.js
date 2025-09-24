@@ -6,10 +6,16 @@ import { useSession } from 'next-auth/react'
 const AuthContext = createContext(null)
 
 export const AuthProvider = ({ children }) => {
-  const { data: session } = useSession() // NextAuth session
+  const { data: session, status } = useSession() // NextAuth session
   const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true) // loading state added
 
   useEffect(() => {
+    if (status === 'loading') {
+      setLoading(true)
+      return
+    }
+
     // Case 1: If logged in with social login (NextAuth)
     if (session?.user) {
       setUser({
@@ -18,17 +24,18 @@ export const AuthProvider = ({ children }) => {
         image: session.user.image,
         provider: 'social',
       })
+      setLoading(false)
     } else {
       // Case 2: If logged in with custom JWT
       const savedUser = localStorage.getItem('user')
       if (savedUser) {
         setUser(JSON.parse(savedUser))
       }
+      setLoading(false)
     }
-  }, [session])
+  }, [session, status])
 
   const login = (data) => {
-    // Save JWT token login user
     localStorage.setItem('token', data.token)
     localStorage.setItem('user', JSON.stringify(data.user))
     setUser(data.user)
@@ -41,7 +48,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, setLoading }}>
       {children}
     </AuthContext.Provider>
   )
