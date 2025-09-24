@@ -433,7 +433,7 @@ const confirmBooking = async () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4 font-sans">
+    <div className="min-h-screen bg-gray-900 text-white p-4 font-sans pt-16">
       <div className="max-w-7xl mx-auto py-8">
         
         {/* Back Button */}
