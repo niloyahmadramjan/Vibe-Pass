@@ -95,7 +95,7 @@ export default function LoginPage() {
     }
   }, [status, user, router])
 
-  // ✅ Watch session change
+  //  Watch session change
   useEffect(() => {
     if (status === 'authenticated' && session?.user) {
       Swal.fire({
@@ -222,7 +222,7 @@ export default function LoginPage() {
 
           {/* Links */}
           <div className="flex justify-between mt-6 text-sm text-[var(--color-white)]">
-            <Link href="#" className="hover:underline">
+            <Link href="/forgot-password" className="hover:underline">
               Forgot Password?
             </Link>
             <Link href="/register" className="hover:underline">
