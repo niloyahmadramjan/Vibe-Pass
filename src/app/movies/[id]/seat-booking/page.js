@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
+import axiosSecure from "@/app/api/axiosHook/useAxiosSecure";
+import Image from "next/image";
 
 // Toast notification system
 const toast = {
@@ -367,25 +369,39 @@ export default function MovieSeatBooking() {
   };
 
   // Confirm booking
-  const confirmBooking = () => {
-    try {
-      setShowBookingConfirm(false);
-      
-      // Show success message
-      toast.success("Booking confirmed successfully! 🎬");
-      
-      // Reset selections after a delay to show success
-      setTimeout(() => {
-        setSelectedSeats([]);
-        setSelectedTime(null);
-        // Optionally redirect to a confirmation page
-        // router.push(`/booking-confirmation?id=${Date.now()}`);
-      }, 2000);
-    } catch (error) {
-      console.error("Error confirming booking:", error);
-      toast.error("Error confirming booking. Please try again.");
+
+
+const confirmBooking = async () => {
+  try {
+    setShowBookingConfirm(false);
+
+    const response = await axiosSecure.post('/api/bookings', {
+      movieId,
+      movieTitle: movieData.title,
+      selectedSeats,
+      showtime: selectedTime?.time,
+      totalAmount: totalPrice,
+    });
+
+    toast.success("Booking confirmed and saved! 🎬");
+
+    setTimeout(() => {
+      setSelectedSeats([]);
+      setSelectedTime(null);
+    }, 2000);
+
+  } catch (error) {
+    console.error("Booking error:", error);
+
+    if (error.response?.data?.error) {
+      toast.error(error.response.data.error);
+    } else {
+      toast.error("Server error while saving booking");
     }
-  };
+  }
+};
+
+
 
   // Loading state
   if (loading) {
@@ -445,7 +461,9 @@ export default function MovieSeatBooking() {
             <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700/50 shadow-xl">
               {movieData.backdrop_path && (
                 <div className="relative h-32 rounded-lg overflow-hidden mb-4">
-                  <img
+                  <Image
+                    width={70}
+                    height={70}
                     src={`https://image.tmdb.org/t/p/w500${movieData.backdrop_path}`}
                     alt={movieData.title}
                     className="w-full h-full object-cover"
@@ -660,47 +678,55 @@ export default function MovieSeatBooking() {
 
         {/* Booking Confirmation Modal */}
         {showBookingConfirm && (
-          <div className="fixed inset-0 bg-black/80 modal-backdrop flex items-center justify-center z-50 p-4">
-            <div className="bg-gray-800 rounded-2xl p-8 border border-gray-700 max-w-md w-full shadow-2xl">
-              <h3 className="text-3xl font-bold mb-4 text-center text-red-500">Confirm Booking</h3>
-              <div className="space-y-4 mb-6">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Movie:</span>
-                  <span className="font-bold text-lg text-white">{movieData.title}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Time:</span>
-                  <span className="font-bold text-lg text-white">{selectedTime?.time}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Seats:</span>
-                  <span className="font-bold text-lg text-white">{selectedSeats.join(", ")}</span>
-                </div>
-                <div className="flex justify-between text-2xl items-center mt-4 pt-4 border-t border-gray-700">
-                  <span className="font-semibold text-red-500">Total:</span>
-                  <span className="font-bold text-green-400">৳{totalPrice}</span>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <button
-                  onClick={() => {
-                    setShowBookingConfirm(false);
-                    toast.error("Booking cancelled");
-                  }}
-                  className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 rounded-xl transition-colors font-semibold text-white"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={confirmBooking}
-                  className="flex-1 py-3 btn-primary font-semibold"
-                >
-                  Confirm
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+  <div className="fixed inset-0 bg-black/80 modal-backdrop flex items-center justify-center z-50 p-4">
+    <div className="bg-gray-800 rounded-2xl p-8 border border-gray-700 max-w-md w-full shadow-2xl">
+      <h3 className="text-3xl font-bold mb-4 text-center text-red-500">Confirm Booking</h3>
+      <div className="space-y-4 mb-6">
+        <div className="flex justify-between items-center">
+          <span className="text-gray-400">Movie:</span>
+          <span className="font-bold text-lg text-white">{movieData.title}</span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="text-gray-400">Time:</span>
+          <span className="font-bold text-lg text-white">{selectedTime?.time}</span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="text-gray-400">Seats:</span>
+          <span className="font-bold text-lg text-white">{selectedSeats.join(", ")}</span>
+        </div>
+        <div className="flex justify-between text-2xl items-center mt-4 pt-4 border-t border-gray-700">
+          <span className="font-semibold text-red-500">Total:</span>
+          <span className="font-bold text-green-400">৳{totalPrice}</span>
+        </div>
+      </div>
+
+      <div className="flex gap-4">
+        <button
+          onClick={() => {
+            setShowBookingConfirm(false);
+            toast.error("Booking cancelled");
+          }}
+          className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 rounded-xl transition-colors font-semibold text-white"
+        >
+          Cancel Booking
+        </button>
+
+        <button
+          onClick={() => {
+            // 🧪 Placeholder for future payment logic
+            // 💳 Payment integration will go here
+
+            confirmBooking(); // Keep calling the confirmBooking for now
+          }}
+          className="flex-1 py-3 btn-primary font-semibold"
+        >
+          Pay Now
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
       </div>
     </div>
   );
