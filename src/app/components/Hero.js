@@ -67,7 +67,7 @@ async function fetchTrailer(movieId) {
 }
 
   return (
-    <section className="w-full h-[75vh] lg:h-[80vh] relative mb-20">
+    <section className="w-full h-[40vh] lg:h-[80vh] relative mb-20 pt-16">
       <Swiper
         modules={[Autoplay, Pagination]}
         autoplay={{ delay: 3000, disableOnInteraction: false }}
@@ -78,7 +78,7 @@ async function fetchTrailer(movieId) {
         {movies.map((movie) => (
           <SwiperSlide key={movie.id}>
             <div
-              className="w-full h-[100vh] lg:h-[110vh] bg-cover bg-center relative flex items-center"
+              className="w-full h-[40vh] lg:h-[110vh] bg-cover bg-center relative flex items-center"
               style={{
                 backgroundImage: `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`,
               }}

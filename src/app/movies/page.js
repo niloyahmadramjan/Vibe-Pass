@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-// ✅ Loading spinner component
+// Loading spinner component
 function LoadingSpinner() {
   return (
     <div className="flex items-center justify-center h-screen">
@@ -81,7 +81,7 @@ export default function MoviesPage() {
                 </div>
 
                 <button
-                  onClick={() => router.push(`/movies/${movie.id}`)}
+                  onClick={() => router.push(`/booking/${movie.id}`)}
                   className="mt-4 w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow transition"
                 >
                   Book Now

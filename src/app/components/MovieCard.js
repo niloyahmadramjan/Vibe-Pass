@@ -25,7 +25,7 @@ export default function MovieCard() {
   const [activeTab, setActiveTab] = useState('nowPlaying')
   const [loading, setLoading] = useState(true)
   const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY
-const router = useRouter()
+  const router = useRouter()
   const categories = useMemo(
     () => [
       { key: 'nowPlaying', label: 'Now Playing', url: `${BASE_URL}/movie/now_playing?api_key=${API_KEY}&language=en-US&page=1` },
@@ -42,8 +42,8 @@ const router = useRouter()
   // const handleBookNow = (id) => {
   //   // Movie er data pass kore seat booking page e jao
   //   router.push(`/movies/${id}/seat-booking?movie=${encodeURIComponent(JSON.stringify({
-  
-   
+
+
   //   }))}`)
   // }
   useEffect(() => {
@@ -110,12 +110,12 @@ const router = useRouter()
           movies.map((movie) => (
             <SwiperSlide key={movie.id}>
               <div
-                className="relative w-full h-[290px] sm:h-[300px] md:h-[350px] lg:h-[410px] 
+                className="relative w-full h-[280px] sm:h-[300px] md:h-[350px] lg:h-[410px] 
                 border rounded-md overflow-hidden bg-zinc-900 text-white transition-all duration-300 cursor-pointer
                 border-red-400 hover:shadow-[0_0_15px_rgba(239,68,68,0.7)] group"
               >
                 {/* Poster */}
-                {/* Poster */}
+
                 <div className="relative w-full h-[70%] sm:h-[67%]">
                   <Image
                     src={movie.poster_path ? IMG_URL + movie.poster_path : '/no-poster.png'}
@@ -130,7 +130,7 @@ const router = useRouter()
 
 
                 {/* Title + Buttons */}
-                <div className="p-2 flex flex-col justify-between ">
+                <div className="p-2 flex flex-col justify-between">
                   {/* Title */}
                   <p className="text-sm sm:text-base md:text-lg font-semibold truncate mb-2">
                     {movie.title}
@@ -138,29 +138,29 @@ const router = useRouter()
 
                   {/* Buttons Section */}
                   <div className="flex flex-col gap-2">
-                    {/* Book Now - hover effect */}
-                    {activeTab !== 'upcoming' && ( // upcoming page এ Book Now show হবে না
+                    {/* Book Now - hide on upcoming, hover effect on larger screens */}
+                    {activeTab !== 'upcoming' && (
                       <Link href={`booking/${movie.id}`}>
-                      <button  className="w-full px-4 py-2 rounded-lg bg-red-600 text-white font-semibold 
-      hover:bg-red-700 transition duration-300 opacity-0 group-hover:opacity-100"
+                        <button className="w-full px-4 py-2 rounded-lg bg-red-600 text-white font-semibold 
+          hover:bg-red-700 transition duration-300
+          opacity-100 sm:opacity-0 sm:group-hover:opacity-100" // small screens always visible
                         >
                           Book Now
-                        </button> 
-                     
-                    </Link>
+                        </button>
+                      </Link>
                     )}
 
-                    {/* Details - always visible */}
+                    {/* Details - always visible on all devices */}
                     <Link href={`/movies/${movie.id}`}>
-                      <button className="w-full px-4 py-2 text-white  bg-red-600 rounded-lg 
-     hover:bg-red-700   transition duration-300"
+                      <button className="w-full px-4 py-2 text-white bg-red-600 rounded-lg 
+        hover:bg-red-700 transition duration-300"
                       >
                         Details
                       </button>
                     </Link>
                   </div>
-
                 </div>
+
               </div>
             </SwiperSlide>
           ))
