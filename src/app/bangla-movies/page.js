@@ -34,9 +34,9 @@ export default function BanglaMoviesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-white px-6 py-10 pt-20 max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-white px-6 py-10 pt-25 max-w-7xl mx-auto">
       <h1 className="text-3xl md:text-4xl font-bold mb-10 text-yellow-400 uppercase">
-        bengali connection
+        ShowTime BD
       </h1>
 
       {movies.length === 0 ? (

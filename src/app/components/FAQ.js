@@ -43,7 +43,7 @@ export default function FAQ() {
     };
 
     return (
-        <section className="text-white max-w-7xl mx-auto py-12 px-4 sm:px-6 md:px-20">
+        <section className="text-white max-w-7xl mx-auto py-12 px-4  ">
             {/* Title aligned left with red highlight */}
             <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-left text-red-500 mb-8">
                 Frequently Asked <span className="text-red-500">Questions</span>
