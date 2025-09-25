@@ -77,7 +77,7 @@ export default function AddShowtimesPage() {
   };
 
   return (
-    <div className="pt-15 md:pt-15 lg:pt-15 min-h-screen p-4 md:p-6 bg-[var(--color-bg-dark)] text-[var(--color-text-light)]">
+    <div className="min-h-screen p-4 md:p-6 bg-[var(--color-bg-dark)] text-[var(--color-text-light)]">
       <Toaster position="top-right" reverseOrder={false} />
       <div className="max-w-6xl mx-auto">
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-[var(--color-primary)] mb-6 md:mb-8 text-center">
