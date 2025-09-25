@@ -69,8 +69,8 @@ export default function UpcomingMoviesPage() {
     <div className="min-h-screen text-white pt-20">
       {/* 🔥 Section Title */}
       <div className="max-w-7xl mx-auto px-4 md:px-6">
-        <h2 className="text-2xl md:text-3xl font-bold mb-8 text-red-500">
-          🎬 Upcoming Movies
+        <h2 className="text-2xl md:text-3xl font-bold py-8 mb-8 text-red-500">
+         Upcoming Movies
         </h2>
 
         {/* 🃏 Movie Cards (4 per row on large screens) */}
