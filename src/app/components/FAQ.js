@@ -50,7 +50,7 @@ export default function FAQ() {
             </h2>
 
             {/* FAQ container */}
-            <div className="max-w-7xl mx-auto space-y-4">
+            <div className=" space-y-4">
                 {faqs.map((faq, index) => (
                     <div
                         key={index}
