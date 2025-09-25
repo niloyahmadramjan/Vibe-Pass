@@ -1,6 +1,6 @@
 'use client'
 import axiosSecure from '@/app/api/axiosHook/useAxiosSecure'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 export default function MovieDetailsPage() {
@@ -12,6 +12,7 @@ export default function MovieDetailsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [map, setMap] = useState(null)
+  const router = useRouter();
 
   // State for location selection
   const [selectedDivision, setSelectedDivision] = useState('')
@@ -60,9 +61,7 @@ export default function MovieDetailsPage() {
     if (id) fetchMovie()
   }, [id])
 
-  const handleBookNow = () => {
-    console.log(' Booking started for', movie?.title)
-  }
+ 
 
   const trailer = movie?.videos?.results?.find(
     (vid) => vid.type === 'Trailer' && vid.site === 'YouTube'
