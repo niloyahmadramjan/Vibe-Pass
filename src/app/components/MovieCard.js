@@ -141,7 +141,7 @@ export default function MovieCard() {
                     {/* Book Now - hide on upcoming, hover effect on larger screens */}
                     {activeTab !== 'upcoming' && (
                       <Link href={`booking/${movie.id}`}>
-                        <button className="w-full px-4 py-2 rounded-lg bg-red-600 text-white font-semibold 
+                        <button className="w-10/12 flex justify-center  mx-auto py-2 rounded-lg bg-red-600 text-white font-semibold 
           hover:bg-red-700 transition duration-300
           opacity-100 sm:opacity-0 sm:group-hover:opacity-100" // small screens always visible
                         >
@@ -152,7 +152,7 @@ export default function MovieCard() {
 
                     {/* Details - always visible on all devices */}
                     <Link href={`/movies/${movie.id}`}>
-                      <button className="w-full px-4 py-2 text-white bg-red-600 rounded-lg 
+                      <button className="w-10/12 flex justify-center  mx-auto py-2 text-white bg-red-600 rounded-lg 
         hover:bg-red-700 transition duration-300"
                       >
                         Details
