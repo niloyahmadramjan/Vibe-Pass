@@ -5,11 +5,12 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { signIn, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import Swal from 'sweetalert2'
 import LoadingSpinner from '../hooks/LoadingSpiner'
-import { useAuth } from '@/app/context/AuthContext'
+import { useAuth } from '../context/AuthContext'
 import axiosSecure from '../api/axiosHook/useAxiosSecure'
+import { FaArrowLeft } from 'react-icons/fa'
 
-// Mock slider data
 const mockSlides = [
   {
     id: 1,
@@ -31,12 +32,12 @@ const mockSlides = [
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [current, setCurrent] = useState(0)
-  const { status } = useSession()
+
+  const { data: session, status } = useSession()
   const router = useRouter()
-  const { login } = useAuth() // custom AuthContext for JWT
+  const { login, user, loading, setLoading } = useAuth() //  from AuthContext
 
   // Auto slide every 3s
   useEffect(() => {
@@ -48,11 +49,11 @@ export default function LoginPage() {
 
   const handleLogin = async (e) => {
     e.preventDefault()
-    setLoading(true)
     setError('')
+    setLoading(true) //  start loading when login begins
 
     try {
-      const res = await axiosSecure.post('/auth/login', {
+      const res = await axiosSecure.post('api/auth/login', {
         email,
         password,
       })
@@ -60,32 +61,65 @@ export default function LoginPage() {
       // save user + token in context/localStorage
       login(res.data)
 
+      // SweetAlert success popup
+      Swal.fire({
+        icon: 'success',
+        title: 'Login Successful!',
+        text: 'Welcome back to VibePass ',
+        timer: 2000,
+        showConfirmButton: false,
+      })
+
       // redirect after login
-      router.push('/')
+      setTimeout(() => {
+        router.push('/')
+      }, 2000)
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed')
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Login Failed!',
+        text: err.response?.data?.message || 'Something went wrong',
+        timer: 2500,
+        showConfirmButton: false,
+      })
     } finally {
-      setLoading(false)
+      setLoading(false) //  always stop loading
     }
   }
 
-  // redirect when authenticated (via social login)
+  // redirect if already logged in (NextAuth social or JWT user)
   useEffect(() => {
-    if (status === 'authenticated') {
+    if (status === 'authenticated' || user) {
       router.push('/')
     }
-  }, [status, router])
+  }, [status, user, router])
 
-  // 🔹 show spinner if session is loading
-  if (status === 'loading') {
+  //  Watch session change
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Login Successful!',
+        text: `Welcome back, ${session.user.name || 'User'}`,
+        timer: 2000,
+        showConfirmButton: false,
+      })
+    }
+  }, [status, session])
+
+  // 🔹 global loading states
+  if (loading || status === 'loading') {
     return <LoadingSpinner />
   }
 
-  // 🔹 show spinner while redirecting (authenticated)
-  if (status === 'authenticated') {
+  // 🔹 if user already logged in, redirect (prevent flicker)
+  if (user || status === 'authenticated') {
     return <LoadingSpinner />
   }
 
+  // 🔹 Login Page (only if no user)
   return (
     <div className="flex min-h-screen">
       {/* Left Slider (hidden on mobile) */}
@@ -109,9 +143,8 @@ export default function LoginPage() {
       </div>
 
       {/* Right Login Form */}
-      <div className="w-full md:w-4/12 flex flex-col justify-center px-10">
+      <div className="w-full md:w-4/12 flex flex-col justify-center px-10 relative">
         <div className="max-w-sm mx-auto w-full">
-          {/* Logo */}
           <h1 className="text-[var(--color-primary)] text-3xl font-bold mb-5 text-center">
             Welcome Back to VibePass
           </h1>
@@ -119,7 +152,6 @@ export default function LoginPage() {
             Log in to book your favorite movies in seconds.
           </h2>
 
-          {/* Error */}
           {error && <p className="text-red-200 text-sm mb-3">{error}</p>}
 
           {/* Login Form */}
@@ -191,7 +223,7 @@ export default function LoginPage() {
 
           {/* Links */}
           <div className="flex justify-between mt-6 text-sm text-[var(--color-white)]">
-            <Link href="#" className="hover:underline">
+            <Link href="/forgot-password" className="hover:underline">
               Forgot Password?
             </Link>
             <Link href="/register" className="hover:underline">
@@ -204,6 +236,13 @@ export default function LoginPage() {
             VibePass v1.0.0 <br /> All Rights Reserved.
           </p>
         </div>
+        <button
+          onClick={() => router.back()}
+          className="flex  absolute top-4 left-4 z-10 items-center gap-2 px-3 py-2 rounded-lg  hover:!bg-red-500 transition"
+        >
+          <FaArrowLeft />
+          <span>Back</span>
+        </button>
       </div>
     </div>
   )

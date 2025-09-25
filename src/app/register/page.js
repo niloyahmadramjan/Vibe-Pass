@@ -8,6 +8,8 @@ import { useForm } from 'react-hook-form'
 import { useMutation } from '@tanstack/react-query'
 import { useAuth } from '@/app/context/AuthContext'
 import axiosSecure from '../api/axiosHook/useAxiosSecure'
+import { useRouter } from 'next/navigation'
+import { FaArrowLeft } from 'react-icons/fa'
 
 // Mock slider data
 const mockSlides = [
@@ -35,6 +37,7 @@ export default function RegisterPage() {
   const [emailData, setEmailData] = useState(null)
   const otpRefs = useRef([])
   const { login } = useAuth()
+  const router = useRouter();
 
   // React Hook Form
   const {
@@ -47,7 +50,7 @@ export default function RegisterPage() {
   // --- React Query Mutations ---
   const sendOtpMutation = useMutation({
     mutationFn: async (data) => {
-      const res = await axiosSecure.post('/auth/send-otp', data)
+      const res = await axiosSecure.post('api/auth/send-otp', data)
       return res.data
     },
     onSuccess: () => {
@@ -61,7 +64,7 @@ export default function RegisterPage() {
 
   const verifyOtpMutation = useMutation({
     mutationFn: async (data) => {
-      const res = await axiosSecure.post('/auth/verify-otp', data)
+      const res = await axiosSecure.post('api/auth/verify-otp', data)
       return res.data
     },
     onSuccess: () => {
@@ -75,7 +78,7 @@ export default function RegisterPage() {
 
   const registerMutation = useMutation({
     mutationFn: async (data) => {
-      const res = await axiosSecure.post('/auth/register', data)
+      const res = await axiosSecure.post('api/auth/register', data)
       return res.data
     },
     onSuccess: (data) => {
@@ -166,7 +169,14 @@ export default function RegisterPage() {
       </div>
 
       {/* Right Form */}
-      <div className="w-full md:w-4/12 flex flex-col justify-center px-10">
+      <div className="w-full md:w-4/12 flex flex-col justify-center px-10 relative">
+        <button
+          onClick={() => router.back()}
+          className="flex  absolute top-4 left-4 z-10 items-center gap-2 px-3 py-2 rounded-lg  hover:!bg-red-500 transition"
+        >
+          <FaArrowLeft />
+          <span>Back</span>
+        </button>
         <div className="max-w-sm mx-auto w-full">
           <h1 className="text-[var(--color-primary)] text-4xl text-center font-bold mb-5">
             Join VibePass Today!

@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import LoadingSpinner from '@/app/hooks/LoadingSpiner'
 import 'leaflet/dist/leaflet.css'
+import { FaArrowLeft } from 'react-icons/fa'
 
 // 📍 Map Locations in Bangladesh
 const mapLocations = {
@@ -112,15 +113,37 @@ export default function MovieDetailsPage() {
     (vid) => vid.type === 'Trailer' && vid.site === 'YouTube'
   )
 
+
+    // Book Now handler function
+  const handleBookNow = () => {
+    // Movie er data pass kore seat booking page e jao
+    router.push(`/movies/${id}/seat-booking?movie=${encodeURIComponent(JSON.stringify({
+      id: movie.id,
+      title: movie.title,
+      backdrop_path: movie.backdrop_path,
+      release_date: movie.release_date,
+      runtime: movie.runtime,
+      vote_average: movie.vote_average,
+      vote_count: movie.vote_count,
+      genres: movie.genres
+    }))}`)
+  }
+
+  if (loading) return <LoadingSpinner />
+  if (!movie)
+    return (
+      <div className="p-6 text-center text-red-500">❌ Movie not found!</div>
+    )
   return (
     <div className="p-4 md:p-6 mx-auto space-y-10 text-white max-w-7xl">
       {/*  Banner */}
       <div className="relative mt-10 w-full h-72 md:h-96 rounded-xl overflow-hidden shadow-lg">
         <button
-          onClick={() => router.push('/movies')}
-          className="absolute top-4 left-4 z-10 px-4 py-2 bg-gray-700/80 text-white rounded-lg shadow hover:bg-gray-600"
+          onClick={() => router.back()}
+          className="flex  absolute top-4 left-4 z-10 items-center gap-2 px-3 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition"
         >
-          ⬅ Back
+          <FaArrowLeft />
+          <span>Back</span>
         </button>
         <Image
           src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
@@ -195,14 +218,24 @@ export default function MovieDetailsPage() {
       </div>
 
       {/* Trailer Button */}
-      {trailer && (
+      <div className="flex gap-4 flex-wrap">
+        {trailer && (
+          <button
+            onClick={() => setShowTrailer(true)}
+            className="px-6 py-3 rounded-lg bg-red-600 hover:bg-red-700 transition flex items-center gap-2"
+          >
+            ▶ Watch Trailer
+          </button>
+        )}
+        
+        {/* Book Now Button */}
         <button
-          onClick={() => setShowTrailer(true)}
-          className="px-6 py-3 rounded-lg bg-red-600 hover:bg-red-700 transition"
+          onClick={handleBookNow}
+          className="px-8 py-3 rounded-lg bg-green-600 hover:bg-green-700 transition-all duration-300 transform hover:scale-105 flex items-center gap-2 shadow-lg"
         >
-          ▶ Watch Trailer
+          🎫 Book Now
         </button>
-      )}
+      </div>
 
       {/*  Location Buttons */}
       <h2 className="text-xl md:text-2xl font-bold mb-4 text-green-400">
