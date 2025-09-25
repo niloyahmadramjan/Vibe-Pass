@@ -251,7 +251,7 @@ export default function MovieDetailsPage() {
       </h2>
       <div
         id="map"
-        className="w-full md:w-3/4 lg:w-1/2 h-72 md:h-96 rounded-xl overflow-hidden shadow-lg mx-auto"
+        className="w-full  h-72 md:h-96 rounded-xl overflow-hidden shadow-lg mx-auto"
       />
     </div>
   )
