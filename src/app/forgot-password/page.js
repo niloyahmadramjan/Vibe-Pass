@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { FaUser, FaLock, FaEnvelope, FaKey, FaArrowLeft } from 'react-icons/fa'
 import { CgSpinner } from 'react-icons/cg'
-import { Router } from 'next/router'
+import { useRouter } from 'next/navigation'
 
 export default function ForgotPassword() {
   const [step, setStep] = useState(1)
@@ -11,6 +11,7 @@ export default function ForgotPassword() {
   const [otp, setOtp] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
   const steps = [
     { id: 1, name: 'Enter Email' },
@@ -84,7 +85,7 @@ export default function ForgotPassword() {
       setEmail('')
       setOtp('')
       setPassword('')
-      Router.push('/login')
+      router.push('/login')
     } catch (err) {
       toast.error(err.message)
     } finally {

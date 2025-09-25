@@ -9,6 +9,7 @@ import Swal from 'sweetalert2'
 import LoadingSpinner from '../hooks/LoadingSpiner'
 import { useAuth } from '../context/AuthContext'
 import axiosSecure from '../api/axiosHook/useAxiosSecure'
+import { FaArrowLeft } from 'react-icons/fa'
 
 const mockSlides = [
   {
@@ -142,7 +143,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right Login Form */}
-      <div className="w-full md:w-4/12 flex flex-col justify-center px-10">
+      <div className="w-full md:w-4/12 flex flex-col justify-center px-10 relative">
         <div className="max-w-sm mx-auto w-full">
           <h1 className="text-[var(--color-primary)] text-3xl font-bold mb-5 text-center">
             Welcome Back to VibePass
@@ -235,6 +236,13 @@ export default function LoginPage() {
             VibePass v1.0.0 <br /> All Rights Reserved.
           </p>
         </div>
+        <button
+          onClick={() => router.back()}
+          className="flex  absolute top-4 left-4 z-10 items-center gap-2 px-3 py-2 rounded-lg  hover:!bg-red-500 transition"
+        >
+          <FaArrowLeft />
+          <span>Back</span>
+        </button>
       </div>
     </div>
   )
