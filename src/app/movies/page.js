@@ -2,15 +2,8 @@
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import LoadingSpinner from '../hooks/LoadingSpiner'
 
-// Loading spinner component
-function LoadingSpinner() {
-  return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="w-12 h-12 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
-    </div>
-  )
-}
 
 export default function MoviesPage() {
   const [movies, setMovies] = useState([])

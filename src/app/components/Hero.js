@@ -17,38 +17,40 @@ const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY
 useEffect(() => {
   async function fetchMovies() {
     try {
-      // Fetch Bollywood (IN) and Hollywood (EN) movies
-      const [indianRes, englishRes] = await Promise.all([
+      // Fetch Action movies: Hollywood + Bollywood
+      const [hollywoodRes, bollywoodRes] = await Promise.all([
         fetch(
-          `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_origin_country=IN&sort_by=popularity.desc&page=1`
+          `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=28&with_original_language=en&sort_by=popularity.desc&page=1`
         ),
         fetch(
-          `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=en&sort_by=popularity.desc&page=1`
+          `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=28&with_origin_country=IN&sort_by=popularity.desc&page=1`
         ),
       ])
 
-      const [indianData, englishData] = await Promise.all([
-        indianRes.json(),
-        englishRes.json(),
+      const [hollywoodData, bollywoodData] = await Promise.all([
+        hollywoodRes.json(),
+        bollywoodRes.json(),
       ])
 
-      // Merge results
+      // Merge results and filter only movies with backdrops
       const merged = [
-        ...(indianData.results || []),
-        ...(englishData.results || []),
+        ...(hollywoodData.results || []),
+        ...(bollywoodData.results || []),
       ].filter((m) => m.backdrop_path)
 
       // Remove duplicates by ID
       const unique = Array.from(new Map(merged.map((m) => [m.id, m])).values())
 
-      // Pick top 7
-      setMovies(unique.slice(6, 16))
+      // Pick top 6–8 epic action movies for hero banners
+      setMovies(unique.slice(8, 20))
     } catch (err) {
       console.error('Error fetching movies:', err)
     }
   }
   fetchMovies()
 }, [API_KEY])
+
+
 
 async function fetchTrailer(movieId) {
   const res = await fetch(
@@ -66,7 +68,7 @@ async function fetchTrailer(movieId) {
 }
 
   return (
-    <section className="w-full h-[40vh] lg:h-[80vh] relative mb-20 pt-16">
+    <section className="w-full h-[40vh] lg:h-[80vh] relative mb-20 pt-16 md:pt-0">
       <Swiper
         modules={[Autoplay, Pagination]}
         autoplay={{ delay: 3000, disableOnInteraction: false }}
