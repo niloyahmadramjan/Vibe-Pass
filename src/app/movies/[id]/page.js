@@ -17,7 +17,7 @@ export default function MovieDetailsPage() {
   const [selectedDivision, setSelectedDivision] = useState('')
   const [selectedDistrict, setSelectedDistrict] = useState('')
 
-  // ✅ Fetch Hall Data
+  // Fetch Hall Data
   useEffect(() => {
     const fetchHallData = async () => {
       try {
@@ -61,7 +61,7 @@ export default function MovieDetailsPage() {
   }, [id])
 
   const handleBookNow = () => {
-    console.log('🎟 Booking started for', movie?.title)
+    console.log(' Booking started for', movie?.title)
   }
 
   const trailer = movie?.videos?.results?.find(
@@ -179,7 +179,7 @@ export default function MovieDetailsPage() {
           </button>
         )}
         <button
-          onClick={handleBookNow}
+          onClick={() => router.push(`/booking/${movie.id}`)}
           className="px-8 py-3 rounded-lg bg-green-600 hover:bg-green-700 transition-all duration-300 transform hover:scale-105 flex items-center gap-2 shadow-lg"
         >
           🎫 Book Now
