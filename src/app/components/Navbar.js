@@ -9,9 +9,9 @@ import {
   FiHome,
   FiInfo,
   FiCalendar,
-  FiBook,
   FiUser,
 } from 'react-icons/fi'
+import { GiTheater } from 'react-icons/gi'
 import { RiMovie2Fill } from 'react-icons/ri'
 import Image from 'next/image'
 
@@ -66,6 +66,11 @@ export default function Navbar() {
       href: '/bangla-movies',
       label: 'BanglaFlix',
       icon: <FaFilm className="mr-1" />,
+    },
+    {
+      href: '/location',
+      label: 'Theaters',
+      icon: <GiTheater className="mr-1" />,
     },
     { href: '/about', label: 'About', icon: <FiInfo className="mr-1" /> },
   ]

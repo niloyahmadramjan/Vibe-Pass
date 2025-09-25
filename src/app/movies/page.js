@@ -40,7 +40,7 @@ export default function MoviesPage() {
   return (
     <div className="min-h-screen text-white px-4 md:px-6 py-10 pt-25 max-w-7xl mx-auto">
       <h1 className="text-3xl md:text-4xl font-bold mb-10 text-red-500">
-      Popular Movies
+        Popular Movies
       </h1>
 
       {movies.length === 0 ? (

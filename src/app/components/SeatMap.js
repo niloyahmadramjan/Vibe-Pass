@@ -28,7 +28,6 @@ export default function SeatMap({
   const [redIcon, setRedIcon] = useState(null)
 
   useEffect(() => {
-    // Import Leaflet only on client
     import('leaflet').then((L) => {
       const icon = new L.Icon({
         iconUrl:
@@ -67,10 +66,10 @@ export default function SeatMap({
         style={{ height: '100%', width: '100%' }}
         whenCreated={(mapInstance) => (mapRef.current = mapInstance)}
       >
-        {/* Dark Map Tiles */}
+        {/* Light Map Tiles */}
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, Tiles &copy; <a href="https://carto.com/">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
           subdomains={['a', 'b', 'c', 'd']}
         />
 
@@ -79,9 +78,9 @@ export default function SeatMap({
           markers.map((marker, index) => (
             <Marker key={index} position={marker.position} icon={redIcon}>
               <Popup>
-                <div className="text-sm text-white bg-black p-2 rounded-md">
+                <div className="text-sm text-black bg-white p-2 rounded-md">
                   <h3 className="font-bold">{marker.name}</h3>
-                  <p className="text-gray-300">District: {marker.district}</p>
+                  <p className="text-gray-700">District: {marker.district}</p>
                 </div>
               </Popup>
             </Marker>
