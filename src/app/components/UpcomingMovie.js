@@ -60,7 +60,7 @@ export default function UpcomingMovie() {
 
   return (
     <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto">
-      <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-3xl font-bold text-red-500 mb-6 text-left">
+      <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-3xl font-bold  text-red-500 mb-6 text-left">
         Coming Soon To Theaters
       </h2>
 
@@ -70,12 +70,12 @@ export default function UpcomingMovie() {
         navigation
         loop={false}
         spaceBetween={20}
-        slidesPerView={2} // default (mobile small screens)
-        slidesPerGroup={2} // move 2 cards at a time on very small screens
+        slidesPerView={2} // default for small screens
+        slidesPerGroup={2}
         breakpoints={{
-          640: { slidesPerView: 3, slidesPerGroup: 3 }, // mobile landscape
-          768: { slidesPerView: 4, slidesPerGroup: 4 }, // tablet
-          1024: { slidesPerView: 6, slidesPerGroup: 6 }, // desktop
+          640: { slidesPerView: 3, slidesPerGroup: 3 },   // mobile landscape
+          768: { slidesPerView: 4, slidesPerGroup: 4 },   // tablet
+          1024: { slidesPerView: 5, slidesPerGroup: 5 },  // desktop 5 cards per row
         }}
       >
         {upcoming.map((movie) => (
@@ -86,7 +86,7 @@ export default function UpcomingMovie() {
                          border-red-400 hover:shadow-[0_0_20px_rgba(239,68,68,0.7)] group"
             >
               {/* Poster */}
-              <div className="relative w-full h-[240px] sm:h-[300px] md:h-[360px] lg:h-[420px]">
+              <div className="relative w-full h-[200px] sm:h-[250px] md:h-[300px] lg:h-[350px]">
                 <Image
                   src={
                     movie.poster_path
@@ -95,7 +95,7 @@ export default function UpcomingMovie() {
                   }
                   alt={movie.title}
                   width={240}
-                  height={360}
+                  height={260}
                   className="object-cover w-full h-full"
                 />
                 <div className="absolute inset-0 bg-red-500 opacity-0 group-hover:opacity-20 transition duration-300"></div>

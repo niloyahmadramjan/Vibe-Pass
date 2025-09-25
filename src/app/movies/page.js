@@ -46,7 +46,7 @@ export default function MoviesPage() {
       {movies.length === 0 ? (
         <p className="text-center text-gray-400">No movies found!</p>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
           {movies.map((movie) => (
             <div
               key={movie.id}

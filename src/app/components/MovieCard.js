@@ -6,6 +6,7 @@ import { Navigation } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 // 🔹 Loading Spinner
 function Spinner() {
@@ -15,50 +16,36 @@ function Spinner() {
     </div>
   )
 }
+
 const BASE_URL = 'https://api.themoviedb.org/3'
 const IMG_URL = 'https://image.tmdb.org/t/p/w500'
-
-
 
 export default function MovieCard() {
   const [moviesData, setMoviesData] = useState({})
   const [activeTab, setActiveTab] = useState('nowPlaying')
   const [loading, setLoading] = useState(true)
-
   const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY
-
-
+const router = useRouter()
   const categories = useMemo(
     () => [
-      {
-        key: 'nowPlaying',
-        label: 'Now Playing',
-        url: `${BASE_URL}/movie/now_playing?api_key=${API_KEY}&language=en-US&page=1`,
-      },
-      {
-        key: 'trending',
-        label: 'Trending',
-        url: `${BASE_URL}/trending/movie/week?api_key=${API_KEY}`,
-      },
-      {
-        key: 'popular',
-        label: 'Popular',
-        url: `${BASE_URL}/movie/popular?api_key=${API_KEY}&language=en-US&page=1`,
-      },
-      {
-        key: 'topRated',
-        label: 'Top Rated',
-        url: `${BASE_URL}/movie/top_rated?api_key=${API_KEY}&language=en-US&page=1`,
-      },
-      {
-        key: 'upcoming',
-        label: 'Upcoming',
-        url: `${BASE_URL}/movie/upcoming?api_key=${API_KEY}&language=en-US&page=1`,
-      },
+      { key: 'nowPlaying', label: 'Now Playing', url: `${BASE_URL}/movie/now_playing?api_key=${API_KEY}&language=en-US&page=1` },
+      { key: 'trending', label: 'Trending', url: `${BASE_URL}/trending/movie/week?api_key=${API_KEY}` },
+      { key: 'popular', label: 'Popular', url: `${BASE_URL}/movie/popular?api_key=${API_KEY}&language=en-US&page=1` },
+      { key: 'topRated', label: 'Top Rated', url: `${BASE_URL}/movie/top_rated?api_key=${API_KEY}&language=en-US&page=1` },
+      { key: 'upcoming', label: 'Upcoming', url: `${BASE_URL}/movie/upcoming?api_key=${API_KEY}&language=en-US&page=1` },
     ],
-    [API_KEY] 
+    [API_KEY]
   )
 
+
+
+  // const handleBookNow = (id) => {
+  //   // Movie er data pass kore seat booking page e jao
+  //   router.push(`/movies/${id}/seat-booking?movie=${encodeURIComponent(JSON.stringify({
+  
+   
+  //   }))}`)
+  // }
   useEffect(() => {
     const fetchAllMovies = async () => {
       setLoading(true)
@@ -70,12 +57,10 @@ export default function MovieCard() {
             return { key: cat.key, movies: data.results || [] }
           })
         )
-
         const dataObj = results.reduce((acc, cur) => {
           acc[cur.key] = cur.movies
           return acc
         }, {})
-
         setMoviesData(dataObj)
       } catch (error) {
         console.error('Error fetching movies:', error)
@@ -83,12 +68,10 @@ export default function MovieCard() {
         setLoading(false)
       }
     }
-
     fetchAllMovies()
-  }, [categories]) 
+  }, [categories])
 
   const movies = moviesData[activeTab] || []
-
   if (loading) return <Spinner />
 
   return (
@@ -100,10 +83,9 @@ export default function MovieCard() {
             key={cat.key}
             onClick={() => setActiveTab(cat.key)}
             className={`px-3 py-2 sm:px-4 sm:py-2 rounded-md text-sm sm:text-base font-semibold transition-colors duration-300 
-              ${
-                activeTab === cat.key
-                  ? 'bg-red-600 text-white'
-                  : 'bg-zinc-800 text-gray-300 hover:bg-red-500 hover:text-white'
+              ${activeTab === cat.key
+                ? 'bg-red-600 text-white'
+                : 'bg-zinc-800 text-gray-300 hover:bg-red-500 hover:text-white'
               }`}
           >
             {cat.label}
@@ -118,70 +100,74 @@ export default function MovieCard() {
         slidesPerView={2}
         spaceBetween={10}
         breakpoints={{
-          640: { slidesPerView: 3, spaceBetween: 14 }, // mobile
-          768: { slidesPerView: 4, spaceBetween: 16 }, // tablet
-          1024: { slidesPerView: 6, spaceBetween: 20 }, // desktop
+          640: { slidesPerView: 3, spaceBetween: 14 },
+          768: { slidesPerView: 4, spaceBetween: 16 },
+          1024: { slidesPerView: 6, spaceBetween: 20 },
         }}
         className="pb-10"
       >
         {movies.length > 0 ? (
           movies.map((movie) => (
             <SwiperSlide key={movie.id}>
-                <Link href={`/movies/${movie.id}`}>
               <div
-                className="relative w-full 
-                           h-[250px] sm:h-[320px] md:h-[380px] lg:h-[420px] 
-                           border rounded-md overflow-hidden 
-                           bg-zinc-900 text-white transition-all duration-300 cursor-pointer
-                           border-red-400 hover:shadow-[0_0_15px_rgba(239,68,68,0.7)] group"
+                className="relative w-full h-[290px] sm:h-[300px] md:h-[350px] lg:h-[410px] 
+                border rounded-md overflow-hidden bg-zinc-900 text-white transition-all duration-300 cursor-pointer
+                border-red-400 hover:shadow-[0_0_15px_rgba(239,68,68,0.7)] group"
               >
                 {/* Poster */}
-                <div className="relative">
+                {/* Poster */}
+                <div className="relative w-full h-[70%] sm:h-[67%]">
                   <Image
-                    src={
-                      movie.poster_path
-                        ? IMG_URL + movie.poster_path
-                        : '/no-poster.png'
-                    }
+                    src={movie.poster_path ? IMG_URL + movie.poster_path : '/no-poster.png'}
                     alt={movie.title || 'No title'}
-                    width={220}
-                    height={320}
-                    className="object-cover w-full h-[70%] sm:h-[75%]"
-                    // 🔹 Blur fallback if image is missing
+                    fill
+                    className="object-cover"
                     placeholder="blur"
                     blurDataURL="/blur-placeholder.png"
                   />
-
                   <div className="absolute inset-0 bg-red-500 opacity-0 group-hover:opacity-20 transition duration-300"></div>
-
-                  {/* Book Button */}
-                  <button
-                    onClick={() => alert(`Booking ticket for ${movie.title}`)}
-                    className="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1.5 sm:px-4 sm:py-2 
-                               bg-red-600 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-lg
-                               block sm:opacity-0 sm:group-hover:opacity-100 
-                               transition duration-300 hover:bg-red-700"
-                  >
-                    Book Now
-                  </button>
                 </div>
 
-                {/* Title */}
-                <div className="p-2 text-center">
-                  <p className="text-sm sm:text-base md:text-lg font-semibold truncate">
+
+                {/* Title + Buttons */}
+                <div className="p-2 flex flex-col justify-between ">
+                  {/* Title */}
+                  <p className="text-sm sm:text-base md:text-lg font-semibold truncate mb-2">
                     {movie.title}
                   </p>
+
+                  {/* Buttons Section */}
+                  <div className="flex flex-col gap-2">
+                    {/* Book Now - hover effect */}
+                    {activeTab !== 'upcoming' && ( // upcoming page এ Book Now show হবে না
+                      <Link href={`booking/${movie.id}`}>
+                      <button  className="w-full px-4 py-2 rounded-lg bg-red-600 text-white font-semibold 
+      hover:bg-red-700 transition duration-300 opacity-0 group-hover:opacity-100"
+                        >
+                          Book Now
+                        </button> 
+                     
+                    </Link>
+                    )}
+
+                    {/* Details - always visible */}
+                    <Link href={`/movies/${movie.id}`}>
+                      <button className="w-full px-4 py-2 text-white  bg-red-600 rounded-lg 
+     hover:bg-red-700   transition duration-300"
+                      >
+                        Details
+                      </button>
+                    </Link>
+                  </div>
+
                 </div>
               </div>
-              </Link>
             </SwiperSlide>
           ))
         ) : (
-          <p className="text-gray-400 text-center w-full">
-            No movies available
-          </p>
+          <p className="text-gray-400 text-center w-full">No movies available</p>
         )}
       </Swiper>
     </div>
-  );
+  )
 }
