@@ -6,6 +6,7 @@ import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
 import PaymentForm from '@/app/components/PaymentForm'
 import axiosSecure from '@/app/api/axiosHook/useAxiosSecure'
+import LoadingSpinner from '@/app/hooks/LoadingSpiner'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
 
@@ -25,10 +26,12 @@ export default function PaymentPage() {
       }
     }
     fetchData()
-  }, [id, axiosSecure])
+  }, [id])
+
+  console.log(session)
 
   if (error) return <p className="text-center text-red-500">{error}</p>
-  if (!session) return <p className="text-center">Loading...</p>
+  if (!session) return <LoadingSpinner/>
 
   return (
     <Elements stripe={stripePromise}>

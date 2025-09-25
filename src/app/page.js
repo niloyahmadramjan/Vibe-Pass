@@ -10,11 +10,11 @@ import FAQ from './components/FAQ'
 export default function home() {
   return (
     <main>
-     <Hero/>
-      <MovieCard/>
-      <KidsMovies/>
-     <UpcomingMovie></UpcomingMovie>
-     <FAQ/>
+      <Hero />
+      <MovieCard />
+      <KidsMovies />
+      <UpcomingMovie></UpcomingMovie>
+      <FAQ />
     </main>
   )
 }
