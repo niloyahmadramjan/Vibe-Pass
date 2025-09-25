@@ -249,11 +249,6 @@ export default function MovieDetailsPage() {
       <h2 className="text-xl md:text-2xl font-bold mb-4 text-purple-400">
         Location Map
       </h2>
-
-      {/* Leaflet Map */}
-      <h2 className="text-xl md:text-2xl font-bold mb-4 text-purple-400">
-        Location Map
-      </h2>
       <div
         id="map"
         className="w-full md:w-3/4 lg:w-1/2 h-72 md:h-96 rounded-xl overflow-hidden shadow-lg mx-auto"
