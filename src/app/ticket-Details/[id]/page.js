@@ -69,6 +69,7 @@ export default function TicketDetailsPage() {
            totalAmount: booking.totalAmount,
            transactionId: ticket.transactionId,
            status: ticket.status,
+           userName:booking.userName,
            userEmail: booking.userEmail,
          }),
        }
