@@ -6,7 +6,6 @@ const LoadingSpinner = () => {
   return (
     <div
       className="flex justify-center items-center min-h-screen"
-      style={{ backgroundColor: '#200903' }}
     >
       <div className="relative flex justify-center items-center w-36 h-36">
         {/* Outer spinning ring with Tailwind classes and custom style */}

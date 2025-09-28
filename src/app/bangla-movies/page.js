@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import LoadingSpinner from '../hooks/LoadingSpiner'
 
 export default function BanglaMoviesPage() {
   const [movies, setMovies] = useState([])
@@ -26,17 +27,13 @@ export default function BanglaMoviesPage() {
   }, [])
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-black text-white">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-red-600"></div>
-      </div>
-    )
+    return <LoadingSpinner/>
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-white px-6 py-10 pt-20 max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-white px-6 py-10 pt-25 max-w-7xl mx-auto">
       <h1 className="text-3xl md:text-4xl font-bold mb-10 text-yellow-400 uppercase">
-        bengali connection
+        ShowTime BD
       </h1>
 
       {movies.length === 0 ? (

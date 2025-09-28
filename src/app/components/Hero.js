@@ -12,44 +12,45 @@ const [movies, setMovies] = useState([])
 const [trailerKey, setTrailerKey] = useState(null)
 const router = useRouter()
 
-const IMG_BASE = 'https://image.tmdb.org/t/p/original'
 const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY
 
 useEffect(() => {
   async function fetchMovies() {
     try {
-      // Fetch Bollywood (IN) and Hollywood (EN) movies
-      const [indianRes, englishRes] = await Promise.all([
+      // Fetch Action movies: Hollywood + Bollywood
+      const [hollywoodRes, bollywoodRes] = await Promise.all([
         fetch(
-          `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_origin_country=IN&sort_by=popularity.desc&page=1`
+          `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=28&with_original_language=en&sort_by=popularity.desc&page=1`
         ),
         fetch(
-          `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=en&sort_by=popularity.desc&page=1`
+          `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=28&with_origin_country=IN&sort_by=popularity.desc&page=1`
         ),
       ])
 
-      const [indianData, englishData] = await Promise.all([
-        indianRes.json(),
-        englishRes.json(),
+      const [hollywoodData, bollywoodData] = await Promise.all([
+        hollywoodRes.json(),
+        bollywoodRes.json(),
       ])
 
-      // Merge results
+      // Merge results and filter only movies with backdrops
       const merged = [
-        ...(indianData.results || []),
-        ...(englishData.results || []),
+        ...(hollywoodData.results || []),
+        ...(bollywoodData.results || []),
       ].filter((m) => m.backdrop_path)
 
       // Remove duplicates by ID
       const unique = Array.from(new Map(merged.map((m) => [m.id, m])).values())
 
-      // Pick top 7
-      setMovies(unique.slice(6, 16))
+      // Pick top 6–8 epic action movies for hero banners
+      setMovies(unique.slice(8, 20))
     } catch (err) {
       console.error('Error fetching movies:', err)
     }
   }
   fetchMovies()
 }, [API_KEY])
+
+
 
 async function fetchTrailer(movieId) {
   const res = await fetch(
@@ -67,7 +68,7 @@ async function fetchTrailer(movieId) {
 }
 
   return (
-    <section className="w-full h-[40vh] lg:h-[80vh] relative mb-20 pt-16">
+    <section className="w-full h-[40vh] lg:h-[80vh] relative mb-20 pt-16 md:pt-0">
       <Swiper
         modules={[Autoplay, Pagination]}
         autoplay={{ delay: 3000, disableOnInteraction: false }}
@@ -78,21 +79,21 @@ async function fetchTrailer(movieId) {
         {movies.map((movie) => (
           <SwiperSlide key={movie.id}>
             <div
-              className="w-full h-[40vh] lg:h-[110vh] bg-cover bg-center relative flex items-center"
+              className="w-full h-[40vh] lg:h-[100vh] bg-cover bg-center relative flex items-center"
               style={{
                 backgroundImage: `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`,
               }}
             >
               <div className="absolute inset-0 bg-[linear-gradient(to_top,black_0%,black_30%,rgba(0,0,0,0.8)_40%,rgba(0,0,0,0.3)_50%)]"></div>
 
-              <div className="relative z-10 w-full">
+              <div className="relative z-10 w-full ">
                 <div className="max-w-7xl mx-auto px-6 md:px-16 lg:px-24 flex justify-start">
                   <div className="max-w-3xl text-white">
                     <h1 className="text-3xl md:text-5xl font-bold drop-shadow-lg mb-4">
                       {movie.title}
                     </h1>
                     <p className="text-sm md:text-lg mb-6 md:block hidden">{movie.overview}</p>
-                    <div className="flex gap-4">
+                    <div className="flex gap-4 ">
                       <button
                         onClick={() => fetchTrailer(movie.id)}
                         className="px-5 py-3 rounded-lg border border-white bg-white/20 backdrop-blur-sm hover:bg-white hover:text-black transition"

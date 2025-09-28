@@ -11,7 +11,7 @@ export default function LayoutWrapper({ children }) {
   )
 
   return (
-    <div className="bottom-0 left-0 w-full h-full bg-gradient-to-t to-black from-red-500/10">
+    <div className="bottom-0 left-0 w-full h-full bg-gradient-to-b from-black via-gray-900 to-black">
       {!hideNavFooter && <Navbar />}
       {children}
       {!hideNavFooter && <Footer />}
