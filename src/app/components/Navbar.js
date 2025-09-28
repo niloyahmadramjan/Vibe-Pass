@@ -9,9 +9,9 @@ import {
   FiHome,
   FiInfo,
   FiCalendar,
-  FiBook,
   FiUser,
 } from 'react-icons/fi'
+import { GiTheater } from 'react-icons/gi'
 import { RiMovie2Fill } from 'react-icons/ri'
 import Image from 'next/image'
 
@@ -20,6 +20,7 @@ import { useSession, signOut } from 'next-auth/react'
 import { useAuth } from '@/app/context/AuthContext'
 import toast from 'react-hot-toast'
 import { Router } from 'next/router'
+import { FaFilm } from 'react-icons/fa'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
@@ -60,8 +61,18 @@ export default function Navbar() {
       label: 'Upcoming',
       icon: <FiCalendar className="mr-1" />,
     },
+
+    {
+      href: '/bangla-movies',
+      label: 'BanglaFlix',
+      icon: <FaFilm className="mr-1" />,
+    },
+    {
+      href: '/location',
+      label: 'Theaters',
+      icon: <GiTheater className="mr-1" />,
+    },
     { href: '/about', label: 'About', icon: <FiInfo className="mr-1" /> },
-    { href: '/blog', label: 'Blog', icon: <FiBook className="mr-1" /> },
   ]
 
   return (

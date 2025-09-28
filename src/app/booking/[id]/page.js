@@ -5,6 +5,7 @@ import { useParams, useSearchParams, useRouter } from 'next/navigation'
 import axiosSecure from '@/app/api/axiosHook/useAxiosSecure'
 import Image from 'next/image'
 import { useAuth } from '@/app/context/AuthContext'
+import LoadingSpinner from '@/app/hooks/LoadingSpiner'
 
 // Toast notification system
 const toast = {
@@ -623,20 +624,13 @@ export default function MovieSeatBooking() {
 
   // Loading state
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-red-500 mx-auto mb-4"></div>
-          <div className="text-white text-xl">Loading seat booking...</div>
-        </div>
-      </div>
-    )
+    return <LoadingSpinner/>
   }
 
   // If no movie data, show error
   if (!movieData) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+      <div className="min-h-screen  flex items-center justify-center p-4">
         <div className="text-center">
           <div className="text-red-500 text-xl mb-4">
             ❌ Movie data not found!
@@ -653,7 +647,7 @@ export default function MovieSeatBooking() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4 font-sans pt-16">
+    <div className="min-h-screen text-white p-4 font-sans pt-16">
       <div className="max-w-7xl mx-auto py-8">
         {/* Back Button */}
         <button

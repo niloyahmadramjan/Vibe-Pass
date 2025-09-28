@@ -2,15 +2,8 @@
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import LoadingSpinner from '../hooks/LoadingSpiner'
 
-// Loading spinner component
-function LoadingSpinner() {
-  return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="w-12 h-12 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
-    </div>
-  )
-}
 
 export default function MoviesPage() {
   const [movies, setMovies] = useState([])
@@ -40,13 +33,13 @@ export default function MoviesPage() {
   return (
     <div className="min-h-screen text-white px-4 md:px-6 py-10 pt-25 max-w-7xl mx-auto">
       <h1 className="text-3xl md:text-4xl font-bold mb-10 text-red-500">
-      Popular Movies
+        Popular Movies
       </h1>
 
       {movies.length === 0 ? (
         <p className="text-center text-gray-400">No movies found!</p>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
           {movies.map((movie) => (
             <div
               key={movie.id}

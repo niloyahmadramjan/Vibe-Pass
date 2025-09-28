@@ -204,12 +204,11 @@ export default function LocationPage() {
         )}
 
         {/* Map Section */}
-        <div className="rounded-2xl shadow-xl overflow-hidden border border-gray-700 bg-black">
+        <div className="rounded-2xl shadow-xl overflow-hidden border border-gray-700 bg-dark">
           <SeatMap
             locations={locations}
             selectedLocation={selectedLocation}
             mapRef={mapRef}
-            darkMode={true} // pass prop if SeatMap supports dark mode
           />
         </div>
       </div>

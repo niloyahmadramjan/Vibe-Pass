@@ -11,6 +11,9 @@ const nextConfig = {
       'avatars.githubusercontent.com',
       'lh3.googleusercontent.com',
       'i.pravatar.cc',
+      'placehold.co',
+      'i.postimg.cc',
+      'i.ibb.co.com',
     ],
   },
 }

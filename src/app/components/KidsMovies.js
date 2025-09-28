@@ -49,7 +49,7 @@ export default function KidsMovies() {
       >
         {movies.map((movie) => (
           <SwiperSlide key={movie.id}>
-            <Link href={`/movies/${movie.id}`}>
+        
               <div
                 className="relative w-full h-[280px] sm:h-[330px] md:h-[380px] lg:h-[420px] 
                          border border-red-500/40 rounded-xl overflow-hidden bg-zinc-900 
@@ -75,8 +75,9 @@ export default function KidsMovies() {
                 </div>
 
                 {/* Book Button */}
+              <Link href={`booking/${movie.id}`}>
                 <button
-                  onClick={() => alert(`Booking ticket for ${movie.title}`)}
+                 
                   className="absolute bottom-4 left-1/2 -translate-x-1/2 
                             py-1 px-2 bg-red-600 hover:bg-red-700 text-white 
                            text-xs sm:text-sm md:text-base font-semibold rounded-lg shadow-lg
@@ -85,8 +86,9 @@ export default function KidsMovies() {
                 >
                   Book Now
                 </button>
+              </Link>
               </div>
-            </Link>
+     
           </SwiperSlide>
         ))}
       </Swiper>
