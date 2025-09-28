@@ -13,7 +13,7 @@ export default function TicketDetailsPage() {
 
   useEffect(() => {
     if (!id) return;
-
+    // payment data
     const fetchPayment = async () => {
       try {
         const response = await fetch(
@@ -32,7 +32,7 @@ export default function TicketDetailsPage() {
 
   useEffect(() => {
     if (!ticket?.sessionId) return;
-
+    // booking cinemas data
     const fetchBooking = async () => {
       try {
         const response = await fetch(
@@ -51,36 +51,44 @@ export default function TicketDetailsPage() {
     fetchBooking();
   }, [ticket?.sessionId]);
 
-  const handleDownloadPDF = async () => {
-    setDownloading(true);
-    try {
-      // Simulate PDF download
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      alert("PDF download started!");
-    } catch (error) {
-      console.error("Download failed:", error);
-    } finally {
-      setDownloading(false);
-    }
-  };
+  // pdf
+ const handleDownloadPDF = async () => {
+   setDownloading(true);
+   try {
+     const response = await fetch(
+       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/generate-ticket-pdf`,
+       {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({
+           movieTitle: booking.movieTitle,
+           theaterName: booking.theaterName,
+           showDate: booking.showDate,
+           showTime: booking.showTime,
+           selectedSeats: booking.selectedSeats,
+           totalAmount: booking.totalAmount,
+           transactionId: ticket.transactionId,
+           status: ticket.status,
+           userEmail: booking.userEmail,
+         }),
+       }
+     );
 
-  const getStatusBadge = (status) => {
-    const statusConfig = {
-      confirmed: { color: "bg-green-100 text-green-800", label: "Confirmed" },
-      pending: { color: "bg-yellow-100 text-yellow-800", label: "Pending" },
-      cancelled: { color: "bg-red-100 text-red-800", label: "Cancelled" },
-      completed: { color: "bg-blue-100 text-blue-800", label: "Completed" },
-    };
+     if (!response.ok) throw new Error("Failed to download PDF");
 
-    const config = statusConfig[status?.toLowerCase()] || statusConfig.pending;
-    return (
-      <span
-        className={`px-3 py-1 rounded-full text-sm font-medium ${config.color}`}
-      >
-        {config.label}
-      </span>
-    );
-  };
+     const blob = await response.blob();
+     const url = window.URL.createObjectURL(blob);
+     const link = document.createElement("a");
+     link.href = url;
+     link.download = `ticket-${ticket.transactionId}.pdf`;
+     link.click();
+     window.URL.revokeObjectURL(url);
+   } catch (error) {
+     console.error("Download failed:", error);
+   } finally {
+     setDownloading(false);
+   }
+ };
 
   if (loading) {
     return (
@@ -128,12 +136,14 @@ export default function TicketDetailsPage() {
           <div className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-hover)] p-4 text-white">
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-2xl font-bold">Cinemas : {booking.movieTitle}</h2>
+                <h2 className="text-2xl font-bold"> {booking.movieTitle}</h2>
                 <p className="opacity-90">
                   {booking.theaterName} • Screen {booking.screen}
                 </p>
               </div>
-              {getStatusBadge(booking.status)}
+              <span className="px-3 py-1 rounded-full text-sm font-medium bg-green-200 text-green-900">
+                {ticket.status?.toUpperCase()}
+              </span>
             </div>
           </div>
 
@@ -145,7 +155,7 @@ export default function TicketDetailsPage() {
                 <QRCodeCanvas
                   value={JSON.stringify({
                     transactionId: ticket.transactionId,
-                    status: ticket.status,
+                    status: "paid",
                     movieTitle: booking.movieTitle,
                     theaterName: booking.theaterName,
                     screen: booking.screen,
@@ -253,10 +263,7 @@ export default function TicketDetailsPage() {
                     value={`৳${booking.totalAmount}`}
                     highlight
                   />
-                  <DetailItem
-                    label="Payment Status"
-                    value={getStatusBadge(ticket.status)}
-                  />
+                  <DetailItem label="Payment Status" value={ticket.status} />
                 </div>
 
                 {/* Customer Information */}
