@@ -87,6 +87,11 @@ export default function PaymentForm({ session }) {
               sessionId: session._id,
               sessionTitle: session.movieTitle,
               userEmail: session.userEmail,
+              userName: session.userName,
+              theaterName: session.theaterName,
+              showTime: session.showTime,
+              selectedSeats: session.selectedSeats,
+              screen: session.screen,
             }),
           }
         );
