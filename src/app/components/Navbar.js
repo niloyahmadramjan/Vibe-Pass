@@ -151,23 +151,23 @@ export default function Navbar() {
                   {openDrop && (
                     <div
                       ref={dropdownRef}
-                      className="absolute top-12 right-0 w-48 bg-gray-900 text-white rounded-lg shadow-lg overflow-hidden z-50"
+                      className="absolute top-12 right-0 w-48 bg-gray-900 !text-white rounded-lg shadow-lg overflow-hidden z-50"
                     >
                       <Link
                         href="/profile"
-                        className="block px-4 py-2 hover:bg-gray-800 transition"
+                        className="block !text-white px-4 py-2 hover:bg-gray-800 transition"
                       >
                         Profile
                       </Link>
                       <Link
                         href="/my-tickets"
-                        className="block px-4 py-2 hover:bg-gray-800 transition"
+                        className="block !text-white px-4 py-2 hover:bg-gray-800 transition"
                       >
                         My Tickets
                       </Link>
                       <Link
                         href="/transactions"
-                        className="block px-4 py-2 hover:bg-gray-800 transition"
+                        className="block px-4 !text-white py-2 hover:bg-gray-800 transition"
                       >
                         Transactions
                       </Link>

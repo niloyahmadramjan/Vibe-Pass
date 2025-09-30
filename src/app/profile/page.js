@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext'
 import axiosSecure from '../api/axiosHook/useAxiosSecure'
 import Swal from 'sweetalert2'
 import toast, { Toaster } from 'react-hot-toast'
+import axios from 'axios'
 
 /**
  * ProfilePage Component
@@ -52,27 +53,41 @@ const ProfilePage = () => {
   // Add this to your handler functions section
  
 
-  const handleUpdateImage = async (imageFile) => {
-    setLoading(true)
-    try {
-      const formData = new FormData()
-      formData.append('image', imageFile)
+ const handleUpdateImage = async (imageFile) => {
+   setLoading(true)
+   try {
+     // 1. Upload to imgbb
+     const imgbbForm = new FormData()
+     imgbbForm.append('image', imageFile)
 
-      const response = await axiosSecure.put('/api/user/image', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
+     const imgbbRes = await axios.post(
+       `https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`,
+       imgbbForm
+     )
 
-      setUserData((prev) => ({ ...prev, image: response.data.imageUrl }))
-      toast.success('Profile image updated successfully ')
-    } catch (err) {
-      console.error('Image upload failed:', err)
-      toast.error('Failed to update profile image ❌')
-    } finally {
-      setLoading(false)
-    }
-  }
+     const imageUrl = imgbbRes.data.data.url
+
+     // 2. Send the URL to your backend
+     const response = await axiosSecure.put(
+       '/api/user/image',
+       { imageUrl }, // just send URL
+       {
+         headers: {
+           'Content-Type': 'application/json',
+         },
+       }
+     )
+
+     setUserData((prev) => ({ ...prev, image: response.data.imageUrl }))
+     toast.success('Profile image updated successfully ✅')
+   } catch (err) {
+     console.error('Image upload failed:', err)
+     toast.error('Failed to update profile image ❌')
+   } finally {
+     setLoading(false)
+   }
+ }
+
 
 
   /**
@@ -160,11 +175,11 @@ const ProfilePage = () => {
     setLoading(true)
     try {
       await axiosSecure.put('/api/user/pin', pinData)
-      toast.success('PIN changed successfully')
+      toast.success('Password changed successfully')
       setShowModal(null)
     } catch (err) {
-      console.error('PIN change failed:', err)
-      toast.error('Failed to change PIN ')
+      console.error('password change failed:', err)
+      toast.error('Failed to change password ')
     } finally {
       setLoading(false)
     }
@@ -474,14 +489,14 @@ const ProfilePage = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex justify-between items-center border-b border-gray-700 pb-2">
                   <span className="font-medium text-[var(--color-text-light)]">
-                    PIN
+                    PASSWORD
                   </span>
                   {/* FIXED: Open modal instead of calling API handler */}
                   <button
                     onClick={() => openModal('changePin')}
                     className="text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] text-sm font-medium"
                   >
-                    CHANGE PIN
+                    CHANGE PASSWORD
                   </button>
                 </div>
                 <div className="flex justify-between items-center border-b border-gray-700 pb-2">
@@ -607,9 +622,14 @@ const ProfilePage = () => {
                 <input
                   type="date"
                   name="dob"
-                  defaultValue={userData?.dob || ''}
+                  defaultValue={
+                    userData?.dob
+                      ? new Date(userData.dob).toISOString().split('T')[0]
+                      : ''
+                  }
                   className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                 />
+
                 <input
                   type="text"
                   name="state"
@@ -715,17 +735,15 @@ const ProfilePage = () => {
                 <input
                   type="password"
                   name="oldPin"
-                  placeholder="Old PIN"
+                  placeholder="Old Password"
                   required
                   className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                 />
                 <input
                   type="password"
                   name="newPin"
-                  placeholder="New PIN (4 digits)"
+                  placeholder="New Password"
                   required
-                  minLength={4}
-                  maxLength={4}
                   className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                 />
                 <button
