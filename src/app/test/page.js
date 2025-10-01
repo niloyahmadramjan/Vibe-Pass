@@ -1,15 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import axiosSecure from '@/app/api/axiosHook/useAxiosSecure';
 import Image from 'next/image';
 import { useAuth } from '@/app/context/AuthContext';
 import LoadingSpinner from '@/app/hooks/LoadingSpiner';
-
-// Socket.io
-import { io } from "socket.io-client";
-const socket = io("http://localhost:5000"); // তোমার server URL
 
 // Components
 import { toast } from './components/Toast';
@@ -22,10 +18,9 @@ import BookingModal from './components/BookingModal';
 import SuccessModal from './components/SuccessModal';
 
 // Utils
-import { seatSections as seatSectionsData } from './utils/seatData';
+import { seatSections, reservedSeats } from './utils/seatData';
 import { showtimes } from './utils/showtimes';
 import { getSeatSection, formatTime, getDateOptions } from './utils/helpers';
-
 
 export default function MovieSeatBooking() {
   const params = useParams();
@@ -44,8 +39,6 @@ export default function MovieSeatBooking() {
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [bookingData, setBookingData] = useState(null);
   const [paymentTimer, setPaymentTimer] = useState(600); // 10 min
-  const [reservedSeats, setReservedSeats] = useState([]); // live reserved seats
-  
 
   // Load movie data
   useEffect(() => {
@@ -72,14 +65,6 @@ export default function MovieSeatBooking() {
     if (id) loadMovieData();
   }, [id, router]);
 
-  // Socket listener for live reserved seats
-  useEffect(() => {
-    socket.on("updateReservedSeats", (newReservedSeats) => {
-      setReservedSeats(newReservedSeats);
-    });
-    return () => socket.off("updateReservedSeats");
-  }, []);
-
   // Payment timer countdown
   useEffect(() => {
     let interval;
@@ -101,7 +86,6 @@ export default function MovieSeatBooking() {
       toast.error('This seat is already booked!');
       return;
     }
-
     if (selectedSeats.includes(seat)) {
       setSelectedSeats(selectedSeats.filter((s) => s !== seat));
       toast.success(`Seat ${seat} deselected`);
@@ -143,11 +127,10 @@ export default function MovieSeatBooking() {
       setBookingData(response.data.booking);
       setBookingSuccess(true);
       toast.success('Booking confirmed successfully!');
-
-      // Emit to socket for live seat update
-      socket.emit("bookSeats", selectedSeats);
-
-      setSelectedSeats([]);
+      setTimeout(() => {
+        setSelectedSeats([]);
+        setSelectedTime(null);
+      }, 2000);
     } catch (error) {
       console.error('Booking error:', error);
       toast.error(error.response?.data?.error || 'Server error while saving booking');
@@ -202,7 +185,7 @@ export default function MovieSeatBooking() {
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Left Panel */}
-          <div className="lg:col-span-1 space-y-6 lg:max-h-[60rem] lg:overflow-y-auto">
+          <div className="lg:col-span-1 space-y-6">
             {/* Movie Card */}
             <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700/50 shadow-xl">
               {movieData.backdrop_path && (
@@ -238,7 +221,6 @@ export default function MovieSeatBooking() {
                   <span>Today, {new Date().toLocaleDateString()}</span>
                 </div>
               </div>
-
             </div>
 
             {/* Date & Showtimes */}
@@ -260,7 +242,7 @@ export default function MovieSeatBooking() {
                 <Ticket className="w-5 h-5" /> Seat Types
               </h3>
               <div className="space-y-3">
-                {seatSectionsData.map((section) => (
+                {seatSections.map((section) => (
                   <div key={section.id} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className={`w-4 h-4 rounded-full bg-gradient-to-r ${section.color}`}></div>
@@ -269,6 +251,20 @@ export default function MovieSeatBooking() {
                     <span className="text-sm font-bold">৳{section.price}</span>
                   </div>
                 ))}
+              </div>
+              <div className="mt-4 pt-4 border-t border-gray-700/50 space-y-2">
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 rounded-full bg-red-600 animate-pulse"></div>
+                  <span className="text-sm">Booked</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 rounded-full bg-green-500"></div>
+                  <span className="text-sm">Selected</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 rounded-full bg-gray-600"></div>
+                  <span className="text-sm">Available</span>
+                </div>
               </div>
             </div>
           </div>
@@ -287,7 +283,7 @@ export default function MovieSeatBooking() {
 
               {/* Seats */}
               <SeatSections
-                seatSections={seatSectionsData}
+                seatSections={seatSections}
                 selectedSeats={selectedSeats}
                 reservedSeats={reservedSeats}
                 hoveredSeat={hoveredSeat}
