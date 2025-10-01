@@ -49,37 +49,35 @@ export default function KidsMovies() {
       >
         {movies.map((movie) => (
           <SwiperSlide key={movie.id}>
-        
-              <div
-                className="relative w-full h-[280px] sm:h-[330px] md:h-[380px] lg:h-[420px] 
+            <div
+              className="relative movie-card w-full h-[280px] sm:h-[330px] md:h-[380px] lg:h-[420px] 
                          border border-red-500/40 rounded-xl overflow-hidden bg-zinc-900 
                          group shadow-lg hover:shadow-[0_0_25px_rgba(239,68,68,0.6)] 
                          transition-all duration-300 cursor-pointer"
-              >
-                {/* Poster */}
-                <Image
-                  src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                  alt={movie.title}
-                  fill
-                  className="object-cover"
-                />
+            >
+              {/* Poster */}
+              <Image
+                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                alt={movie.title}
+                fill
+                className="object-cover"
+              />
 
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-90"></div>
+              {/* Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-90"></div>
 
-                {/* Title */}
-                <div className="absolute bottom-16 w-full text-center px-3">
-                  <p className="text-sm sm:text-base md:text-lg font-bold text-white truncate drop-shadow-md">
-                    {movie.title}
-                  </p>
-                </div>
+              {/* Title */}
+              <div className="absolute bottom-16 w-full text-center px-3">
+                <p className="text-sm sm:text-base md:text-lg font-bold text-white truncate drop-shadow-md">
+                  {movie.title}
+                </p>
+              </div>
 
-                {/* Book Button */}
+              {/* Book Button */}
               <Link href={`booking/${movie.id}`}>
                 <button
-                 
                   className="absolute bottom-4 left-1/2 -translate-x-1/2 
-                            py-1 px-2 bg-red-600 hover:bg-red-700 text-white 
+                            py-1 px-2 btn btn-secondary
                            text-xs sm:text-sm md:text-base font-semibold rounded-lg shadow-lg
                            transition duration-300
                            opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
@@ -87,8 +85,7 @@ export default function KidsMovies() {
                   Book Now
                 </button>
               </Link>
-              </div>
-     
+            </div>
           </SwiperSlide>
         ))}
       </Swiper>

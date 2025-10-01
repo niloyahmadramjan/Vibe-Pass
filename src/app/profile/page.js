@@ -9,6 +9,7 @@ import axiosSecure from '../api/axiosHook/useAxiosSecure'
 import Swal from 'sweetalert2'
 import toast, { Toaster } from 'react-hot-toast'
 import axios from 'axios'
+import { useRouter } from 'next/navigation'
 
 /**
  * ProfilePage Component
@@ -23,17 +24,12 @@ const ProfilePage = () => {
   // State for user data from backend
   const [userData, setUserData] = useState(null)
   const { user } = useAuth()
+  const router = useRouter()
 
   // ========================= EFFECT TO FETCH USER DATA =========================
 
-  /**
-   * Fetches user data from backend on component mount
-   */
   useEffect(() => {
     const fetchUserData = async () => {
-      if (!user) return
-
-      setLoading(true)
       try {
         const response = await axiosSecure.get('/api/user/info')
         setUserData(response.data)
@@ -46,49 +42,46 @@ const ProfilePage = () => {
     }
 
     fetchUserData()
-  }, [user])
+  }, [user, router])
 
   // ========================= HANDLER FUNCTIONS (API Calls) =========================
 
   // Add this to your handler functions section
- 
 
- const handleUpdateImage = async (imageFile) => {
-   setLoading(true)
-   try {
-     // 1. Upload to imgbb
-     const imgbbForm = new FormData()
-     imgbbForm.append('image', imageFile)
+  const handleUpdateImage = async (imageFile) => {
+    setLoading(true)
+    try {
+      // 1. Upload to imgbb
+      const imgbbForm = new FormData()
+      imgbbForm.append('image', imageFile)
 
-     const imgbbRes = await axios.post(
-       `https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`,
-       imgbbForm
-     )
+      const imgbbRes = await axios.post(
+        `https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`,
+        imgbbForm
+      )
 
-     const imageUrl = imgbbRes.data.data.url
+      const imageUrl = imgbbRes.data.data.url
 
-     // 2. Send the URL to your backend
-     const response = await axiosSecure.put(
-       '/api/user/image',
-       { imageUrl }, // just send URL
-       {
-         headers: {
-           'Content-Type': 'application/json',
-         },
-       }
-     )
+      // 2. Send the URL to your backend
+      const response = await axiosSecure.put(
+        '/api/user/image',
+        { imageUrl }, // just send URL
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
 
-     setUserData((prev) => ({ ...prev, image: response.data.imageUrl }))
-     toast.success('Profile image updated successfully ✅')
-   } catch (err) {
-     console.error('Image upload failed:', err)
-     toast.error('Failed to update profile image ❌')
-   } finally {
-     setLoading(false)
-   }
- }
-
-
+      setUserData((prev) => ({ ...prev, image: response.data.imageUrl }))
+      toast.success('Profile image updated successfully ✅')
+    } catch (err) {
+      console.error('Image upload failed:', err)
+      toast.error('Failed to update profile image ❌')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   /**
    * Updates the user's mobile number.

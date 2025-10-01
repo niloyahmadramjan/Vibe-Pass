@@ -68,14 +68,17 @@ async function fetchTrailer(movieId) {
 }
 
   return (
-    <section className="w-full h-[40vh] lg:h-[80vh] relative mb-20 pt-16 md:pt-0">
-      <Swiper
-        modules={[Autoplay, Pagination]}
-        autoplay={{ delay: 3000, disableOnInteraction: false }}
-        pagination={{ clickable: true }}
-        loop
-        className="w-full h-full custom-swiper"
-      >
+    <section className="w-full h-[44vh] lg:h-[80vh] relative mb-5 md:mb-10 pt-16 md:pt-0">
+       <Swiper
+      modules={[Autoplay, Pagination]}
+      autoplay={{
+        delay: 3000,
+        disableOnInteraction: false,
+        pauseOnMouseEnter: true,
+      }}
+      pagination={{ clickable: true }}
+      loop={true}
+      className="w-full h-full custom-swiper">
         {movies.map((movie) => (
           <SwiperSlide key={movie.id}>
             <div
@@ -92,17 +95,19 @@ async function fetchTrailer(movieId) {
                     <h1 className="text-3xl md:text-5xl font-bold drop-shadow-lg mb-4">
                       {movie.title}
                     </h1>
-                    <p className="text-sm md:text-lg mb-6 md:block hidden">{movie.overview}</p>
+                    <p className="text-sm md:text-lg mb-6 md:block hidden">
+                      {movie.overview}
+                    </p>
                     <div className="flex gap-4 ">
                       <button
                         onClick={() => fetchTrailer(movie.id)}
-                        className="px-5 py-3 rounded-lg border border-white bg-white/20 backdrop-blur-sm hover:bg-white hover:text-black transition"
+                        className=" px-2 lg:px-5 py-0 lg:py-3 rounded-lg border border-white bg-white/20 backdrop-blur-sm hover:bg-white hover:text-black transition text-sm"
                       >
                         Watch Trailer
                       </button>
                       <button
                         onClick={() => router.push(`/movies/${movie.id}`)}
-                        className="px-5 py-3 rounded-lg bg-red-600 hover:bg-red-700 transition"
+                        className=" px-2 lg:px-5 py-1 lg:py-3  rounded-lg bg-red-600 hover:bg-red-700 transition"
                       >
                         Book Now
                       </button>

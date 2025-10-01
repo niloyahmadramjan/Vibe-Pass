@@ -14,18 +14,28 @@ import { FaArrowLeft } from 'react-icons/fa'
 const mockSlides = [
   {
     id: 1,
-    img: 'https://w0.peakpx.com/wallpaper/15/57/HD-wallpaper-deadpool-hero-movie-sitting-super.jpg',
-    title: 'The Bad Guys 2',
+    img: 'https://i.ibb.co/gLvq12yd/photo-1517604931442-7e0c8ed2963c-q-80-w-1170-auto-format-fit-crop-ixlib-rb-4-1.jpg',
+    title: 'Experience Movies Together',
+    description:
+      'Join thousands of movie lovers enjoying premium cinema experiences',
   },
   {
     id: 2,
-    img: 'https://w0.peakpx.com/wallpaper/894/474/HD-wallpaper-kung-fu-panda-kicking-kung-fu-panda-kicking-animated-panda.jpg',
-    title: 'Inside Out 2',
+    img: 'https://i.ibb.co/rRg5pd69/photo-1608170825938-a0ea0305d46c-q-80-w-1025-auto-format-fit-crop-ixlib-rb-4-1.jpg',
+    title: 'Perfect Date Nights',
+    description: 'Create unforgettable moments with your loved ones',
   },
   {
     id: 3,
-    img: 'https://w0.peakpx.com/wallpaper/126/584/HD-wallpaper-kung-fu-panda-swimming-kung-fu-panda-swimming-panda-animated.jpg',
-    title: 'Kung Fu Panda 4',
+    img: 'https://i.ibb.co/chWQ58NS/pexels-photo-7991269.jpg',
+    title: 'Premium Cinema Experience',
+    description: 'Luxury seating, crystal-clear sound, and stunning visuals',
+  },
+  {
+    id: 4,
+    img: 'https://i.ibb.co/fVYg2W8L/VT0.jpg',
+    title: 'Family Entertainment',
+    description: 'Movies that bring families together for magical moments',
   },
 ]
 
@@ -37,20 +47,20 @@ export default function LoginPage() {
 
   const { data: session, status } = useSession()
   const router = useRouter()
-  const { login, user, loading, setLoading } = useAuth() //  from AuthContext
+  const { login, user, loading, setLoading } = useAuth()
 
-  // Auto slide every 3s
+  // Auto slide every 4s (increased for better reading)
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrent((prev) => (prev + 1) % mockSlides.length)
-    }, 3000)
+    }, 4000)
     return () => clearInterval(interval)
   }, [])
 
   const handleLogin = async (e) => {
     e.preventDefault()
     setError('')
-    setLoading(true) //  start loading when login begins
+    setLoading(true)
 
     try {
       const res = await axiosSecure.post('api/auth/login', {
@@ -58,70 +68,89 @@ export default function LoginPage() {
         password,
       })
 
-      // save user + token in context/localStorage
+      // Save user + token in context/localStorage
       login(res.data)
 
-      // SweetAlert success popup
+      // Enhanced SweetAlert success popup
       Swal.fire({
         icon: 'success',
-        title: 'Login Successful!',
-        text: 'Welcome back to VibePass ',
+        title: 'Welcome Back! 🎬',
+        text: 'Login successful! Redirecting to your dashboard...',
         timer: 2000,
         showConfirmButton: false,
+        background: '#1E1E1E',
+        color: '#FFFFFF',
+        iconColor: '#4CAF50',
       })
 
-      // redirect after login
+      // Redirect after login
       setTimeout(() => {
         router.push('/')
       }, 2000)
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed')
+      const errorMessage =
+        err.response?.data?.message ||
+        'Login failed. Please check your credentials.'
+      setError(errorMessage)
 
       Swal.fire({
         icon: 'error',
-        title: 'Login Failed!',
-        text: err.response?.data?.message || 'Something went wrong',
-        timer: 2500,
+        title: 'Login Failed',
+        text: errorMessage,
+        timer: 3000,
         showConfirmButton: false,
+        background: '#1E1E1E',
+        color: '#FFFFFF',
+        iconColor: '#D32F2F',
       })
     } finally {
-      setLoading(false) //  always stop loading
+      setLoading(false)
     }
   }
 
-  // redirect if already logged in (NextAuth social or JWT user)
+  // Redirect if already logged in
   useEffect(() => {
     if (status === 'authenticated' || user) {
       router.push('/')
     }
   }, [status, user, router])
 
-  //  Watch session change
+  // Watch session change for social logins
   useEffect(() => {
     if (status === 'authenticated' && session?.user) {
       Swal.fire({
         icon: 'success',
-        title: 'Login Successful!',
-        text: `Welcome back, ${session.user.name || 'User'}`,
+        title: 'Welcome! 🎉',
+        text: `Successfully logged in as ${
+          session.user.name || session.user.email
+        }`,
         timer: 2000,
         showConfirmButton: false,
+        background: '#1E1E1E',
+        color: '#FFFFFF',
+        iconColor: '#4CAF50',
       })
-    }
-  }, [status, session])
 
-  // 🔹 global loading states
+      // Redirect after social login success
+      setTimeout(() => {
+        router.push('/')
+      }, 2000)
+    }
+  }, [status, session, router])
+
+  // Global loading states
   if (loading || status === 'loading') {
     return <LoadingSpinner />
   }
 
-  // 🔹 if user already logged in, redirect (prevent flicker)
+  // If user already logged in, redirect (prevent flicker)
   if (user || status === 'authenticated') {
     return <LoadingSpinner />
   }
 
-  // 🔹 Login Page (only if no user)
+  // Login Page (only if no user)
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen ">
       {/* Left Slider (hidden on mobile) */}
       <div className="hidden md:flex w-8/12 bg-black items-center justify-center relative overflow-hidden">
         {mockSlides.map((slide, index) => (
@@ -138,40 +167,82 @@ export default function LoginPage() {
               className="object-cover"
               priority
             />
+            {/* Overlay with text */}
+            <div className="absolute inset-0 bg-black/40 flex items-end">
+              <div className="p-8 text-white max-w-2xl">
+                <h3 className="text-3xl font-bold mb-3 text-[var(--color-secondary)]">
+                  {slide.title}
+                </h3>
+                <p className="text-lg opacity-90">{slide.description}</p>
+                {/* Slide indicators */}
+                <div className="flex gap-2 mt-6">
+                  {mockSlides.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrent(idx)}
+                      className={`w-3 h-3 rounded-full transition-all ${
+                        idx === current
+                          ? 'bg-[var(--color-primary)] w-8'
+                          : 'bg-white/50 hover:bg-white/70'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         ))}
       </div>
 
       {/* Right Login Form */}
-      <div className="w-full md:w-4/12 flex flex-col justify-center px-10 relative">
-        <div className="max-w-sm mx-auto w-full">
-          <h1 className="text-[var(--color-primary)] text-3xl font-bold mb-5 text-center">
-            Welcome Back to VibePass
-          </h1>
-          <h2 className="text-gray-400 text-md font-bold mb-10 text-center">
-            Log in to book your favorite movies in seconds.
-          </h2>
+      <div className="w-full md:w-4/12 flex flex-col justify-center px-6 sm:px-10 relative">
+        {/* Back Button */}
+        <button
+          onClick={() => router.back()}
+          className="flex absolute top-6 left-6 items-center gap-2 px-4 py-2 rounded-lg bg-[var(--color-bg-card)] hover:bg-[var(--color-primary)] text-white transition-all duration-300 group"
+        >
+          <FaArrowLeft className="group-hover:translate-x-[-2px] transition-transform" />
+          <span>Back</span>
+        </button>
 
-          {error && <p className="text-red-200 text-sm mb-3">{error}</p>}
+        <div className="max-w-sm mx-auto w-full">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl font-bold text-white">VP</span>
+            </div>
+            <h1 className="text-[var(--color-primary)] text-3xl font-bold mb-3">
+              Welcome Back
+            </h1>
+            <h2 className="text-gray-400 text-lg">
+              Sign in to continue your cinematic journey
+            </h2>
+          </div>
+
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 mb-6">
+              <p className="text-red-200 text-sm text-center">{error}</p>
+            </div>
+          )}
 
           {/* Login Form */}
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
-              <label className="block text-[var(--color-white)] text-sm mb-2">
-                Email
+              <label className="block text-white text-sm font-medium mb-3">
+                Email Address
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="w-full border-b border-[var(--color-white)] bg-transparent text-[var(--color-white)] focus:outline-none py-2 placeholder:text-white/70"
+                className="w-full bg-[var(--color-bg-card)] border border-[#333] text-white rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20 transition-all placeholder:text-gray-500"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-[var(--color-white)] text-sm mb-2">
+              <label className="block text-white text-sm font-medium mb-3">
                 Password
               </label>
               <input
@@ -179,7 +250,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                className="w-full border-b border-[var(--color-white)] bg-transparent text-[var(--color-white)] focus:outline-none py-2 placeholder:text-white/70"
+                className="w-full bg-[var(--color-bg-card)] border border-[#333] text-white rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20 transition-all placeholder:text-gray-500"
                 required
               />
             </div>
@@ -187,17 +258,31 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[var(--color-primary-hover)] hover:bg-red-700 transition rounded-lg py-3 font-semibold text-[var(--color-white)]"
+              className="w-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] hover:from-[var(--color-primary-hover)] hover:to-[var(--color-primary)] text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl shadow-red-500/25"
             >
-              {loading ? 'Logging in...' : 'Login'}
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Signing In...
+                </span>
+              ) : (
+                'Sign In to VibePass'
+              )}
             </button>
           </form>
 
+          {/* Divider */}
+          <div className="flex items-center my-8">
+            <div className="flex-1 border-t border-gray-600"></div>
+            <span className="px-4 text-gray-400 text-sm">Or continue with</span>
+            <div className="flex-1 border-t border-gray-600"></div>
+          </div>
+
           {/* Social Logins */}
-          <div className="mt-6 space-y-3">
+          <div className="space-y-3">
             <button
               onClick={() => signIn('google')}
-              className="w-full flex items-center justify-center gap-2 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] transition rounded-lg py-3 font-semibold text-[var(--color-white)] shadow-md"
+              className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-100 text-gray-800 font-medium py-3 px-4 rounded-lg transition-all duration-300 border border-gray-300 hover:border-gray-400 shadow-sm"
             >
               <Image
                 src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -209,40 +294,44 @@ export default function LoginPage() {
             </button>
             <button
               onClick={() => signIn('github')}
-              className="w-full flex items-center justify-center gap-2 bg-black hover:bg-gray-800 transition rounded-lg py-3 font-semibold text-white shadow-md"
+              className="w-full flex items-center justify-center gap-3 bg-gray-800 hover:bg-gray-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 border border-gray-700 hover:border-gray-600 shadow-sm"
             >
               <Image
                 src="https://www.svgrepo.com/show/475654/github-color.svg"
                 alt="GitHub"
                 width={20}
                 height={20}
+                className="filter invert"
               />
               Continue with GitHub
             </button>
           </div>
 
           {/* Links */}
-          <div className="flex justify-between mt-6 text-sm text-[var(--color-white)]">
-            <Link href="/forgot-password" className="hover:underline">
+          <div className="flex justify-between mt-8 text-sm">
+            <Link
+              href="/forgot-password"
+              className="text-[var(--color-primary-light)] hover:text-[var(--color-primary)] transition-colors"
+            >
               Forgot Password?
             </Link>
-            <Link href="/register" className="hover:underline">
-              Register
+            <Link
+              href="/register"
+              className="text-[var(--color-primary-light)] hover:text-[var(--color-primary)] transition-colors"
+            >
+              Create Account
             </Link>
           </div>
 
           {/* Footer */}
-          <p className="mt-8 text-xs text-[var(--color-white)]/70 text-center">
-            VibePass v1.0.0 <br /> All Rights Reserved.
-          </p>
+          <div className="mt-12 pt-6 border-t border-gray-700">
+            <p className="text-xs text-gray-500 text-center">
+              © 2024 VibePass Cinema. All rights reserved.
+              <br />
+              Your ticket to unforgettable movie experiences.
+            </p>
+          </div>
         </div>
-        <button
-          onClick={() => router.back()}
-          className="flex  absolute top-4 left-4 z-10 items-center gap-2 px-3 py-2 rounded-lg  hover:!bg-red-500 transition"
-        >
-          <FaArrowLeft />
-          <span>Back</span>
-        </button>
       </div>
     </div>
   )
