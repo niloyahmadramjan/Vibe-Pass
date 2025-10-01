@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useParams, useSearchParams, useRouter } from 'next/navigation'
+import { useParams,  useRouter } from 'next/navigation'
 import axiosSecure from '@/app/api/axiosHook/useAxiosSecure'
 import Image from 'next/image'
 import { useAuth } from '@/app/context/AuthContext'
@@ -414,7 +414,7 @@ const reservedSeats = [
 
 export default function MovieSeatBooking() {
   const params = useParams()
-  const searchParams = useSearchParams()
+
   const router = useRouter()
   const id = params.id
   const { user } = useAuth()
