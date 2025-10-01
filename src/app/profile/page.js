@@ -8,6 +8,8 @@ import { useAuth } from '../context/AuthContext'
 import axiosSecure from '../api/axiosHook/useAxiosSecure'
 import Swal from 'sweetalert2'
 import toast, { Toaster } from 'react-hot-toast'
+import axios from 'axios'
+import { useRouter } from 'next/navigation'
 
 /**
  * ProfilePage Component
@@ -22,17 +24,12 @@ const ProfilePage = () => {
   // State for user data from backend
   const [userData, setUserData] = useState(null)
   const { user } = useAuth()
+  const router = useRouter()
 
   // ========================= EFFECT TO FETCH USER DATA =========================
 
-  /**
-   * Fetches user data from backend on component mount
-   */
   useEffect(() => {
     const fetchUserData = async () => {
-      if (!user) return
-
-      setLoading(true)
       try {
         const response = await axiosSecure.get('/api/user/info')
         setUserData(response.data)
@@ -45,27 +42,39 @@ const ProfilePage = () => {
     }
 
     fetchUserData()
-  }, [user])
+  }, [user, router])
 
   // ========================= HANDLER FUNCTIONS (API Calls) =========================
 
   // Add this to your handler functions section
- 
 
   const handleUpdateImage = async (imageFile) => {
     setLoading(true)
     try {
-      const formData = new FormData()
-      formData.append('image', imageFile)
+      // 1. Upload to imgbb
+      const imgbbForm = new FormData()
+      imgbbForm.append('image', imageFile)
 
-      const response = await axiosSecure.put('/api/user/image', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
+      const imgbbRes = await axios.post(
+        `https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`,
+        imgbbForm
+      )
+
+      const imageUrl = imgbbRes.data.data.url
+
+      // 2. Send the URL to your backend
+      const response = await axiosSecure.put(
+        '/api/user/image',
+        { imageUrl }, // just send URL
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
 
       setUserData((prev) => ({ ...prev, image: response.data.imageUrl }))
-      toast.success('Profile image updated successfully ')
+      toast.success('Profile image updated successfully ✅')
     } catch (err) {
       console.error('Image upload failed:', err)
       toast.error('Failed to update profile image ❌')
@@ -73,7 +82,6 @@ const ProfilePage = () => {
       setLoading(false)
     }
   }
-
 
   /**
    * Updates the user's mobile number.
@@ -160,11 +168,11 @@ const ProfilePage = () => {
     setLoading(true)
     try {
       await axiosSecure.put('/api/user/pin', pinData)
-      toast.success('PIN changed successfully')
+      toast.success('Password changed successfully')
       setShowModal(null)
     } catch (err) {
-      console.error('PIN change failed:', err)
-      toast.error('Failed to change PIN ')
+      console.error('password change failed:', err)
+      toast.error('Failed to change password ')
     } finally {
       setLoading(false)
     }
@@ -474,14 +482,14 @@ const ProfilePage = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex justify-between items-center border-b border-gray-700 pb-2">
                   <span className="font-medium text-[var(--color-text-light)]">
-                    PIN
+                    PASSWORD
                   </span>
                   {/* FIXED: Open modal instead of calling API handler */}
                   <button
                     onClick={() => openModal('changePin')}
                     className="text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] text-sm font-medium"
                   >
-                    CHANGE PIN
+                    CHANGE PASSWORD
                   </button>
                 </div>
                 <div className="flex justify-between items-center border-b border-gray-700 pb-2">
@@ -607,9 +615,14 @@ const ProfilePage = () => {
                 <input
                   type="date"
                   name="dob"
-                  defaultValue={userData?.dob || ''}
+                  defaultValue={
+                    userData?.dob
+                      ? new Date(userData.dob).toISOString().split('T')[0]
+                      : ''
+                  }
                   className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                 />
+
                 <input
                   type="text"
                   name="state"
@@ -715,17 +728,15 @@ const ProfilePage = () => {
                 <input
                   type="password"
                   name="oldPin"
-                  placeholder="Old PIN"
+                  placeholder="Old Password"
                   required
                   className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                 />
                 <input
                   type="password"
                   name="newPin"
-                  placeholder="New PIN (4 digits)"
+                  placeholder="New Password"
                   required
-                  minLength={4}
-                  maxLength={4}
                   className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                 />
                 <button
@@ -781,12 +792,13 @@ const ProfilePage = () => {
               <div className="space-y-4">
                 {/* Image Preview */}
                 <div className="flex justify-center">
-                  <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-[var(--color-primary)]">
-                    <img
+                  <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-[var(--color-primary)] relative">
+                    <Image
                       id="imagePreview"
                       src={userData?.image || '/default-avatar.png'}
                       alt="Preview"
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
                     />
                   </div>
                 </div>
