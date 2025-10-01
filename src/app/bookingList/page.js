@@ -164,7 +164,7 @@ const UserBookings = () => {
                     </p>
                     <Link
                         href="/movies"
-                        className="inline-block px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                        className="mt-auto flex-1 px-4 py-2 bg-red-600 hover:bg-red-800 !text-white  text-sm font-semibold rounded-lg shadow-md transition"
                     >
                         Go to Movies
                     </Link>
