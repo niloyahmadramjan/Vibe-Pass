@@ -1,35 +1,43 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import {
-  FiMenu,
-  FiX,
-  FiHome,
-  FiInfo,
-  FiCalendar,
-  FiUser,
-} from 'react-icons/fi'
+import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
+import { FiMenu, FiX, FiHome, FiInfo, FiCalendar, FiUser } from 'react-icons/fi'
 import { GiTheater } from 'react-icons/gi'
 import { RiMovie2Fill } from 'react-icons/ri'
 import Image from 'next/image'
 
-//  NextAuth + custom auth
+// NextAuth + custom auth
 import { useSession, signOut } from 'next-auth/react'
 import { useAuth } from '@/app/context/AuthContext'
 import toast from 'react-hot-toast'
-import { Router } from 'next/router'
 import { FaFilm } from 'react-icons/fa'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
+
   const { data: session, status } = useSession()
   const { user, logout } = useAuth()
 
-  // detect scroll to change navbar background
+  const [openDrop, setOpenDrop] = useState(false)
+  const dropdownRef = useRef(null)
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpenDrop(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  // Detect scroll to change navbar background
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20)
@@ -46,7 +54,7 @@ export default function Navbar() {
       await logout({ redirect: false })
       toast.success('Logged out successfully!')
     }
-    Router.refresh()
+    router.refresh()
   }
 
   const navLinks = [
@@ -61,7 +69,6 @@ export default function Navbar() {
       label: 'Upcoming',
       icon: <FiCalendar className="mr-1" />,
     },
-
     {
       href: '/bangla-movies',
       label: 'BanglaFlix',
@@ -80,8 +87,8 @@ export default function Navbar() {
       <nav
         className={`fixed w-full z-50 transition-all duration-300 ${
           scrolled
-            ? 'bg-gray-950 text-white shadow-lg border-b border-stone-700'
-            : 'bg-transparent text-white'
+            ? 'bg-gray-950 !text-white shadow-lg border-b border-stone-700'
+            : 'bg-transparent !text-white'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -100,16 +107,17 @@ export default function Navbar() {
             </div>
 
             {/* Middle - Links (desktop) */}
-            <div className="hidden md:flex space-x-8 justify-center items-center">
+            <div className="hidden lg:flex space-x-8 justify-center items-center">
               {navLinks.map(({ href, label, icon }) => (
                 <Link
                   key={href}
                   href={href}
-                  className={`relative flex items-center font-bold transition-colors duration-200 ${
-                    pathname === href
-                      ? 'text-red-400'
-                      : 'hover:text-red-900 text-blue-500'
-                  }`}
+                  className={`relative flex items-center font-bold transition-all duration-300 ease-in-out   
+                    ${
+                      pathname === href
+                        ? 'border-b-4 border-blue-400 !text-blue-400'
+                        : '!text-gray-300 hover:text-blue-400'
+                    }`}
                 >
                   {icon} {label}
                 </Link>
@@ -117,29 +125,60 @@ export default function Navbar() {
             </div>
 
             {/* Right - Auth (desktop) */}
-            <div className="hidden md:flex items-center">
+            <div className="hidden lg:flex items-center">
               {status === 'loading' ? (
                 <div className="animate-spin h-6 w-6 rounded-full border-2 border-red-500 border-t-transparent"></div>
               ) : session || user ? (
-                <div className="flex items-center gap-3">
-                  {(session?.user?.image || user?.image) && (
-                    <Image
-                      src={session?.user?.image || user?.image}
-                      alt={session?.user?.name || user?.name || 'User'}
-                      width={32}
-                      height={32}
-                      className="rounded-full"
-                    />
-                  )}
-                  <span className="text-white font-medium">
+                <div className="flex items-center gap-3 relative">
+                  <span className="text-red-400 font-medium">
                     {session?.user?.name || user?.name}
                   </span>
-                  <button
-                    onClick={handleLogout}
-                    className="ml-3 bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-white text-sm"
-                  >
-                    Logout
-                  </button>
+                  {(session?.user?.image || user?.image) && (
+                    <button
+                      onClick={() => setOpenDrop((prev) => !prev)}
+                      className="focus:outline-none"
+                    >
+                      <Image
+                        src={session?.user?.image || user?.image}
+                        alt={session?.user?.name || user?.name || 'User'}
+                        width={32}
+                        height={32}
+                        className="rounded-full"
+                      />
+                    </button>
+                  )}
+
+                  {openDrop && (
+                    <div
+                      ref={dropdownRef}
+                      className="absolute top-12 right-0 w-48 bg-gray-900 !text-white rounded-lg shadow-lg overflow-hidden z-50"
+                    >
+                      <Link
+                        href="/profile"
+                        className="block !text-white px-4 py-2 hover:bg-gray-800 transition"
+                      >
+                        Profile
+                      </Link>
+                      <Link
+                        href="/my-tickets"
+                        className="block !text-white px-4 py-2 hover:bg-gray-800 transition"
+                      >
+                        My Tickets
+                      </Link>
+                      <Link
+                        href="/transactions"
+                        className="block px-4 !text-white py-2 hover:bg-gray-800 transition"
+                      >
+                        Transactions
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 hover:bg-red-600 transition"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <Link
@@ -152,7 +191,7 @@ export default function Navbar() {
             </div>
 
             {/* Mobile Menu Button */}
-            <div className="md:hidden flex items-center">
+            <div className="md:hidden  flex items-center">
               <button
                 onClick={() => setOpen(!open)}
                 className="p-2 rounded-md text-gray-300 hover:text-white hover:bg-gray-800 focus:outline-none transition-colors duration-200"
@@ -191,16 +230,15 @@ export default function Navbar() {
           </div>
 
           {/* Links */}
-          <div className="flex-1 flex flex-col space-y-2 p-4">
+          <div className="flex-1 flex flex-col space-y-4 p-4">
             {navLinks.map(({ href, label, icon }) => (
               <Link
                 key={href}
                 href={href}
-                onClick={() => setOpen(false)}
-                className={`flex items-center font-semibold px-4 py-3 rounded-md transition-all duration-200 ${
+                className={`relative flex items-center font-bold transition-colors duration-200 ${
                   pathname === href
-                    ? '!bg-black !text-white'
-                    : '!text-gray-300 !hover:bg-gray-800 !hover:text-red-400'
+                    ? 'border-b-4 border-blue-400 !text-blue-400'
+                    : '!text-gray-300 hover:text-blue-400'
                 }`}
               >
                 {icon} {label}
@@ -212,7 +250,7 @@ export default function Navbar() {
           <div className="mt-auto p-4 border-t border-gray-800">
             {session || user ? (
               <div className="flex items-center gap-3">
-                <span className="text-white font-medium">
+                <span className="!text-white font-medium">
                   {session?.user?.name || user?.name}
                 </span>
                 <button
