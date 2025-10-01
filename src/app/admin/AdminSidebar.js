@@ -9,12 +9,13 @@ import {
 } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { RiCoupon2Fill } from 'react-icons/ri';
+import { usePathname } from 'next/navigation';
 
 export default function AdminSidebar({ toggleSidebar, isOpen }) {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const { user } = useAuth();
-
+const pathname = usePathname()
   // Close dropdown when clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -163,22 +164,26 @@ export default function AdminSidebar({ toggleSidebar, isOpen }) {
       <div className="flex-1 overflow-y-auto no-scrollbar">
         <nav className="p-4">
           <ul className="space-y-1">
-            {menuItems.map((item) => (
-              <li key={item.path}>
+            {menuItems.map(({ item, path,icon,name}) => (
+              <li key={path}>
                 <Link
-                  href={item.path}
+                  href={path}
                   onClick={() => {
                     // Close sidebar on mobile when menu item is clicked
                     if (window.innerWidth < 1024) {
                       toggleSidebar();
                     }
                   }}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-[#a1a1aa] 
-                    hover:bg-[#2a2c36] hover:text-white transition-colors duration-200
-                    focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+                  className={`flex  items-center gap-3 px-4 py-3 rounded-lg  font-semibold
+                    hover:bg-[#2a2c36] hover:text-white transition-colors duration-200  ${
+                    pathname === path
+                    ? ' bg-[#2a2c36] !text-purple-500 font-bold'
+                      : '!text-gray-300 hover:text-blue-400'
+                }`}
+                     
                 >
-                  <span className="text-lg flex-shrink-0">{item.icon}</span>
-                  <span className="text-base whitespace-nowrap">{item.name}</span>
+                  <span className="text-lg flex-shrink-0">{icon}</span>
+                  <span className="text-base whitespace-nowrap">{name}</span>
                 </Link>
               </li>
             ))}
