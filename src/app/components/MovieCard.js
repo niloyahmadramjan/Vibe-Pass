@@ -83,9 +83,10 @@ export default function MovieCard() {
             key={cat.key}
             onClick={() => setActiveTab(cat.key)}
             className={`px-3 py-2 sm:px-4 sm:py-2 rounded-md text-sm sm:text-base font-semibold transition-colors duration-300 
-              ${activeTab === cat.key
-                ? 'bg-red-600 text-white'
-                : 'bg-zinc-800 text-gray-300 hover:bg-red-500 hover:text-white'
+              ${
+                activeTab === cat.key
+                  ? 'bg-red-600 text-white'
+                  : 'bg-zinc-800 text-gray-300 hover:bg-red-500 hover:text-white'
               }`}
           >
             {cat.label}
@@ -102,15 +103,15 @@ export default function MovieCard() {
         breakpoints={{
           640: { slidesPerView: 3, spaceBetween: 14 },
           768: { slidesPerView: 4, spaceBetween: 16 },
-          1024: { slidesPerView: 6, spaceBetween: 20 },
+          1024: { slidesPerView: 5, spaceBetween: 20 },
         }}
-        className="pb-10"
+        className="pb-10 "
       >
         {movies.length > 0 ? (
           movies.map((movie) => (
             <SwiperSlide key={movie.id}>
               <div
-                className="relative w-full h-[280px] sm:h-[300px] md:h-[350px] lg:h-[410px] 
+                className="relative movie-card w-full h-[350px] md:h-[380px] lg:h-[410px] 
                 border rounded-md overflow-hidden bg-zinc-900 text-white transition-all duration-300 cursor-pointer
                 border-red-400 hover:shadow-[0_0_15px_rgba(239,68,68,0.7)] group"
               >
@@ -118,7 +119,11 @@ export default function MovieCard() {
 
                 <div className="relative w-full h-[70%] sm:h-[67%]">
                   <Image
-                    src={movie.poster_path ? IMG_URL + movie.poster_path : '/no-poster.png'}
+                    src={
+                      movie.poster_path
+                        ? IMG_URL + movie.poster_path
+                        : '/no-poster.png'
+                    }
                     alt={movie.title || 'No title'}
                     fill
                     className="object-cover"
@@ -127,7 +132,6 @@ export default function MovieCard() {
                   />
                   <div className="absolute inset-0 bg-red-500 opacity-0 group-hover:opacity-20 transition duration-300"></div>
                 </div>
-
 
                 {/* Title + Buttons */}
                 <div className="p-2 flex flex-col justify-between">
@@ -140,10 +144,11 @@ export default function MovieCard() {
                   <div className="flex flex-col gap-2">
                     {/* Book Now - hide on upcoming, hover effect on larger screens */}
                     {activeTab !== 'upcoming' && (
-                      <Link href={`booking/${movie.id}`}>
-                        <button className="w-10/12 flex justify-center  mx-auto py-2 rounded-lg bg-red-600 text-white font-semibold 
+                      <Link href={`booking/${movie.id}`}> 
+                        <button
+                          className="w-10/12 flex justify-center  mx-auto py-1 rounded-lg  btn-secondary font-semibold 
           hover:bg-red-700 transition duration-300
-          opacity-100 sm:opacity-0 sm:group-hover:opacity-100" // small screens always visible
+          opacity-100 lg:opacity-0 group-hover:opacity-100" // small screens always visible
                         >
                           Book Now
                         </button>
@@ -152,7 +157,8 @@ export default function MovieCard() {
 
                     {/* Details - always visible on all devices */}
                     <Link href={`/movies/${movie.id}`}>
-                      <button className="w-10/12 flex justify-center  mx-auto py-2 text-white bg-red-600 rounded-lg 
+                      <button
+                        className="w-10/12 flex justify-center  mx-auto py-1  text-white bg-red-600 rounded-lg 
         hover:bg-red-700 transition duration-300"
                       >
                         Details
@@ -160,12 +166,13 @@ export default function MovieCard() {
                     </Link>
                   </div>
                 </div>
-
               </div>
             </SwiperSlide>
           ))
         ) : (
-          <p className="text-gray-400 text-center w-full">No movies available</p>
+          <p className="text-gray-400 text-center w-full">
+            No movies available
+          </p>
         )}
       </Swiper>
     </div>

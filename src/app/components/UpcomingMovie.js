@@ -8,6 +8,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
+import Link from 'next/link'
 
 // Simple Loading Spinner Component
 function Spinner() {
@@ -73,15 +74,15 @@ export default function UpcomingMovie() {
         slidesPerView={2} // default for small screens
         slidesPerGroup={2}
         breakpoints={{
-          640: { slidesPerView: 3, slidesPerGroup: 3 },   // mobile landscape
-          768: { slidesPerView: 4, slidesPerGroup: 4 },   // tablet
-          1024: { slidesPerView: 5, slidesPerGroup: 5 },  // desktop 5 cards per row
+          640: { slidesPerView: 3, slidesPerGroup: 3 }, // mobile landscape
+          768: { slidesPerView: 4, slidesPerGroup: 4 }, // tablet
+          1024: { slidesPerView: 5, slidesPerGroup: 5 }, // desktop 5 cards per row
         }}
       >
         {upcoming.map((movie) => (
           <SwiperSlide key={movie.id}>
             <div
-              className="relative border rounded-lg overflow-hidden 
+              className="relative movie-card border rounded-lg overflow-hidden 
                          bg-zinc-900 text-white transition-all duration-300 cursor-pointer
                          border-red-400 hover:shadow-[0_0_20px_rgba(239,68,68,0.7)] group"
             >
@@ -111,12 +112,12 @@ export default function UpcomingMovie() {
                 <p className="text-sm sm:text-base md:text-lg font-bold truncate mb-2">
                   {movie.title}
                 </p>
-                <button
-                  onClick={() => router.push(`/movies/${movie.id}`)}
-                  className="px-3 py-1.5 sm:px-4 sm:py-2 bg-red-600 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-lg transition duration-300 hover:bg-red-700"
+                <Link
+                  href={`/movies/${movie.id}`}
+                  className="px-3 py-1.5 sm:px-4  btn-secondary text-xs sm:text-sm font-semibold rounded-lg shadow-lg transition duration-300"
                 >
                   Details
-                </button>
+                </Link>
               </div>
             </div>
           </SwiperSlide>
