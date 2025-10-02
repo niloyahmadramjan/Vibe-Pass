@@ -36,7 +36,7 @@ const pathname = usePathname()
     { name: 'Showtimes', path: '/admin/add-showtimes', icon: <FiClock /> },
     { name: 'Bookings', path: '/admin/bookings', icon: <FiTag /> },
     { name: 'Users', path: '/admin/users', icon: <FiUsers /> },
-    { name: 'Loyalty', path: '/admin/loyalty', icon: <FiGift /> },
+    // { name: 'Loyalty', path: '/admin/loyalty', icon: <FiGift /> },
     { name: 'Analytics', path: '/admin/analytics', icon: <FiBarChart2 /> },
     { name: 'Payments', path: '/admin/payment', icon: <FiCreditCard /> },
     { name: 'Marketing', path: '/admin/marketing', icon: <FiMail /> },
