@@ -16,6 +16,7 @@ export default function PaymentForm({ session }) {
   const stripe = useStripe()
   const elements = useElements()
   const router = useRouter()
+  console.log( "session",session)
 
   const [clientSecret, setClientSecret] = useState('')
   const [processing, setProcessing] = useState(false)
@@ -41,7 +42,9 @@ export default function PaymentForm({ session }) {
     fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/payments`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: session.totalAmount * 100 }),
+      body: JSON.stringify({ amount: session.totalAmount  ,
+        bookingId:session._id
+      }),
     })
       .then((res) => res.json())
       .then((data) => {
@@ -50,12 +53,12 @@ export default function PaymentForm({ session }) {
       .catch((err) => Swal.fire('Error', err.message, 'error'))
   }, [session])
 
-  // ✅ Handle Stripe payment
+  //  Handle Stripe payment
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!stripe || !elements || !clientSecret) return
+    e.preventDefault();
+    if (!stripe || !elements || !clientSecret) return;
 
-    setProcessing(true)
+    setProcessing(true);
 
     try {
       const { error, paymentIntent } = await stripe.confirmCardPayment(
@@ -69,57 +72,62 @@ export default function PaymentForm({ session }) {
             },
           },
         }
-      )
+      );
 
-      if (error) throw error
+      if (error) throw error;
 
-      if (paymentIntent?.status === 'succeeded') {
+      if (paymentIntent?.status === "succeeded") {
         // Save payment
         await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/payments/confirm-payment`,
           {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               transactionId: paymentIntent.id,
               amount: paymentIntent.amount,
               status: paymentIntent.status,
               sessionId: session._id,
+              bookingId: session._id, // ✅ Booking ID পাঠানো
               sessionTitle: session.movieTitle,
               userEmail: session.userEmail,
             }),
           }
-        )
+        );
 
         // Update booking
         await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/bookings/${session._id}`,
           {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: 'paid' }),
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: "paid" }),
           }
-        )
+        );
+
         Swal.fire({
-          icon: 'success',
-          title: 'Payment Successful 🎉',
-          text: 'Redirecting you to your tickets...',
+          icon: "success",
+          title: "Payment Successful 🎉",
+          text: "Redirecting you to your tickets...",
           timer: 2000,
           showConfirmButton: false,
-        })
-         setTimeout(() => router.push(`/my-bookings/${paymentIntent.id}`), 2000)
-        
+        });
+
+        setTimeout(() =>
+          router.push(`/my-bookings/${paymentIntent.id}`), 2000
+        );
       }
     } catch (err) {
-     Swal.fire({
-       icon: 'error',
-       title: 'Payment Failed',
-       text: err.message,
-     })
+      Swal.fire({
+        icon: "error",
+        title: "Payment Failed",
+        text: err.message,
+      });
     } finally {
-      setProcessing(false)
+      setProcessing(false);
     }
-  }
+  };
+
 
   return (
     <div className="min-h-screen pt-20 md:pt-0 font-[Inter]  p-6 flex items-center justify-center text-white">

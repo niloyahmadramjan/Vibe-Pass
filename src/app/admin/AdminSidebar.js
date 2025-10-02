@@ -177,7 +177,7 @@ const pathname = usePathname()
                   className={`flex  items-center gap-3 px-4 py-3 rounded-lg  font-semibold
                     hover:bg-[#2a2c36] hover:text-white transition-colors duration-200  ${
                     pathname === path
-                    ? ' bg-[#2a2c36] !text-purple-500 font-bold'
+                    ? ' bg-[#2a2c36] !text-red-400  font-bold'
                       : '!text-gray-300 hover:text-blue-400'
                 }`}
                      
