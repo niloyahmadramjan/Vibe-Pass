@@ -433,6 +433,10 @@ export default function MovieSeatBooking() {
   const [bookingData, setBookingData] = useState(null)
   const [paymentTimer, setPaymentTimer] = useState(600) // 10 minutes in seconds
 
+  const theaterName = searchParams.get("cinema") || "Default Theater";
+
+
+
   // Load movie data from TMDB API
   useEffect(() => {
     const loadMovieData = async () => {
@@ -554,7 +558,7 @@ export default function MovieSeatBooking() {
       const bookingPayload = {
         movieId: id,
         movieTitle: movieData.title,
-        theaterName: 'Star Cineplex',
+         theaterName: theaterName, 
         showId: selectedTime?.id,
         showDate: selectedDate,
         showTime: selectedTime?.time,
@@ -705,7 +709,8 @@ export default function MovieSeatBooking() {
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400 mb-4">
                 <div className="flex items-center gap-1">
                   <MapPin className="w-4 h-4 text-red-500" />
-                  <span>Star Cineplex</span>
+                 <span>{theaterName}</span>
+
                 </div>
                 <div className="flex items-center gap-1">
                   <Calendar className="w-4 h-4 text-red-500" />
