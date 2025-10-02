@@ -11,13 +11,14 @@ export default function LocationPage() {
   const [selectedDistrict, setSelectedDistrict] = useState('')
   const [districts, setDistricts] = useState([])
   const [selectedLocation, setSelectedLocation] = useState(null)
+  const [selectedCinema, setSelectedCinema] = useState(null) // ✅ নতুন state
   const [isLoading, setIsLoading] = useState(false)
 
   const mapRef = useRef(null)
 
   const uniqueDivisions = [...new Set(locations.map((loc) => loc.region))]
 
-  // Update districts when division changes
+  // যখন Division select হবে তখন districts আপডেট হবে
   useEffect(() => {
     if (selectedDivision) {
       const filteredDistricts = locations
@@ -26,41 +27,43 @@ export default function LocationPage() {
       setDistricts([...new Set(filteredDistricts)])
       setSelectedDistrict('')
       setSelectedLocation(null)
+      setSelectedCinema(null)
     } else {
       setDistricts([])
       setSelectedLocation(null)
+      setSelectedCinema(null)
     }
   }, [selectedDivision])
 
-  // Update selected location when district changes
+  // District change হলে location আপডেট হবে
   useEffect(() => {
     if (selectedDistrict && selectedDivision) {
       const loc = locations.find(
         (l) => l.region === selectedDivision && l.district === selectedDistrict
       )
       setSelectedLocation(loc || null)
+      setSelectedCinema(null)
     } else {
       setSelectedLocation(null)
+      setSelectedCinema(null)
     }
   }, [selectedDistrict, selectedDivision])
 
-  // Find Cinemas Button
+  // Location এ zoom
   const handleFindCinemas = () => {
     if (selectedLocation && mapRef.current) {
       setIsLoading(true)
 
-      // Scroll to map
       setTimeout(() => {
         mapRef.current?.scrollIntoView({ behavior: 'smooth' })
       }, 100)
 
-      // Fly to district
       setTimeout(() => {
         if (mapRef.current.flyTo) {
           mapRef.current.flyTo(
             [selectedLocation.latitude, selectedLocation.longitude],
-            13,
-            { duration: 2, easeLinearity: 0.25 }
+            10,
+            { duration: 2 }
           )
         }
         setIsLoading(false)
@@ -78,19 +81,23 @@ export default function LocationPage() {
     }
   }
 
-  // Zoom to specific cinema
-  const handleZoomToCinema = (cinema) => {
+  // ✅ Cinema select করলে শুধু ওইটা দেখাবে
+  const handleSelectCinema = (cinema) => {
+    setSelectedCinema(cinema)
+
     if (mapRef.current && selectedLocation) {
-      const offset = 0.1
-      const lat = selectedLocation.latitude + (Math.random() - 0.5) * offset
-      const lng = selectedLocation.longitude + (Math.random() - 0.5) * offset
-      mapRef.current.flyTo([lat, lng], 15, { duration: 1.5 })
+      mapRef.current.flyTo(
+        [selectedLocation.latitude, selectedLocation.longitude],
+        14,
+        { duration: 1.5 }
+      )
     }
   }
 
   return (
     <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 pt-20 text-white">
       <div className="max-w-6xl mx-auto">
+        {/* Header */}
         <div className="text-center mb-10">
           <h1 className="text-4xl font-bold text-white mb-3">
             Find Cinemas And Setup Your Location
@@ -101,10 +108,10 @@ export default function LocationPage() {
           </p>
         </div>
 
-        {/* Selection Card */}
+        {/* Division + District Select */}
         <div className="rounded-2xl shadow-xl p-6 mb-8 border border-gray-700 bg-transparent">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
-            {/* Division Select */}
+            {/* Division */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Division
@@ -113,11 +120,11 @@ export default function LocationPage() {
                 <select
                   value={selectedDivision}
                   onChange={(e) => setSelectedDivision(e.target.value)}
-                  className="w-full px-4 py-3 pl-10 border border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 text-white bg-[#121212] appearance-none"
+                  className="w-full px-4 py-3 pl-10 border border-gray-600 rounded-lg text-white bg-[#121212] appearance-none"
                 >
                   <option value="">Choose a Division</option>
                   {uniqueDivisions.map((div) => (
-                    <option key={div} value={div} className="bg-[#121212]">
+                    <option key={div} value={div}>
                       {div}
                     </option>
                   ))}
@@ -131,7 +138,7 @@ export default function LocationPage() {
               </div>
             </div>
 
-            {/* District Select */}
+            {/* District */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 District
@@ -141,11 +148,11 @@ export default function LocationPage() {
                   value={selectedDistrict}
                   onChange={(e) => setSelectedDistrict(e.target.value)}
                   disabled={!selectedDivision}
-                  className="w-full px-4 py-3 pl-10 border border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 disabled:bg-gray-800 disabled:cursor-not-allowed text-white bg-[#121212] appearance-none"
+                  className="w-full px-4 py-3 pl-10 border border-gray-600 rounded-lg disabled:bg-gray-800 text-white bg-[#121212] appearance-none"
                 >
                   <option value="">Choose a District</option>
                   {districts.map((dist) => (
-                    <option key={dist} value={dist} className="bg-[#121212]">
+                    <option key={dist} value={dist}>
                       {dist}
                     </option>
                   ))}
@@ -159,12 +166,12 @@ export default function LocationPage() {
               </div>
             </div>
 
-            {/* Find Cinemas Button */}
+            {/* Button */}
             <div>
               <button
                 onClick={handleFindCinemas}
                 disabled={!selectedLocation || isLoading}
-                className="w-full bg-[#E50914] disabled:bg-[#7a3d3f] text-white py-3 px-6 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:bg-[#B20710]"
+                className="w-full bg-[#E50914] disabled:bg-[#7a3d3f] text-white py-3 px-6 rounded-lg font-medium"
               >
                 {isLoading ? 'Loading...' : 'Set Your Location'}
               </button>
@@ -172,9 +179,9 @@ export default function LocationPage() {
           </div>
         </div>
 
-        {/* Cinemas List */}
+        {/* Cinemas */}
         {selectedLocation && (
-          <div className="rounded-2xl shadow-md p-6 mb-8 border border-gray-700 bg-transparent transition-all duration-500 ease-in-out transform">
+          <div className="rounded-2xl shadow-md p-6 mb-8 border border-gray-700 bg-transparent">
             <h2 className="text-2xl font-semibold text-white mb-6 pb-2 border-b border-gray-700 flex items-center gap-2">
               <FaMapMarkerAlt className="text-red-500" />
               Cinemas in {selectedLocation.district}, {selectedLocation.region}
@@ -183,19 +190,26 @@ export default function LocationPage() {
               {selectedLocation.cinemas.map((cinema, index) => (
                 <div
                   key={index}
-                  onClick={() => handleZoomToCinema(cinema)}
-                  className="rounded-lg p-4 border border-gray-700 hover:bg-gray-800 cursor-pointer transition-colors duration-200"
+                  onClick={() => handleSelectCinema(cinema)}
+                  className={`rounded-lg p-4 border cursor-pointer transition-colors ${
+                    selectedCinema === cinema
+                      ? 'border-red-500 bg-gray-800'
+                      : 'border-gray-700 hover:bg-gray-800'
+                  }`}
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 rounded-full shadow-sm bg-gray-900">
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center gap-2">
                       <FaMapMarkerAlt className="text-red-500 text-lg" />
-                    </div>
-                    <div>
                       <h3 className="font-medium text-white">{cinema}</h3>
-                      <p className="text-sm text-gray-400 mt-1">
-                        {selectedLocation.district}
-                      </p>
                     </div>
+                    <p className="text-sm text-gray-400">
+                      {selectedLocation.district}
+                    </p>
+                    {selectedCinema === cinema && (
+                      <button className="bg-red-600 text-white py-2 rounded-md mt-2 hover:bg-red-700 transition">
+                        Book Now
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -203,11 +217,12 @@ export default function LocationPage() {
           </div>
         )}
 
-        {/* Map Section */}
+        {/* Map */}
         <div className="rounded-2xl shadow-xl overflow-hidden border border-gray-700 bg-dark">
           <SeatMap
             locations={locations}
             selectedLocation={selectedLocation}
+            selectedCinema={selectedCinema} // ✅ এখন cinema নাম পাঠাচ্ছি
             mapRef={mapRef}
           />
         </div>

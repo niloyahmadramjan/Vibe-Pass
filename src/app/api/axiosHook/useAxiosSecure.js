@@ -12,12 +12,12 @@ axiosSecure.interceptors.request.use(
   async (config) => {
     let token = null
 
-    // LocalStorage token (custom JWT)
+    // First try localStorage JWT
     if (typeof window !== 'undefined') {
       token = localStorage.getItem('token')
     }
 
-    // if localStorage don't have then NextAuth sesstion will take
+    // If not found, fallback to NextAuth session token
     if (!token) {
       const session = await getSession()
       if (session?.accessToken) {
@@ -25,6 +25,7 @@ axiosSecure.interceptors.request.use(
       }
     }
 
+    // Attach final token
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
@@ -39,7 +40,7 @@ axiosSecure.interceptors.response.use(
   async (error) => {
     if (error.response && error.response.status === 401) {
       console.error('Unauthorized! Maybe token expired.')
-      //write here future refresh token logic
+      // TODO: refresh token logic here
     }
     return Promise.reject(error)
   }

@@ -14,6 +14,7 @@ const nextConfig = {
       'placehold.co',
       'i.postimg.cc',
       'i.ibb.co.com',
+      'cdn-icons-png.flaticon.com',
     ],
   },
 }

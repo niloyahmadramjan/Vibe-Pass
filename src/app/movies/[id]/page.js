@@ -2,6 +2,7 @@
 import axiosSecure from '@/app/api/axiosHook/useAxiosSecure'
 import TheatersNear from '@/app/components/NearbyTheaters'
 import LoadingSpinner from '@/app/hooks/LoadingSpiner'
+import LocationPage from '@/app/location/page'
 import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -15,6 +16,7 @@ export default function MovieDetailsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [nearbyTheaters, setNearbyTheaters] = useState([])
+  const [selectedCinema, setSelectedCinema] = useState(null)
   const router = useRouter()
 
   // ✅ Fetch Hall Data
@@ -58,17 +60,23 @@ export default function MovieDetailsPage() {
       (pos) => {
         const { latitude, longitude } = pos.coords
 
-        // উদাহরণ: simple matching (real app হলে distance calc লাগত)
         const foundDivision = hallData.find((div) =>
           div.districts.some((d) => d.lat && d.lng)
         )
 
         if (foundDivision) {
-          // এখনো simple করে প্রথম district ধরে নিচ্ছি
           const theaters = foundDivision.districts.flatMap(
             (d) => d.theaters || []
           )
           setNearbyTheaters(theaters)
+
+          if (theaters.length > 0) {
+            setSelectedCinema({
+              name: theaters[0].name,
+              city: theaters[0].city || '',
+              district: theaters[0].district || ''
+            })
+          }
         }
       },
       (err) => {
@@ -116,7 +124,7 @@ export default function MovieDetailsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4">
-        {/* Trailer */}
+        {/* Trailer Modal */}
         {showTrailer && trailer && (
           <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
             <div className="relative bg-gray-900 rounded-xl p-4 max-w-3xl w-full">
@@ -171,30 +179,53 @@ export default function MovieDetailsPage() {
             <strong>Cast:</strong>{' '}
             {movie.credits?.cast?.slice(0, 5).map((actor) => actor.name).join(', ')}
           </p>
-        </div>
 
-        {/* ✅ Nearby Theaters */}
-        
-
-        {/* Buttons */}
-        <div className="flex gap-4 flex-wrap pb-20 pt-10">
+          {/* 🎬 Watch Trailer button under Cast */}
           {trailer && (
             <button
               onClick={() => setShowTrailer(true)}
-              className="px-6 py-3 rounded-lg bg-red-600 hover:bg-red-700 transition flex items-center gap-2"
+              className="mt-4 px-6 py-3 rounded-lg bg-red-600 hover:bg-red-700 transition flex items-center gap-2"
             >
               ▶ Watch Trailer
             </button>
           )}
-          <button
-            onClick={() => router.push(`/booking/${movie.id}`)}
-            className="px-8 py-3 rounded-lg bg-green-600 hover:bg-green-700 transition-all duration-300 transform hover:scale-105 flex items-center gap-2 shadow-lg"
-          >
-            🎫 Book Now
-          </button>
+        </div>
+
+        {/* ✅ Nearby Theaters (Auto Detect) */}
+        <TheatersNear 
+          selectedCinema={selectedCinema} 
+          setSelectedCinema={setSelectedCinema} 
+        />
+
+        {/* ✅ Location Page (Manual Select) */}
+        {/* <LocationPage
+          onLocationSelect={(loc) => {
+            if (loc.cinemas?.length > 0) {
+              setSelectedCinema({
+                name: loc.cinemas[0],
+                city: loc.region,
+                district: loc.district
+              })
+            }
+          }}
+        /> */}
+
+        {/* Book Now Button */}
+        <div className="flex gap-4 flex-wrap pb-20 pt-10">
+          {selectedCinema && (
+            <button
+              onClick={() =>
+                router.push(
+                  `/booking/${movie.id}?cinema=${encodeURIComponent(selectedCinema.name)}&city=${selectedCinema.city}&district=${selectedCinema.district}`
+                )
+              }
+              className="px-8 py-3 rounded-lg bg-green-600 hover:bg-green-700 transition-all duration-300 transform hover:scale-105 flex items-center gap-2 shadow-lg"
+            >
+              🎫 Book Now at {selectedCinema.name}
+            </button>
+          )}
         </div>
       </div>
-      <TheatersNear/>
     </div>
   )
 }

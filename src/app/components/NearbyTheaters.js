@@ -5,10 +5,9 @@ import dynamic from 'next/dynamic'
 
 const TheaterMap = dynamic(() => import('./TheaterMap'), { ssr: false })
 
-export default function TheatersNear() {
+export default function TheatersNear({ selectedCinema, setSelectedCinema }) {
   const [nearest, setNearest] = useState(null)
   const [error, setError] = useState(null)
-  const [selectedCinema, setSelectedCinema] = useState(null)
   const [cinemaCoords, setCinemaCoords] = useState({ lat: null, lng: null })
 
   // Haversine formula
@@ -55,8 +54,13 @@ export default function TheatersNear() {
   if (!nearest) return <p className="text-gray-400">📍 Detecting nearby theaters...</p>
 
   const handleCinemaClick = (cinema, index) => {
-    setSelectedCinema(cinema)
-    // Map marker position slightly offset for each cinema
+    setSelectedCinema({ 
+      name: cinema, 
+      lat: nearest.latitude + index * 0.001, 
+      lng: nearest.longitude + index * 0.001,
+      district: nearest.district,
+      city: nearest.city
+    })
     setCinemaCoords({ lat: nearest.latitude + index * 0.001, lng: nearest.longitude + index * 0.001 })
   }
 
@@ -72,7 +76,7 @@ export default function TheatersNear() {
             key={i}
             onClick={() => handleCinemaClick(cinema, i)}
             className={`p-2 bg-gray-700 rounded cursor-pointer hover:bg-gray-600 transition ${
-              selectedCinema === cinema ? 'ring-2 ring-[#E50914]' : ''
+              selectedCinema?.name === cinema ? 'ring-2 ring-[#E50914]' : ''
             }`}
           >
             {cinema}
@@ -84,7 +88,7 @@ export default function TheatersNear() {
         <TheaterMap
           latitude={cinemaCoords.lat}
           longitude={cinemaCoords.lng}
-          cinema={selectedCinema}
+          cinema={selectedCinema.name}
         />
       )}
     </div>
