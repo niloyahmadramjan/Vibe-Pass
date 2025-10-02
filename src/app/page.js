@@ -6,6 +6,7 @@ import Hero from './components/Hero'
 import KidsMovies from './components/KidsMovies'
 import UpcomingMovie from './components/UpcomingMovie'
 import FAQ from './components/FAQ'
+import MovieExperienceSection from './components/Experience'
 
 export default function home() {
   return (
@@ -14,6 +15,7 @@ export default function home() {
       <MovieCard />
       <KidsMovies />
       <UpcomingMovie></UpcomingMovie>
+      <MovieExperienceSection/>
       <FAQ />
     </main>
   )
