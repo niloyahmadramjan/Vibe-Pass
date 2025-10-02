@@ -136,7 +136,7 @@ export default function Navbar() {
                     onClick={() => setOpenDrop((prev) => !prev)}
                     className="flex items-center gap-2 focus:outline-none hover:bg-gray-800 px-3 py-2 rounded-lg transition-colors"
                   >
-                    {session?.user?.image || user?.image ? (
+                    {/* {session?.user?.image || user?.image ? (
                       <Image
                         src={session?.user?.image || user?.image}
                         alt={session?.user?.name || user?.name || 'User'}
@@ -152,7 +152,7 @@ export default function Navbar() {
                           'U'
                         ).toUpperCase()}
                       </div>
-                    )}
+                    )} */}
 
                     <div className="flex flex-col items-start">
                       <span className="text-white font-semibold text-sm leading-tight max-w-[120px] truncate">
@@ -213,7 +213,7 @@ export default function Navbar() {
                               {session?.user?.name || user?.name}
                             </p>
                             <p className="text-red-400 text-xs">
-                              HJ.MOVIECLUB U...
+                              Hi.MOVIECLUB U...
                             </p>
                           </div>
                         </div>
@@ -338,7 +338,7 @@ export default function Navbar() {
               ) : (
                 <Link
                   href="/login"
-                  className="flex items-center gap-2 rounded-lg font-medium bg-red-600 hover:bg-red-700 px-4 py-2 transition-colors duration-200 text-white"
+                  className="flex items-center gap-2 rounded-lg font-medium bg-red-600 hover:bg-red-700 px-4 py-2 transition-colors duration-200 !text-white"
                 >
                   <svg
                     className="w-5 h-5"
