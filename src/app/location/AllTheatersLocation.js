@@ -110,11 +110,11 @@ export default function AllTheatersLocation() {
   }
 
   return (
-    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 pt-20 text-white">
+    <div className=" py-8 px-4 sm:px-6  text-white">
       <div className="max-w-6xl mx-auto">
         {/* Division + District Select */}
         <div className="rounded-2xl shadow-xl p-6 mb-8 border border-gray-700 bg-transparent">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+          <div className="grid grid-cols-1  gap-6 items-end">
             {/* Division */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -190,7 +190,7 @@ export default function AllTheatersLocation() {
               <FaMapMarkerAlt className="text-red-500" />
               Cinemas in {selectedLocation.district}, {selectedLocation.region}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               {selectedLocation.cinemas.map((cinema, index) => (
                 <div
                   key={index}
@@ -225,7 +225,7 @@ export default function AllTheatersLocation() {
         )}
 
         {/* Map */}
-        <div className="rounded-2xl shadow-xl overflow-hidden border border-gray-700 bg-dark">
+        <div className="rounded-2xl shadow-xl overflow-hidden border border-gray-700 bg-dark h-72">
           <SeatMap
             locations={locations}
             selectedLocation={selectedLocation}
