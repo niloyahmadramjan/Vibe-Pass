@@ -101,7 +101,7 @@ export default function ShowtimesPage() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0c0c14] via-[#0f1018] to-[#1e1233]">
+    <div className="p-6 w-full  mx-auto bg-gradient-to-br from-[#0c0c14] via-[#0f1018] to-[#1e1233]">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2"> Showtimes Management</h1>
