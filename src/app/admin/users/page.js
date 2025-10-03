@@ -35,10 +35,11 @@ export default function UserManagementPage() {
     fetchBookings();
   }, []);
 
-  useEffect(() => {
-    filterUsers();
-    calculateStats();
-  }, [users, bookings, searchTerm, statusFilter]);
+ useEffect(() => {
+   filterUsers()
+   calculateStats()
+ }, [users, bookings, searchTerm, statusFilter, filterUsers, calculateStats])
+
 
   const fetchUsers = async () => {
     try {
