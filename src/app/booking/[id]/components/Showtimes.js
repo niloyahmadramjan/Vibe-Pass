@@ -38,7 +38,7 @@ export default function Showtimes({ showtimes, selectedTime, setSelectedTime, to
                 <div className="text-sm text-gray-300">{show.available} seats</div>
                 <div className="text-xs text-gray-400">available</div>
               </div>
-            </div>gi
+            </div>
           </button>
         ))}
       </div>
