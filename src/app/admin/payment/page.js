@@ -463,7 +463,7 @@ export default function PaymentsPage() {
                                 {activeTab === 'today' ? "Today's Unpaid" : "Weekly Unpaid"}
                                 <span className="text-sm text-orange-400 ml-2">(Latest First)</span>
                             </h2>
-                            <span className="bg-red-500/20 text-red-400 px-3 py-1 rounded-full text-sm">
+                            <span className="bg-red-500/20 text-red-400 px-8  py-2 rounded-full text-sm">
                                 {unpaidBookings.length} pending
                             </span>
                         </div>
@@ -524,7 +524,7 @@ export default function PaymentsPage() {
                                 {activeTab === 'today' ? "Today's Refunds" : "Weekly Refunds"}
                                 <span className="text-sm text-red-400 ml-2">(Latest First)</span>
                             </h2>
-                            <span className="bg-red-500/20 text-red-400 px-3 py-1 rounded-full text-sm">
+                            <span className="bg-red-500/20 text-red-400 px-8 py-1 rounded-full text-sm">
                                 {refundedPayments.length} refunds
                             </span>
                         </div>
