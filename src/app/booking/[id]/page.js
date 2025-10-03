@@ -637,7 +637,7 @@ export default function MovieSeatBooking() {
       <div className="min-h-screen  flex items-center justify-center p-4">
         <div className="text-center">
           <div className="text-red-500 text-xl mb-4">
-            ❌ Movie data not found!
+             Movie data not found!
           </div>
           <button
             onClick={() => router.push('/movies')}
