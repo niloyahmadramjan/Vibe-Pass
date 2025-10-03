@@ -70,21 +70,27 @@ const [loadingShowtimes, setLoadingShowtimes] = useState(false)
   }, [id, router])
 
   // ✅ Fetch reserved seats when showtime changes
-  useEffect(() => {
-    const fetchReservedSeats = async () => {
-      if (!id || !selectedTime) return
-      try {
-        const res = await axiosSecure.get('/api/ticket/reserved-seats', {
-          params: { movieId: id, showtime: selectedTime.time, showDate: selectedDate }
-        })
-        setReservedSeatsState(res.data.reservedSeats || [])
-      } catch (err) {
-        console.error('Error fetching reserved seats:', err)
-      }
+// ✅ CORRECT VERSION
+useEffect(() => {
+  const fetchReservedSeats = async () => {
+    if (!id || !selectedTime || !selectedDate) return
+    
+    try {
+      const res = await axiosSecure.get('/api/ticket/reserved-seats', {
+        params: { 
+          movieId: id, 
+          showTime: selectedTime.time, // ✅ Changed from 'showtime'
+          showDate: selectedDate 
+        }
+      })
+      setReservedSeatsState(res.data.reservedSeats || [])
+    } catch (err) {
+      console.error('Error fetching reserved seats:', err)
     }
+  }
 
-    fetchReservedSeats()
-  }, [id, selectedTime, selectedDate])
+  fetchReservedSeats()
+}, [id, selectedTime, selectedDate])
 
 
 
@@ -95,7 +101,7 @@ useEffect(() => {
     
     try {
       setLoadingShowtimes(true)
-      const res = await axiosSecure.get('/api/showtime/available-showtimes', {
+      const res = await axiosSecure.get('/api/showtime', {
         params: { movieId: id, showDate: selectedDate }
       })
       
@@ -111,13 +117,14 @@ useEffect(() => {
   }
 
   fetchShowtimes()
-}, [id, selectedDate])
+}, [id, selectedDate ])
 
   // ✅ Socket.io Real-time Updates
   useEffect(() => {
     if (!id || !selectedTime) return
 
-    const room = `${id}-${selectedTime.time}-&{selectedDate}`
+    const room = `${id}-${selectedDate}-${selectedTime.time}`
+
     
     // Join room for this movie + showtime
     socket.emit("joinRoom", { movieId: id, showtime: selectedTime.time, showDate: selectedDate })
@@ -133,41 +140,6 @@ useEffect(() => {
       socket.off("reservedSeatsUpdate")
     }
   }, [id, selectedTime, selectedDate])
-
-
-  // ✅ ADD THIS NEW useEffect
-useEffect(() => {
-  socket.on("bookingExpired", (data) => {
-    toast.error("A booking has expired. Seats have been released.");
-    
-    // Refresh showtimes to update availability
-    if (selectedDate && id) {
-      fetchShowtimes();
-    }
-  });
-
-  return () => {
-    socket.off("bookingExpired");
-  };
-}, [selectedDate, id]);
-
-// ✅ ADD THIS HELPER FUNCTION (if not already exists)
-const fetchShowtimes = async () => {
-  if (!id || !selectedDate) return;
-  
-  try {
-    setLoadingShowtimes(true);
-    const res = await axiosSecure.get('/api/showtime/available-showtimes', {
-      params: { movieId: id, showDate: selectedDate }
-    });
-    
-    setAvailableShowtimes(res.data.showtimes || []);
-  } catch (err) {
-    console.error('Error fetching showtimes:', err);
-  } finally {
-    setLoadingShowtimes(false);
-  }
-};
 
   // ✅ Payment timer
   useEffect(() => {
