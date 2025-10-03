@@ -22,7 +22,7 @@ export default function AddMoviesPage() {
     vote_average: 0,
     vote_count: 0
   });
-console.log(formData)
+// console.log(formData)
   const [uploading, setUploading] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
 
@@ -91,7 +91,7 @@ console.log(formData)
     e.preventDefault();
     try {
       const response = await axiosSecure.post("/api/movies/add", formData);
-      console.log(' Movie added:', response.data);
+      // console.log(' Movie added:', response.data);
 
       toast.success(' Movie added successfully!', { duration: 3000 });
 

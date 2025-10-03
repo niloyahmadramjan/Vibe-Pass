@@ -28,7 +28,7 @@ export default function PaymentPage() {
     fetchData()
   }, [id])
 
-  console.log(session)
+  // console.log(session)
 
   if (error) return <p className="text-center text-red-500">{error}</p>
   if (!session) return <LoadingSpinner/>
