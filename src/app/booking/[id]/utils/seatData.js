@@ -46,5 +46,5 @@ export const seatSections = [
 
 // Pre-booked seats
 export const reservedSeats = [
-  'A3', 'B5', 'C8', 'D1', 'E4', 'F7', 'G3', 'H5', 'I2', 'J8', 'C4', 'D9',
+  'B5', 'C8', 'D1', 'E4', 'F7', 'G3', 'H5', 'I2', 'J8', 'C4', 'D9',
 ];
