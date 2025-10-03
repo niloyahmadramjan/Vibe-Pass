@@ -44,7 +44,11 @@ export default function MovieSeatBooking() {
   const [availableShowtimes, setAvailableShowtimes] = useState([])
 const [loadingShowtimes, setLoadingShowtimes] = useState(false)
 
-  // ✅ Load movie data
+  const theaterName = searchParams.get("cinema") || "Default Theater";
+
+
+
+  // Load movie data from TMDB API
   useEffect(() => {
     const loadMovieData = async () => {
       try {
@@ -187,7 +191,7 @@ useEffect(() => {
       const bookingPayload = {
         movieId: id,
         movieTitle: movieData.title,
-        theaterName: 'Star Cineplex',
+         theaterName: theaterName, 
         showId: selectedTime?.id,
         showDate: selectedDate,
         showTime: selectedTime?.time,
@@ -342,6 +346,46 @@ useEffect(() => {
                     {movieData.genres?.map((g) => g.name).join(', ')} | {movieData.runtime}m | ⭐ {movieData.vote_average?.toFixed(1)}
                   </p>
                 </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400 mb-4">
+                <div className="flex items-center gap-1">
+                  <MapPin className="w-4 h-4 text-red-500" />
+                 <span>{theaterName}</span>
+
+                </div>
+                <div className="flex items-center gap-1">
+                  <Calendar className="w-4 h-4 text-red-500" />
+                  <span>Today, {new Date().toLocaleDateString()}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Date Selection */}
+            <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700/50 shadow-xl">
+              <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-red-500">
+                <Calendar className="w-5 h-5" />
+                Select Date
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                {getDateOptions().map((date) => (
+                  <button
+                    key={date.value}
+                    onClick={() => setSelectedDate(date.value)}
+                    className={`p-3 rounded-lg text-center transition-all ${
+                      selectedDate === date.value
+                        ? 'bg-red-600 border-red-500'
+                        : 'bg-gray-700/50 border-gray-600/50 hover:bg-gray-600/50'
+                    } border-2`}
+                  >
+                    <div className="font-semibold">
+                      {date.label.split(' ')[0]}
+                    </div>
+                    <div className="text-sm">
+                      {date.label.split(' ').slice(1).join(' ')}
+                    </div>
+                  </button>
+                ))}
               </div>
             </div>
 
