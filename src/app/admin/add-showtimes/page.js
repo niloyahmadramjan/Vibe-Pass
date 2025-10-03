@@ -98,11 +98,11 @@ export default function ShowtimesPage() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-gradient-to-br from-[#0c0c14] via-[#0f1018] to-[#1e1233]">
+    <div className="p-6 w-full mx-auto bg-gradient-to-br from-[#0c0c14] via-[#0f1018] to-[#1e1233]">
       {/* Header with Add Button */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
         <div className="mb-4 lg:mb-0">
-          <h1 className="text-3xl font-bold text-white mb-2">Showtimes Management</h1>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 bg-clip-text text-transparent mb-4">Showtimes Management</h1>
           <p className="text-gray-400">Manage all movie showtimes and schedules</p>
         </div>
         <button

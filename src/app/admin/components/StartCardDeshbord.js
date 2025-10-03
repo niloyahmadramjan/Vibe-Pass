@@ -16,7 +16,7 @@ function StarCardtDeshbord({ title, value, subtitle, icon, delay }) {
                     <p className="text-2xl font-bold text-white mt-2">{value}</p>
                     <p className="text-gray-400 text-xs mt-1">{subtitle}</p>
                 </div>
-                <div className="p-3 bg-gradient-to-r from-purple-600 to-purple-600/30 hover:from-purple-600/40 hover:to-purple-600/50 rounded-xl">
+                <div className="p-3 bg-gradient-to-r from-red-600/20 to-red-500/30 hover:from-red-700/40 hover:to-red-700/50 rounded-xl">
                     <div className="text-white text-xl">
                         {icon}
                     </div>

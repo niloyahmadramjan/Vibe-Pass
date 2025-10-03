@@ -1,77 +1,89 @@
-'use client';
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FiX, FiCalendar, FiClock, FiDollarSign, FiFilm, FiMapPin, FiMonitor } from 'react-icons/fi';
-import axiosSecure from '@/app/api/axiosHook/useAxiosSecure';
-import toast from 'react-hot-toast';
+"use client";
+import { useState, useEffect } from "react";
+import axiosSecure from "@/app/api/axiosHook/useAxiosSecure";
+import { motion, AnimatePresence } from "framer-motion";
+import { FiX, FiFilm, FiCalendar, FiClock, FiDollarSign, FiMapPin, FiGlobe, FiLayers } from "react-icons/fi";
+import toast from "react-hot-toast";
 
 export default function AddShowtimeModal({ isOpen, onClose, onSuccess }) {
     const [formData, setFormData] = useState({
-        movieId: '',
-        date: '',
-        time: '',
-        hall: '',
-        price: '',
-        screen: 'Screen 1'
+        movieId: "",
+        date: "",
+        time: "",
+        price: "",
+        hall: "",
+        language: "English",
+        format: "2D",
+        totalSeats: 100,
+        availableSeats: 100
     });
+
     const [movies, setMovies] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [movieLoading, setMovieLoading] = useState(true);
 
     // Fetch movies for dropdown
     useEffect(() => {
         if (isOpen) {
             fetchMovies();
-            // Set default date to today
-            const today = new Date().toISOString().split('T')[0];
-            setFormData(prev => ({ ...prev, date: today }));
         }
     }, [isOpen]);
 
     const fetchMovies = async () => {
         try {
-            const res = await axiosSecure.get('/api/movies');
-            setMovies(res.data || []);
+            setMovieLoading(true);
+            const res = await axiosSecure.get("/api/movies"); // Adjust API endpoint as needed
+            setMovies(res.data);
         } catch (error) {
-            console.error('Error fetching movies:', error);
-            toast.error('Failed to load movies');
+            toast.error("Failed to load movies");
+        } finally {
+            setMovieLoading(false);
         }
     };
 
     const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: name === 'price' || name === 'totalSeats' || name === 'availableSeats'
+                ? Number(value)
+                : value
+        }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         // Validation
-        if (!formData.movieId || !formData.date || !formData.time || !formData.hall || !formData.price) {
-            toast.error('Please fill all required fields');
+        if (!formData.movieId || !formData.date || !formData.time || !formData.price || !formData.hall) {
+            toast.error("Please fill in all required fields");
+            return;
+        }
+
+        if (formData.price <= 0) {
+            toast.error("Price must be greater than 0");
+            return;
+        }
+
+        if (formData.totalSeats <= 0) {
+            toast.error("Total seats must be greater than 0");
+            return;
+        }
+
+        if (formData.availableSeats > formData.totalSeats) {
+            toast.error("Available seats cannot exceed total seats");
             return;
         }
 
         setLoading(true);
-
         try {
-            await axiosSecure.post('/api/showtimes/add', formData);
-            toast.success(' Showtime added successfully!');
+            await axiosSecure.post("/api/showtimes/add", formData);
+            toast.success("Showtime added successfully!");
             onSuccess();
-            onClose();
-            // Reset form
-            setFormData({
-                movieId: '',
-                date: new Date().toISOString().split('T')[0],
-                time: '',
-                hall: '',
-                price: '',
-                screen: 'Screen 1'
-            });
+            handleClose();
         } catch (error) {
-            console.error('Error adding showtime:', error);
-            toast.error(error.response?.data?.message || '❌ Failed to add showtime');
+            console.error("Add showtime error:", error);
+            toast.error(error.response?.data?.message || "Failed to add showtime");
         } finally {
             setLoading(false);
         }
@@ -79,71 +91,88 @@ export default function AddShowtimeModal({ isOpen, onClose, onSuccess }) {
 
     const handleClose = () => {
         setFormData({
-            movieId: '',
-            date: new Date().toISOString().split('T')[0],
-            time: '',
-            hall: '',
-            price: '',
-            screen: 'Screen 1'
+            movieId: "",
+            date: "",
+            time: "",
+            price: "",
+            hall: "",
+            language: "English",
+            format: "2D",
+            totalSeats: 100,
+            availableSeats: 100
         });
         onClose();
+    };
+
+    // Get today's date in YYYY-MM-DD format for min date
+    const getTodayDate = () => {
+        return new Date().toISOString().split('T')[0];
     };
 
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+                    onClick={handleClose}
+                >
                     <motion.div
-                        initial={{ scale: 0.9, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0.9, opacity: 0 }}
-                        className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl border border-gray-700 shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto"
+                        initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                        animate={{ scale: 1, opacity: 1, y: 0 }}
+                        exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                        className="bg-gradient-to-br from-[#1a1c2b] to-[#151724] rounded-2xl border border-gray-800 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                        onClick={(e) => e.stopPropagation()}
                     >
                         {/* Header */}
-                        <div className="flex items-center justify-between p-6 border-b border-gray-700 sticky top-0 bg-gray-800/90 backdrop-blur-sm">
-                            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                                <FiFilm className="text-purple-400" />
-                                Add New Showtime
-                            </h2>
+                        <div className="flex items-center justify-between p-6 border-b border-gray-800">
+                            <div>
+                                <h2 className="text-2xl font-bold text-white">Add New Showtime</h2>
+                                <p className="text-gray-400 mt-1">Create a new movie screening schedule</p>
+                            </div>
                             <button
                                 onClick={handleClose}
-                                className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
-                                disabled={loading}
+                                className="p-2 hover:bg-gray-800 rounded-xl transition-colors duration-200"
                             >
-                                <FiX size={20} />
+                                <FiX size={24} className="text-gray-400" />
                             </button>
                         </div>
 
                         {/* Form */}
-                        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                            {/* Movie Selection */}
-                            <div>
-                                <label className="flex items-center gap-2 text-gray-400 text-sm mb-2">
-                                    <FiFilm />
-                                    Select Movie *
-                                </label>
-                                <select
-                                    name="movieId"
-                                    value={formData.movieId}
-                                    onChange={handleChange}
-                                    required
-                                    disabled={loading}
-                                    className="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    <option value="">Choose a movie...</option>
-                                    {movies.map((movie) => (
-                                        <option key={movie._id} value={movie._id}>
-                                            {movie.title}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+                        <form onSubmit={handleSubmit} className="p-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Movie Selection */}
+                                <div className="md:col-span-2">
+                                    <label className="flex items-center text-sm font-medium text-gray-400 mb-2">
+                                        <FiFilm className="mr-2 text-purple-400" />
+                                        Select Movie *
+                                    </label>
+                                    <select
+                                        name="movieId"
+                                        value={formData.movieId}
+                                        onChange={handleChange}
+                                        required
+                                        disabled={movieLoading}
+                                        className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    >
+                                        <option value="">Choose a movie</option>
+                                        {movies.map((movie) => (
+                                            <option key={movie._id} value={movie._id}>
+                                                {movie.title} ({movie.release_year || new Date(movie.release_date).getFullYear()})
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {movieLoading && (
+                                        <p className="text-gray-500 text-sm mt-1">Loading movies...</p>
+                                    )}
+                                </div>
 
-                            <div className="grid grid-cols-2 gap-4">
                                 {/* Date */}
                                 <div>
-                                    <label className="flex items-center gap-2 text-gray-400 text-sm mb-2">
-                                        <FiCalendar />
+                                    <label className="flex items-center text-sm font-medium text-gray-400 mb-2">
+                                        <FiCalendar className="mr-2 text-blue-400" />
                                         Date *
                                     </label>
                                     <input
@@ -151,17 +180,16 @@ export default function AddShowtimeModal({ isOpen, onClose, onSuccess }) {
                                         name="date"
                                         value={formData.date}
                                         onChange={handleChange}
+                                        min={getTodayDate()}
                                         required
-                                        disabled={loading}
-                                        min={new Date().toISOString().split('T')[0]}
-                                        className="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
                                 </div>
 
                                 {/* Time */}
                                 <div>
-                                    <label className="flex items-center gap-2 text-gray-400 text-sm mb-2">
-                                        <FiClock />
+                                    <label className="flex items-center text-sm font-medium text-gray-400 mb-2">
+                                        <FiClock className="mr-2 text-green-400" />
                                         Time *
                                     </label>
                                     <input
@@ -170,154 +198,139 @@ export default function AddShowtimeModal({ isOpen, onClose, onSuccess }) {
                                         value={formData.time}
                                         onChange={handleChange}
                                         required
-                                        disabled={loading}
-                                        className="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                     />
                                 </div>
-                            </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                {/* Hall.......................................................... */}
+                                {/* Hall */}
                                 <div>
-                                    <label className="flex items-center gap-2 text-gray-400 text-sm mb-2">
-                                        <FiMapPin />
+                                    <label className="flex items-center text-sm font-medium text-gray-400 mb-2">
+                                        <FiMapPin className="mr-2 text-yellow-400" />
                                         Hall *
                                     </label>
-                                    <select
+                                    <input
+                                        type="text"
                                         name="hall"
+                                        placeholder="e.g., Hall A, IMAX, VIP"
                                         value={formData.hall}
                                         onChange={handleChange}
                                         required
-                                        disabled={loading}
-                                        className="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        <option value="">Select Hall</option>
-                                        <option value="Main Hall">Main Hall</option>
-                                        <option value="IMAX Hall">IMAX Hall</option>
-                                        <option value="VIP Hall">VIP Hall</option>
-                                        <option value="Hall 1">Hall 1</option>
-                                        <option value="Hall 2">Hall 2</option>
-                                        <option value="Hall 3">Hall 3</option>
-                                    </select>
+                                        className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                                    />
                                 </div>
 
-                                {/* Price............................................................ */}
+                                {/* Price */}
                                 <div>
-                                    <label className="flex items-center gap-2 text-gray-400 text-sm mb-2">
-                                        <FiDollarSign />
-                                        Price *
+                                    <label className="flex items-center text-sm font-medium text-gray-400 mb-2">
+                                        <FiDollarSign className="mr-2 text-emerald-400" />
+                                        Price ($) *
                                     </label>
                                     <input
                                         type="number"
                                         name="price"
-                                        placeholder="15.00"
+                                        placeholder="0.00"
+                                        min="0"
+                                        step="0.01"
                                         value={formData.price}
                                         onChange={handleChange}
                                         required
-                                        disabled={loading}
+                                        className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                    />
+                                </div>
+
+                                {/* Language */}
+                                <div>
+                                    <label className="flex items-center text-sm font-medium text-gray-400 mb-2">
+                                        <FiGlobe className="mr-2 text-cyan-400" />
+                                        Language
+                                    </label>
+                                    <select
+                                        name="language"
+                                        value={formData.language}
+                                        onChange={handleChange}
+                                        className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                                    >
+                                        <option value="English">English</option>
+                                        <option value="Hindi">Hindi</option>
+                                        <option value="Spanish">Spanish</option>
+                                        <option value="French">French</option>
+                                        <option value="German">German</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+
+                                {/* Format */}
+                                <div>
+                                    <label className="flex items-center text-sm font-medium text-gray-400 mb-2">
+                                        <FiLayers className="mr-2 text-orange-400" />
+                                        Format
+                                    </label>
+                                    <select
+                                        name="format"
+                                        value={formData.format}
+                                        onChange={handleChange}
+                                        className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                    >
+                                        <option value="2D">2D</option>
+                                        <option value="3D">3D</option>
+                                        <option value="IMAX">IMAX</option>
+                                        <option value="4DX">4DX</option>
+                                    </select>
+                                </div>
+
+                                {/* Total Seats */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-400 mb-2">
+                                        Total Seats
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="totalSeats"
+                                        min="1"
+                                        value={formData.totalSeats}
+                                        onChange={handleChange}
+                                        className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    />
+                                </div>
+
+                                {/* Available Seats */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-400 mb-2">
+                                        Available Seats
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="availableSeats"
                                         min="0"
-                                        step="0.01"
-                                        className="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        max={formData.totalSeats}
+                                        value={formData.availableSeats}
+                                        onChange={handleChange}
+                                        className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                     />
                                 </div>
                             </div>
 
-                            {/* Screen ..........................................*/}
-                            <div>
-                                <label className="flex items-center gap-2 text-gray-400 text-sm mb-2">
-                                    <FiMonitor />
-                                    Screen
-                                </label>
-                                <select
-                                    name="screen"
-                                    value={formData.screen}
-                                    onChange={handleChange}
-                                    disabled={loading}
-                                    className="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    <option value="Screen 1">Screen 1</option>
-                                    <option value="Screen 2">Screen 2</option>
-                                    <option value="Screen 3">Screen 3</option>
-                                    <option value="Screen 4">Screen 4</option>
-                                    <option value="IMAX">IMAX</option>
-                                    <option value="VIP">VIP</option>
-                                </select>
-                            </div>
-
-                            {/* Form Preview ...........................................................*/}
-                            {(formData.movieId || formData.date || formData.time || formData.hall) && (
-                                <div className="bg-gray-700/50 rounded-xl p-4 border border-gray-600">
-                                    <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
-                                        <FiFilm className="text-purple-400" />
-                                        Showtime Preview
-                                    </h3>
-                                    <div className="space-y-2 text-sm">
-                                        {formData.movieId && (
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-400">Movie:</span>
-                                                <span className="text-white">
-                                                    {movies.find(m => m._id === formData.movieId)?.title}
-                                                </span>
-                                            </div>
-                                        )}
-                                        {formData.date && (
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-400">Date:</span>
-                                                <span className="text-white">
-                                                    {new Date(formData.date).toLocaleDateString()}
-                                                </span>
-                                            </div>
-                                        )}
-                                        {formData.time && (
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-400">Time:</span>
-                                                <span className="text-white">{formData.time}</span>
-                                            </div>
-                                        )}
-                                        {formData.hall && (
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-400">Hall:</span>
-                                                <span className="text-white">{formData.hall}</span>
-                                            </div>
-                                        )}
-                                        {formData.price && (
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-400">Price:</span>
-                                                <span className="text-green-400 font-semibold">${formData.price}</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Actions */}
-                            <div className="flex gap-3 pt-4">
+                            {/* Action Buttons */}
+                            <div className="flex justify-end space-x-3 pt-6 mt-6 border-t border-gray-800">
                                 <button
                                     type="button"
                                     onClick={handleClose}
-                                    className="flex-1 px-4 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     disabled={loading}
+                                    className="px-6 py-3 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:cursor-not-allowed rounded-xl text-white transition-colors duration-200"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                     disabled={loading}
+                                    className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed rounded-xl text-white font-medium transition-all duration-200 shadow-lg shadow-purple-600/25"
                                 >
-                                    {loading ? (
-                                        <>
-                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                            Adding...
-                                        </>
-                                    ) : (
-                                        'Add Showtime'
-                                    )}
+                                    {loading ? "Adding..." : "Add Showtime"}
                                 </button>
                             </div>
                         </form>
                     </motion.div>
-                </div>
+                </motion.div>
             )}
         </AnimatePresence>
     );

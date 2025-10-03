@@ -127,20 +127,20 @@ export default function UserManagementPage() {
     //   toast.error('Failed to update user');
     // }
   };
-
+// delete user..................................................
   const deleteUser = async () => {
 
-    toast.success('Not created api');
-    // if (!selectedUser) return;
-    // try {
-    //   await axiosSecure.delete(`/api/auth/${selectedUser._id}`);
-    //   toast.success('User deleted successfully');
-    //   setDeleteModalOpen(false);
-    //   fetchUsers();
-    // } catch (error) {
-    //   console.error('Error deleting user:', error);
-    //   toast.error('Failed to delete user');
-    // }
+    // toast.success('Not created api');
+    if (!selectedUser) return;
+    try {
+      await axiosSecure.delete(`/api/auth/${selectedUser._id}`);
+      toast.success('User deleted successfully');
+      setDeleteModalOpen(false);
+      fetchUsers();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast.error('Failed to delete user');
+    }
   };
 
   // pdf downlord
@@ -162,7 +162,7 @@ export default function UserManagementPage() {
     <div className="min-h-screen  bg-gradient-to-br from-[#0c0c14] via-[#0f1018] to-[#1e1233] p-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">User Management</h1>
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 bg-clip-text text-transparent mb-4">User Management</h1>
         <p className="text-gray-400">Manage all VibePass users and their activities</p>
       </div>
 
