@@ -31,7 +31,7 @@ export default function AnalyticsDashboard() {
         try {
             setLoading(true);
             const [showtimesRes, bookingsRes, revenueRes] = await Promise.all([
-                axiosSecure.get("/api/showtimes"),
+                axiosSecure.get("/api/showtime"),
                 axiosSecure.get("/api/ticket"),
                 axiosSecure.get("/api/payments/weekly-revenue")
             ]);
