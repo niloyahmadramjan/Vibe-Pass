@@ -144,7 +144,7 @@ router.push("/admin/booking")
   ];
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto  bg-gradient-to-br from-[#0c0c14] via-[#0f1018] to-[#1e1233]">
+    <div className="p-6 space-y-6 w-full  mx-auto  bg-gradient-to-br from-[#0c0c14] via-[#0f1018] to-[#1e1233]">
       {/* Header Section */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -152,7 +152,7 @@ router.push("/admin/booking")
         transition={{ duration: 0.5 }}
         className="mb-8"
       >
-        <h1 className="text-3xl font-bold text-white mb-2">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 bg-clip-text text-transparent mb-4">
           Welcome back, Admin!
         </h1>
         <p className="text-gray-400 text-lg">

@@ -22,7 +22,7 @@ export default function AddMoviesPage() {
     vote_average: 0,
     vote_count: 0
   });
-
+// console.log(formData)
   const [uploading, setUploading] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
 
@@ -91,7 +91,7 @@ export default function AddMoviesPage() {
     e.preventDefault();
     try {
       const response = await axiosSecure.post("/api/movies/add", formData);
-      console.log(' Movie added:', response.data);
+      // console.log(' Movie added:', response.data);
 
       toast.success(' Movie added successfully!', { duration: 3000 });
 
@@ -116,6 +116,7 @@ export default function AddMoviesPage() {
       toast.error('Failed to add movie', { duration: 3000 });
     }
   };
+ 
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -185,7 +186,7 @@ export default function AddMoviesPage() {
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-3 flex items-center">
+                    <label className=" text-sm font-semibold text-gray-300 mb-3 flex items-center">
                       <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
                       Movie Title *
                     </label>
@@ -201,7 +202,7 @@ export default function AddMoviesPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-3 flex items-center">
+                    <label className=" text-sm font-semibold text-gray-300 mb-3 flex items-center">
                       <span className="w-2 h-2 bg-indigo-500 rounded-full mr-2"></span>
                       Original Title
                     </label>
@@ -218,7 +219,7 @@ export default function AddMoviesPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-3 flex items-center">
+                    <label className=" text-sm font-semibold text-gray-300 mb-3 flex items-center">
                       <span className="w-2 h-2 bg-pink-500 rounded-full mr-2"></span>
                       Genre *
                     </label>
@@ -237,7 +238,7 @@ export default function AddMoviesPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-3 flex items-center">
+                    <label className=" text-sm font-semibold text-gray-300 mb-3 flex items-center">
                       <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
                       Language *
                     </label>
@@ -269,7 +270,7 @@ export default function AddMoviesPage() {
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-3 flex items-center">
+                    <label className=" text-sm font-semibold text-gray-300 mb-3 flex items-center">
                       <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
                       Release Date *
                     </label>
@@ -284,7 +285,7 @@ export default function AddMoviesPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-3 flex items-center">
+                    <label className=" text-sm font-semibold text-gray-300 mb-3 flex items-center">
                       <span className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></span>
                       Vote Average
                     </label>
@@ -303,7 +304,7 @@ export default function AddMoviesPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300 mb-3 flex items-center">
+                  <label className=" text-sm font-semibold text-gray-300 mb-3 flex items-center">
                     <span className="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
                     Overview
                   </label>
@@ -327,7 +328,7 @@ export default function AddMoviesPage() {
                 className="space-y-6"
               >
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300 mb-3 flex items-center">
+                  <label className=" text-sm font-semibold text-gray-300 mb-3 flex items-center">
                     <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
                     Upload Poster
                   </label>
@@ -386,7 +387,7 @@ export default function AddMoviesPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-300 mb-3 flex items-center">
+                  <label className=" text-sm font-semibold text-gray-300 mb-3 flex items-center">
                     <span className="w-2 h-2 bg-teal-500 rounded-full mr-2"></span>
                     Backdrop Image URL
                   </label>
@@ -411,7 +412,7 @@ export default function AddMoviesPage() {
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-3 flex items-center">
+                    <label className=" text-sm font-semibold text-gray-300 mb-3 flex items-center">
                       <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
                       Vote Count
                     </label>
@@ -427,7 +428,7 @@ export default function AddMoviesPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-300 mb-3 flex items-center">
+                    <label className=" text-sm font-semibold text-gray-300 mb-3 flex items-center">
                       <span className="w-2 h-2 bg-pink-500 rounded-full mr-2"></span>
                       Popularity
                     </label>

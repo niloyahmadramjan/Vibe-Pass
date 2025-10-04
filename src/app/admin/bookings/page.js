@@ -22,6 +22,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import AdminLoading from '../components/AdminLoading';
 import toast from 'react-hot-toast';
 import StatCard from '../components/StartCard';
+import Swal from "sweetalert2";
 
 import UniversalTable from '../components/UniversalTable';
 
@@ -131,43 +132,56 @@ export default function BookingsPage() {
   };
 
   const handleDeleteBooking = async (bookingId) => {
-    if (!confirm('Are you sure you want to delete this booking?')) return;
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this action!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axiosSecure.delete(`/api/ticket/${bookingId}`);
+          toast.success("Booking deleted successfully");
 
-    try {
-      await axiosSecure.delete(`/api/ticket/${bookingId}`);
-      toast.success('Booking deleted successfully');
-      // Refresh bookings
-      const res = await axiosSecure.get('/api/ticket');
-      setBookings(res.data || []);
-    } catch (error) {
-      console.error('Error deleting booking:', error);
-      toast.error('Failed to delete booking');
-    }
+          // Refresh bookings
+          const res = await axiosSecure.get("/api/ticket");
+          setBookings(res.data || []);
+
+          Swal.fire("Deleted!", "The booking has been deleted.", "success");
+        } catch (error) {
+          console.error("Error deleting booking:", error);
+          toast.error("Failed to delete booking");
+          Swal.fire("Error!", "Something went wrong while deleting.", "error");
+        }
+      }
+    });
   };
-
   const exportBookings = () => {
-    // const csvContent = [
-    //   ['Movie', 'User', 'Date', 'Time', 'Screen', 'Seats', 'Amount', 'Status', 'Payment Status'],
-    //   ...filteredBookings.map(booking => [
-    //     booking.movieTitle,
-    //     booking.userName,
-    //     new Date(booking.showDate).toLocaleDateString(),
-    //     booking.showTime,
-    //     booking.screen,
-    //     booking.selectedSeats?.join(', '),
-    //     `$${booking.totalAmount}`,
-    //     booking.status,
-    //     booking.paymentStatus
-    //   ])
-    // ].map(row => row.join(',')).join('\n');
+    const csvContent = [
+      ['Movie', 'User', 'Date', 'Time', 'Screen', 'Seats', 'Amount', 'Status', 'Payment Status'],
+      ...filteredBookings.map(booking => [
+        booking.movieTitle,
+        booking.userName,
+        new Date(booking.showDate).toLocaleDateString(),
+        booking.showTime,
+        booking.screen,
+        booking.selectedSeats?.join(', '),
+        `$${booking.totalAmount}`,
+        booking.status,
+        booking.paymentStatus
+      ])
+    ].map(row => row.join(',')).join('\n');
 
-    // const blob = new Blob([csvContent], { type: 'text/csv' });
-    // const url = window.URL.createObjectURL(blob);
-    // const a = document.createElement('a');
-    // a.href = url;
-    // a.download = 'bookings.csv';
-    // a.click();
-    // window.URL.revokeObjectURL(url);
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'bookings.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
 
     toast.success('not add on the time');
   };
@@ -206,7 +220,7 @@ export default function BookingsPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#0c0c14] via-[#0f1018] to-[#1e1233] p-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2"> Bookings Management</h1>
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 bg-clip-text text-transparent mb-4"> Bookings Management</h1>
         <p className="text-gray-400">Manage all movie bookings and reservations</p>
       </div>
 

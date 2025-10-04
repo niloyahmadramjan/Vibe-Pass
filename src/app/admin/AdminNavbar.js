@@ -11,7 +11,7 @@ export default function AdminNavbar({ toggleSidebar }) {
     const [userDropdownOpen, setUserDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
   
-  console.log(user)
+  // console.log(user)
 
   return (
     <nav className="w-full bg-[#0c0c0f] text-white shadow px-4 lg:px-6  flex items-center justify-between border-b border-[#1e1f26]">

@@ -4,12 +4,13 @@ import React from 'react';
 import { Clock } from './Icons';
 
 export default function Showtimes({ showtimes, selectedTime, setSelectedTime, toast }) {
+
+  console.log(showtimes)
   return (
     <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700/50 shadow-xl">
       <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-red-500">
         <Clock className="w-5 h-5" /> Showtimes
       </h3>
-
       <div className="space-y-3">
         {showtimes.map((show) => (
           <button

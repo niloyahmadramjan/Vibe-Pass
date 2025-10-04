@@ -16,7 +16,7 @@ export default function PaymentForm({ session }) {
   const stripe = useStripe()
   const elements = useElements()
   const router = useRouter()
-  console.log( "session",session)
+  // console.log( "session",session)
 
   const [clientSecret, setClientSecret] = useState("");
   const [processing, setProcessing] = useState(false);
