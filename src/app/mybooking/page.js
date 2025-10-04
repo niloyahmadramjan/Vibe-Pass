@@ -1,56 +1,33 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Swal from "sweetalert2";
-
-export default function MyBooking({ userEmail }) {
-  const [booking, setBooking] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchBooking = async () => {
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/bookings?email=${userEmail}`
-        );
-        if (!res.ok) throw new Error("Failed to fetch booking");
-        const data = await res.json();
-        // Assuming backend returns array of bookings, pick first or latest
-        setBooking(data[0] || null);
-      } catch (err) {
-        console.error(err);
-        Swal.fire("Error", err.message, "error");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (userEmail) fetchBooking();
-  }, [userEmail]);
-
-  if (loading) return <div className="text-white p-6">Loading booking...</div>;
-  if (!booking) return <div className="text-white p-6">No booking found</div>;
-
+export default function BookingTable({ booking }) {
   return (
-    <div className="min-h-screen p-6 font-[Inter] text-white flex items-center justify-center">
+    <div className="min-h-screen p-8 font-[Inter] text-white flex items-center justify-center">
       <div className="w-full max-w-4xl bg-[var(--color-bg-dark)] rounded-2xl shadow-xl border border-gray-700 overflow-hidden">
         <h2 className="text-2xl font-bold p-6 border-b border-gray-700 text-center">
-          🎟️ My Booking
+          🎟️ Booking Information
         </h2>
         <table className="w-full text-left border-collapse">
           <tbody>
+            {/* Booking ID */}
             <tr className="border-b border-gray-700">
               <td className="p-4 font-semibold w-1/3">Booking ID</td>
               <td className="p-4">{booking._id}</td>
             </tr>
+
+            {/* Movie Title */}
             <tr className="border-b border-gray-700">
               <td className="p-4 font-semibold">Movie Title</td>
               <td className="p-4">{booking.movieTitle}</td>
             </tr>
+
+            {/* Theater Name */}
             <tr className="border-b border-gray-700">
               <td className="p-4 font-semibold">Theater</td>
               <td className="p-4">{booking.theaterName}</td>
             </tr>
+
+            {/* Show Info */}
             <tr className="border-b border-gray-700">
               <td className="p-4 font-semibold">Show</td>
               <td className="p-4">
@@ -58,16 +35,22 @@ export default function MyBooking({ userEmail }) {
                 {booking.screen})
               </td>
             </tr>
+
+            {/* Seats */}
             <tr className="border-b border-gray-700">
               <td className="p-4 font-semibold">Seats</td>
               <td className="p-4">{booking.selectedSeats.join(", ")}</td>
             </tr>
+
+            {/* Amount */}
             <tr className="border-b border-gray-700">
               <td className="p-4 font-semibold">Amount</td>
               <td className="p-4 font-bold text-[var(--color-primary)]">
                 ৳{booking.totalAmount}
               </td>
             </tr>
+
+            {/* User */}
             <tr className="border-b border-gray-700">
               <td className="p-4 font-semibold">Booked By</td>
               <td className="p-4">
@@ -75,6 +58,8 @@ export default function MyBooking({ userEmail }) {
                 <span className="text-gray-400">{booking.userEmail}</span>
               </td>
             </tr>
+
+            {/* Status */}
             <tr className="border-b border-gray-700">
               <td className="p-4 font-semibold">Status</td>
               <td className="p-4">
@@ -90,6 +75,8 @@ export default function MyBooking({ userEmail }) {
                 </span>
               </td>
             </tr>
+
+            {/* Created At */}
             <tr>
               <td className="p-4 font-semibold">Created At</td>
               <td className="p-4">
