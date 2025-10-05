@@ -1,95 +1,95 @@
-"use client";
+'use client'
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { QRCodeCanvas } from "qrcode.react";
+import { useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
+import { QRCodeCanvas } from 'qrcode.react'
 
 export default function TicketDetailsPage() {
-  const { id } = useParams();
-  const [ticket, setTicket] = useState(null);
-  const [booking, setBooking] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [downloading, setDownloading] = useState(false);
+  const { id } = useParams()
+  const [ticket, setTicket] = useState(null)
+  const [booking, setBooking] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [downloading, setDownloading] = useState(false)
 
   useEffect(() => {
-    if (!id) return;
+    if (!id) return
     // payment data
     const fetchPayment = async () => {
       try {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/payments/${id}`
-        );
-        if (!response.ok) throw new Error("Payment fetch failed");
-        const data = await response.json();
-        setTicket(data);
+        )
+        if (!response.ok) throw new Error('Payment fetch failed')
+        const data = await response.json()
+        setTicket(data)
       } catch (err) {
-        console.error("❌ Error fetching payment:", err);
+        console.error('❌ Error fetching payment:', err)
       }
-    };
+    }
 
-    fetchPayment();
-  }, [id]);
+    fetchPayment()
+  }, [id])
 
   useEffect(() => {
-    if (!ticket?.sessionId) return;
+    if (!ticket?.sessionId) return
     // booking cinemas data
     const fetchBooking = async () => {
       try {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/ticket/bookings/${ticket.sessionId}`
-        );
-        if (!response.ok) throw new Error("Booking fetch failed");
-        const data = await response.json();
-        setBooking(data);
+        )
+        if (!response.ok) throw new Error('Booking fetch failed')
+        const data = await response.json()
+        setBooking(data)
       } catch (err) {
-        console.error("❌ Error fetching booking:", err);
+        console.error('❌ Error fetching booking:', err)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchBooking();
-  }, [ticket?.sessionId]);
+    fetchBooking()
+  }, [ticket?.sessionId])
 
   // pdf
- const handleDownloadPDF = async () => {
-   setDownloading(true);
-   try {
-     const response = await fetch(
-       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/generate-ticket-pdf`,
-       {
-         method: "POST",
-         headers: { "Content-Type": "application/json" },
-         body: JSON.stringify({
-           movieTitle: booking.movieTitle,
-           theaterName: booking.theaterName,
-           showDate: booking.showDate,
-           showTime: booking.showTime,
-           selectedSeats: booking.selectedSeats,
-           totalAmount: booking.totalAmount,
-           transactionId: ticket.transactionId,
-           status: ticket.status,
-           userName:booking.userName,
-           userEmail: booking.userEmail,
-         }),
-       }
-     );
+  const handleDownloadPDF = async () => {
+    setDownloading(true)
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/generate-ticket-pdf`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            movieTitle: booking.movieTitle,
+            theaterName: booking.theaterName,
+            showDate: booking.showDate,
+            showTime: booking.showTime,
+            selectedSeats: booking.selectedSeats,
+            totalAmount: booking.totalAmount,
+            transactionId: ticket.transactionId,
+            status: ticket.status,
+            userName: booking.userName,
+            userEmail: booking.userEmail,
+          }),
+        }
+      )
 
-     if (!response.ok) throw new Error("Failed to download PDF");
+      if (!response.ok) throw new Error('Failed to download PDF')
 
-     const blob = await response.blob();
-     const url = window.URL.createObjectURL(blob);
-     const link = document.createElement("a");
-     link.href = url;
-     link.download = `ticket-${ticket.transactionId}.pdf`;
-     link.click();
-     window.URL.revokeObjectURL(url);
-   } catch (error) {
-     console.error("Download failed:", error);
-   } finally {
-     setDownloading(false);
-   }
- };
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `ticket-${ticket.transactionId}.pdf`
+      link.click()
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Download failed:', error)
+    } finally {
+      setDownloading(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -101,7 +101,7 @@ export default function TicketDetailsPage() {
           </p>
         </div>
       </div>
-    );
+    )
   }
 
   if (!ticket?._id || !booking?._id) {
@@ -117,7 +117,7 @@ export default function TicketDetailsPage() {
           </p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -156,7 +156,7 @@ export default function TicketDetailsPage() {
                 <QRCodeCanvas
                   value={JSON.stringify({
                     transactionId: ticket.transactionId,
-                    status: "paid",
+                    status: 'paid',
                     movieTitle: booking.movieTitle,
                     theaterName: booking.theaterName,
                     screen: booking.screen,
@@ -208,7 +208,7 @@ export default function TicketDetailsPage() {
                     Generating PDF...
                   </span>
                 ) : (
-                  "Download PDF Ticket"
+                  'Download PDF Ticket'
                 )}
               </button>
             </div>
@@ -234,12 +234,12 @@ export default function TicketDetailsPage() {
                   <DetailItem
                     label="Date & Time"
                     value={`${new Date(booking.showDate).toLocaleDateString(
-                      "en-US",
+                      'en-US',
                       {
-                        weekday: "short",
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
+                        weekday: 'short',
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
                       }
                     )} at ${booking.showTime}`}
                   />
@@ -257,7 +257,7 @@ export default function TicketDetailsPage() {
                   />
                   <DetailItem
                     label="Seats"
-                    value={booking.selectedSeats.join(", ")}
+                    value={booking.selectedSeats.join(', ')}
                   />
                   <DetailItem
                     label="Total Amount"
@@ -302,7 +302,7 @@ export default function TicketDetailsPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 // Reusable Detail Item Component
@@ -311,12 +311,12 @@ function DetailItem({ label, value, mono = false, highlight = false }) {
     <div className="flex justify-between items-start">
       <span className="text-sm font-medium text-gray-500">{label}:</span>
       <span
-        className={`text-sm text-right ${mono ? "font-mono" : ""} ${
-          highlight ? "font-bold text-[#CC2027]" : "text-gray-900"
+        className={`text-sm text-right ${mono ? 'font-mono' : ''} ${
+          highlight ? 'font-bold text-[#CC2027]' : 'text-gray-900'
         }`}
       >
         {value}
       </span>
     </div>
-  );
+  )
 }
