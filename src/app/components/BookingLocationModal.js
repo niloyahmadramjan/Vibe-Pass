@@ -16,6 +16,13 @@ export default function BookingLocationModal({
   const router = useRouter()
   if (!isOpen) return null
 
+  // 🔹 Mode change handler
+  const handleModeChange = (mode) => {
+    setSelectionMode(mode)
+    // Auto → Manual বা Manual → Auto গেলে আগের selection clear হবে
+    setSelectedCinema(null)
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 px-3">
       <div className="bg-[#1E1E1E] rounded-xl p-4 w-full max-w-sm sm:max-w-md relative border border-gray-700 shadow-xl">
@@ -39,19 +46,19 @@ export default function BookingLocationModal({
           {/* Toggle Buttons */}
           <div className="flex gap-1.5 p-1 bg-gray-800 rounded-md text-xs sm:text-sm">
             <button
-              onClick={() => setSelectionMode('auto')}
+              onClick={() => handleModeChange('auto')}
               className={`flex-1 py-1 rounded font-medium transition-all ${selectionMode === 'auto'
-                  ? 'bg-red-600 text-white'
-                  : 'text-gray-400 hover:text-white'
+                ? 'bg-red-600 text-white'
+                : 'text-gray-400 hover:text-white'
                 }`}
             >
               Auto
             </button>
             <button
-              onClick={() => setSelectionMode('manual')}
+              onClick={() => handleModeChange('manual')}
               className={`flex-1 py-1 rounded font-medium transition-all ${selectionMode === 'manual'
-                  ? 'bg-red-600 text-white'
-                  : 'text-gray-400 hover:text-white'
+                ? 'bg-red-600 text-white'
+                : 'text-gray-400 hover:text-white'
                 }`}
             >
               Manual
