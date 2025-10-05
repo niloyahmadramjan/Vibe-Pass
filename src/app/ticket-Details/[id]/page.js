@@ -21,6 +21,7 @@ export default function TicketDetailsPage() {
         );
         if (!response.ok) throw new Error("Payment fetch failed");
         const data = await response.json();
+        console.log("✅ Payment Data:", data);
         setTicket(data);
       } catch (err) {
         console.error("❌ Error fetching payment:", err);
@@ -31,25 +32,26 @@ export default function TicketDetailsPage() {
   }, [id]);
 
   useEffect(() => {
-    if (!ticket?.sessionId) return;
+    if (!ticket?.bookingId) return;
     // booking cinemas data
     const fetchBooking = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/ticket/bookings/${ticket.sessionId}`
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/ticket/bookings/${ticket.bookingId}`
         );
         if (!response.ok) throw new Error("Booking fetch failed");
         const data = await response.json();
         setBooking(data);
       } catch (err) {
         console.error("❌ Error fetching booking:", err);
+        setLoading(false); 
       } finally {
         setLoading(false);
       }
     };
 
     fetchBooking();
-  }, [ticket?.sessionId]);
+  }, [ticket?.bookingId]);
 
   // pdf
  const handleDownloadPDF = async () => {
@@ -68,6 +70,7 @@ export default function TicketDetailsPage() {
            selectedSeats: booking.selectedSeats,
            totalAmount: booking.totalAmount,
            transactionId: ticket.transactionId,
+           screen: booking.screen,
            status: ticket.status,
            userName:booking.userName,
            userEmail: booking.userEmail,
