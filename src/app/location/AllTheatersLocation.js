@@ -5,20 +5,22 @@ import { FaMapMarkerAlt, FaChevronDown, FaSearchLocation } from 'react-icons/fa'
 import SeatMap from '../components/SeatMap'
 import { locations } from '../lib/locations'
 import Swal from 'sweetalert2'
+import { useRouter } from 'next/navigation'
 
-export default function LocationPage() {
+export default function AllTheatersLocation() {
   const [selectedDivision, setSelectedDivision] = useState('')
   const [selectedDistrict, setSelectedDistrict] = useState('')
   const [districts, setDistricts] = useState([])
   const [selectedLocation, setSelectedLocation] = useState(null)
-  const [selectedCinema, setSelectedCinema] = useState(null) // ✅ নতুন state
+  const [selectedCinema, setSelectedCinema] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
 
   const mapRef = useRef(null)
+  const router = useRouter()
 
   const uniqueDivisions = [...new Set(locations.map((loc) => loc.region))]
 
-  // যখন Division select হবে তখন districts আপডেট হবে
+  // Division select হলে District filter হবে
   useEffect(() => {
     if (selectedDivision) {
       const filteredDistricts = locations
@@ -35,7 +37,7 @@ export default function LocationPage() {
     }
   }, [selectedDivision])
 
-  // District change হলে location আপডেট হবে
+  // District select হলে Location update হবে
   useEffect(() => {
     if (selectedDistrict && selectedDivision) {
       const loc = locations.find(
@@ -49,7 +51,7 @@ export default function LocationPage() {
     }
   }, [selectedDistrict, selectedDivision])
 
-  // Location এ zoom
+  // Map এ zoom
   const handleFindCinemas = () => {
     if (selectedLocation && mapRef.current) {
       setIsLoading(true)
@@ -81,7 +83,7 @@ export default function LocationPage() {
     }
   }
 
-  // ✅ Cinema select করলে শুধু ওইটা দেখাবে
+  // Cinema select করলে update হবে
   const handleSelectCinema = (cinema) => {
     setSelectedCinema(cinema)
 
@@ -94,23 +96,25 @@ export default function LocationPage() {
     }
   }
 
-  return (
-    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 pt-20 text-white">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold text-white mb-3">
-            Find Cinemas And Setup Your Location
-          </h1>
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-            Select your division and district to discover cinema locations and
-            zoom to them on the map
-          </p>
-        </div>
+  // ✅ Book Now click করলে redirect হবে booking page এ
+  const handleBookNow = () => {
+    if (!selectedCinema || !selectedLocation) return
 
+    router.push(
+      `/booking/1311031?cinema=${encodeURIComponent(
+        selectedCinema
+      )}&city=${encodeURIComponent(selectedLocation.city)}&district=${encodeURIComponent(
+        selectedLocation.district
+      )}`
+    )
+  }
+
+  return (
+    <div className=" py-8 px-4 sm:px-6  text-white">
+      <div className="max-w-6xl mx-auto">
         {/* Division + District Select */}
         <div className="rounded-2xl shadow-xl p-6 mb-8 border border-gray-700 bg-transparent">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+          <div className="grid grid-cols-1  gap-6 items-end">
             {/* Division */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -186,7 +190,7 @@ export default function LocationPage() {
               <FaMapMarkerAlt className="text-red-500" />
               Cinemas in {selectedLocation.district}, {selectedLocation.region}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               {selectedLocation.cinemas.map((cinema, index) => (
                 <div
                   key={index}
@@ -206,7 +210,10 @@ export default function LocationPage() {
                       {selectedLocation.district}
                     </p>
                     {selectedCinema === cinema && (
-                      <button className="bg-red-600 text-white py-2 rounded-md mt-2 hover:bg-red-700 transition">
+                      <button
+                        onClick={handleBookNow}
+                        className="bg-red-600 text-white py-2 rounded-md mt-2 hover:bg-red-700 transition"
+                      >
                         Book Now
                       </button>
                     )}
@@ -218,11 +225,11 @@ export default function LocationPage() {
         )}
 
         {/* Map */}
-        <div className="rounded-2xl shadow-xl overflow-hidden border border-gray-700 bg-dark">
+        <div className="rounded-2xl shadow-xl overflow-hidden border border-gray-700 bg-dark h-72">
           <SeatMap
             locations={locations}
             selectedLocation={selectedLocation}
-            selectedCinema={selectedCinema} 
+            selectedCinema={selectedCinema}
             mapRef={mapRef}
           />
         </div>

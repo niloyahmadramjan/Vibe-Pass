@@ -1,20 +1,51 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: [
-      'image.tmdb.org',
-      'i.ibb.co',
-      'w0.peakpx.com',
-      'images-na.ssl-images-amazon.com',
-      'm.media-amazon.com',
-      'images-na.ssl-images-amazon.com',
-      'avatars.githubusercontent.com',
-      'lh3.googleusercontent.com',
-      'i.pravatar.cc',
-      'placehold.co',
-      'i.postimg.cc',
-      'i.ibb.co.com',
-      'cdn-icons-png.flaticon.com',
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'image.tmdb.org',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.ibb.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'w0.peakpx.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images-na.ssl-images-amazon.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'm.media-amazon.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.pravatar.cc',
+      },
+      {
+        protocol: 'https',
+        hostname: 'placehold.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.postimg.cc',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn-icons-png.flaticon.com',
+      },
     ],
   },
 }

@@ -1,238 +1,386 @@
-'use client';
+"use client";
+import { useEffect, useState } from "react";
+import axiosSecure from "@/app/api/axiosHook/useAxiosSecure";
+import { HiDotsHorizontal } from "react-icons/hi";
+import { FiEdit2, FiTrash2, FiCalendar, FiClock, FiDollarSign, FiMapPin, FiPlus } from "react-icons/fi";
+import { motion, AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
+import AdminLoading from "../components/AdminLoading";
+import Image from "next/image";
+import AddShowtimeModal from "../components/AddShowtimeModal";
 
-import Image from 'next/image';
-import React, { useState, useEffect } from 'react';
-import toast, { Toaster } from 'react-hot-toast';
-
-export default function AddShowtimesPage() {
-  const [movies, setMovies] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedMovie, setSelectedMovie] = useState(null);
+export default function ShowtimesPage() {
   const [showtimes, setShowtimes] = useState([]);
-  const [formData, setFormData] = useState({ price: '', date: '', time: '', hall: '' });
+  const [selected, setSelected] = useState(null);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [isAddModalOpen, setAddModalOpen] = useState(false); // Add this state
+  const [editData, setEditData] = useState({
+    date: "",
+    time: "",
+    price: "",
+    hall: "",
+  });
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Pagination
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const moviesPerPage =
-    typeof window !== 'undefined'
-      ? window.innerWidth < 640
-        ? 2
-        : window.innerWidth < 768
-        ? 4
-        : 8
-      : 8;
-
-  // Fetch movies
+  // ✅ Load Showtimes
   useEffect(() => {
-    const fetchMovies = async () => {
-      try {
-        const res = await fetch(
-          'https://gist.githubusercontent.com/saniyusuf/406b843afdfb9c6a86e25753fe2761f4/raw/523c324c7fcc36efab8224f9ebb7556c09b69a14/Film.JSON'
-        );
-        if (!res.ok) throw new Error('Failed to fetch movies');
-        const data = await res.json();
-        setMovies(data);
-      } catch (err) {
-        console.error(err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchMovies();
+    fetchShowtimes();
   }, []);
 
-  // Pagination logic
-  const indexOfLast = currentPage * moviesPerPage;
-  const indexOfFirst = indexOfLast - moviesPerPage;
-  const currentMovies = movies.slice(indexOfFirst, indexOfLast);
-  const totalPages = Math.ceil(movies.length / moviesPerPage);
-
-  // Input handler
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  // Add showtime
-  const addShowtime = (e) => {
-    e.preventDefault();
-    if (!selectedMovie || !formData.date || !formData.time || !formData.price || !formData.hall) {
-      toast.error('Please fill out all fields!');
-      return;
+  const fetchShowtimes = async () => {
+    try {
+      setLoading(true);
+      const res = await axiosSecure.get("/api/showtimes");
+      setShowtimes(res.data);
+    } catch (error) {
+      toast.error("Failed to load showtimes");
+    } finally {
+      setLoading(false);
     }
-    const newShowtime = { ...formData, movie: selectedMovie };
-    setShowtimes([...showtimes, newShowtime]);
-    setFormData({ price: '', date: '', time: '', hall: '' });
-
-    // ✅ Show hot toast
-    toast.success('Showtime added successfully!');
   };
 
-  // Remove showtime
-  const removeShowtime = (index) => {
-    setShowtimes(showtimes.filter((_, i) => i !== index));
-    toast('Showtime removed.', { icon: '🗑️' });
+  // Open update modal
+  const openUpdate = (item) => {
+    setSelected(item);
+    setEditData({
+      date: item.date,
+      time: item.time,
+      price: item.price,
+      hall: item.hall,
+    });
+    setModalOpen(true);
+    setOpenMenuId(null);
   };
+
+  //  Update Showtime
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      await axiosSecure.put(`/api/showtimes/${selected._id}`, editData);
+      setModalOpen(false);
+      fetchShowtimes();
+      toast.success(" Showtime updated successfully!");
+    } catch (error) {
+      toast.error(" Failed to update showtime!");
+    }
+  };
+
+  //  Delete Showtime
+  const handleDelete = async (id) => {
+    if (!confirm("Are you sure you want to delete this showtime?")) return;
+
+    try {
+      await axiosSecure.delete(`/api/showtimes/${id}`);
+      fetchShowtimes();
+      toast.success(" Showtime deleted successfully!");
+    } catch (error) {
+      toast.error("Failed to delete showtime!");
+    }
+  };
+
+  // Handle Add Showtime Success
+  const handleAddSuccess = () => {
+    fetchShowtimes(); // Refresh the list
+  };
+
+  // Format date to readable format
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  if (loading) {
+    return <AdminLoading />
+  }
 
   return (
-    <div className="min-h-screen p-4 md:p-6 bg-[var(--color-bg-dark)] text-[var(--color-text-light)]">
-      <Toaster position="top-right" reverseOrder={false} />
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-[var(--color-primary)] mb-6 md:mb-8 text-center">
-          🎬 Add New Showtimes
-        </h1>
-
-        {/* --- Movie Selection Section --- */}
-        <div className="bg-[#1E1E1E] p-4 sm:p-6 md:p-8 rounded-3xl shadow-lg border border-gray-700 mb-6 md:mb-8">
-          <h2 className="text-lg sm:text-xl font-bold text-[var(--color-text-light)] mb-4">
-            Select Movie
-          </h2>
-          {loading && <p className="text-center text-gray-400">Loading movies...</p>}
-          {error && <p className="text-center text-red-500">Failed to load data. Please try again.</p>}
-          {!loading && !error && (
-            <>
-              <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                {currentMovies.map((movie, index) => (
-                  <div
-                    key={index}
-                    onClick={() => setSelectedMovie(movie)}
-                    className={`w-28 sm:w-32 md:w-40 cursor-pointer rounded-2xl shadow-lg transition-all duration-300 transform
-                      ${selectedMovie?.Title === movie.Title ? 'ring-4 ring-[var(--color-primary)] scale-105' : 'hover:scale-105'}
-                      bg-[#2A2A2A]`}
-                  >
-                    <Image
-                        width={160}
-                        height={240}
-                      src={movie.Images[0]}
-                      alt={movie.Title}
-                      className="rounded-t-2xl w-full h-36 sm:h-44 md:h-48 object-cover"
-                    />
-                    <div className="p-2 sm:p-3 text-center">
-                      <h3 className="text-xs sm:text-sm md:text-base font-semibold text-[var(--color-text-light)] mb-1">
-                        {movie.Title}
-                      </h3>
-                      <p className="text-[10px] sm:text-xs text-gray-400">{movie.Genre}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex justify-center items-center gap-2 mt-6">
-                  <button
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage((p) => p - 1)}
-                    className="px-3 py-1 rounded-lg bg-gray-700 text-white disabled:opacity-40"
-                  >
-                    ⟨
-                  </button>
-                  <span className="text-sm text-gray-400">
-                    Page {currentPage} of {totalPages}
-                  </span>
-                  <button
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage((p) => p + 1)}
-                    className="px-3 py-1 rounded-lg bg-gray-700 text-white disabled:opacity-40"
-                  >
-                    ⟩
-                  </button>
-                </div>
-              )}
-            </>
-          )}
+    <div className="p-6 w-full mx-auto bg-gradient-to-br from-[#0c0c14] via-[#0f1018] to-[#1e1233]">
+      {/* Header with Add Button */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
+        <div className="mb-4 lg:mb-0">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 bg-clip-text text-transparent mb-4">Showtimes Management</h1>
+          <p className="text-gray-400">Manage all movie showtimes and schedules</p>
         </div>
+        <button
+          onClick={() => setAddModalOpen(true)}
+          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-xl text-white font-semibold transition-all duration-300 shadow-lg shadow-purple-500/25"
+        >
+          <FiPlus size={20} />
+          Add Showtime
+        </button>
+      </div>
 
-        {/* --- Showtime Form Section --- */}
-        <div className="bg-[#1E1E1E] p-4 sm:p-6 md:p-8 rounded-3xl shadow-lg border border-gray-700 mb-6 md:mb-8 max-w-2xl mx-auto">
-          <h2 className="text-lg sm:text-xl font-bold text-[var(--color-text-light)] mb-4 sm:mb-6">
-            Showtime Details
-          </h2>
-          <form onSubmit={addShowtime} className="space-y-4 sm:space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-              <input
-                type="text"
-                name="hall"
-                value={formData.hall}
-                onChange={handleChange}
-                placeholder="e.g., Hall 1"
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-600 rounded-xl bg-transparent text-[var(--color-text-light)]"
-                required
-              />
-              <input
-                type="number"
-                name="price"
-                value={formData.price}
-                onChange={handleChange}
-                placeholder="e.g., 12.5"
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-600 rounded-xl bg-transparent text-[var(--color-text-light)]"
-                required
-              />
-              <input
-                type="date"
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-600 rounded-xl bg-transparent text-[var(--color-text-light)]"
-                required
-              />
-              <input
-                type="time"
-                name="time"
-                value={formData.time}
-                onChange={handleChange}
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-600 rounded-xl bg-transparent text-[var(--color-text-light)]"
-                required
-              />
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="bg-gradient-to-br from-purple-600/20 to-blue-600/20 p-4 rounded-xl border border-purple-500/20">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-400 text-sm">Total Showtimes</p>
+              <p className="text-2xl font-bold text-white">{showtimes.length}</p>
             </div>
-
-            <button
-              type="submit"
-              className="w-full py-2 sm:py-3 px-4 sm:px-6 rounded-2xl text-base sm:text-lg font-bold bg-[var(--color-primary)] text-white"
-            >
-              Add Showtime
-            </button>
-          </form>
+            <div className="p-3 bg-purple-600/20 rounded-lg">
+              <FiCalendar className="text-purple-400 text-xl" />
+            </div>
+          </div>
         </div>
 
-        {/* --- Added Showtimes --- */}
-        {showtimes.length > 0 && (
-          <div className="bg-[#1E1E1E] p-4 sm:p-6 md:p-8 rounded-3xl shadow-lg border border-gray-700 max-w-2xl mx-auto">
-            <h2 className="text-lg sm:text-xl font-bold text-[var(--color-text-light)] mb-4 sm:mb-6">
-              🎟️ Added Showtimes
-            </h2>
-            <div className="space-y-3 sm:space-y-4">
-              {showtimes.map((show, idx) => (
-                <div
-                  key={idx}
-                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between
-                    bg-[#2A2A2A] text-[var(--color-text-light)] p-3 sm:p-4 rounded-xl"
+        <div className="bg-gradient-to-br from-blue-600/20 to-cyan-600/20 p-4 rounded-xl border border-blue-500/20">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-400 text-sm">Active Today</p>
+              <p className="text-2xl font-bold text-white">
+                {showtimes.filter(st => new Date(st.date).toDateString() === new Date().toDateString()).length}
+              </p>
+            </div>
+            <div className="p-3 bg-blue-600/20 rounded-lg">
+              <FiClock className="text-blue-400 text-xl" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-green-600/20 to-emerald-600/20 p-4 rounded-xl border border-green-500/20">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-400 text-sm">Halls Used</p>
+              <p className="text-2xl font-bold text-white">
+                {[...new Set(showtimes.map(st => st.hall))].length}
+              </p>
+            </div>
+            <div className="p-3 bg-green-600/20 rounded-lg">
+              <FiMapPin className="text-green-400 text-xl" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-orange-600/20 to-red-600/20 p-4 rounded-xl border border-orange-500/20">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-400 text-sm">Avg Price</p>
+              <p className="text-2xl font-bold text-white">
+                ${(showtimes.reduce((acc, st) => acc + parseFloat(st.price), 0) / showtimes.length || 0).toFixed(2)}
+              </p>
+            </div>
+            <div className="p-3 bg-orange-600/20 rounded-lg">
+              <FiDollarSign className="text-orange-400 text-xl" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Table Container */}
+      <div className="bg-[#12131a] rounded-2xl border border-gray-800 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-900/50">
+              <tr>
+                <th className="text-left py-4 px-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">Movie</th>
+                <th className="text-left py-4 px-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">Date & Time</th>
+                <th className="text-left py-4 px-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">Hall</th>
+                <th className="text-left py-4 px-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">Price</th>
+                <th className="text-left py-4 px-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-800">
+              {showtimes.map((st) => (
+                <motion.tr
+                  key={st._id}
+                  className="hover:bg-gray-800/30 transition-colors duration-200"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  <div>
-                    <h3 className="font-semibold text-[var(--color-primary)] text-base sm:text-lg">
-                      {show.movie.Title}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-gray-400">
-                      Hall: {show.hall} | Price: ${show.price}
-                    </p>
-                    <p className="text-xs sm:text-sm text-gray-400">
-                      Date: {show.date} | Time: {show.time}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => removeShowtime(idx)}
-                    className="mt-2 sm:mt-0 text-red-400 border border-red-400 rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center"
-                  >
-                    X
-                  </button>
-                </div>
+                  {/* Movie Info */}
+                  <td className="py-4 px-6">
+                    <div className="flex items-center space-x-4">
+                      <Image
+                        src={st.movieId.poster_path}
+                        alt={st.movieId.title}
+                        width={48}
+                        height={48}
+                        className="rounded-lg object-cover shadow-lg"
+                      />
+                      <div>
+                        <p className="text-white font-medium">{st.movieId.title}</p>
+                        <p className="text-gray-400 text-sm">Movie</p>
+                      </div>
+                    </div>
+                  </td>
+
+                  {/* Date & Time */}
+                  <td className="py-4 px-6">
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2">
+                        <FiCalendar className="text-purple-400 text-sm" />
+                        <span className="text-white font-medium">{formatDate(st.date)}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <FiClock className="text-blue-400 text-sm" />
+                        <span className="text-gray-400 text-sm">{st.time}</span>
+                      </div>
+                    </div>
+                  </td>
+
+                  {/* Hall */}
+                  <td className="py-4 px-6">
+                    <div className="flex items-center space-x-2">
+                      <FiMapPin className="text-green-400" />
+                      <span className="text-white font-medium">{st.hall}</span>
+                    </div>
+                  </td>
+
+                  {/* Price */}
+                  <td className="py-4 px-6">
+                    <div className="flex items-center space-x-2">
+                      <FiDollarSign className="text-yellow-400" />
+                      <span className="text-white font-bold">${st.price}</span>
+                    </div>
+                  </td>
+
+                  {/* Actions */}
+                  <td className="py-4 px-6 relative">
+                    <button
+                      className="p-2 rounded-lg hover:bg-gray-700/50 transition-colors duration-200"
+                      onClick={() => setOpenMenuId(openMenuId === st._id ? null : st._id)}
+                    >
+                      <HiDotsHorizontal size={20} className="text-gray-400" />
+                    </button>
+
+                    <AnimatePresence>
+                      {openMenuId === st._id && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                          className="absolute right-6 top-14 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl z-50 w-48 overflow-hidden"
+                        >
+                          <button
+                            onClick={() => openUpdate(st)}
+                            className="flex items-center space-x-3 w-full px-4 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors duration-200"
+                          >
+                            <FiEdit2 className="text-blue-400" />
+                            <span>Edit Showtime</span>
+                          </button>
+                          <button
+                            onClick={() => handleDelete(st._id)}
+                            className="flex items-center space-x-3 w-full px-4 py-3 text-sm text-red-400 hover:bg-gray-700 transition-colors duration-200"
+                          >
+                            <FiTrash2 className="text-red-400" />
+                            <span>Delete</span>
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </td>
+                </motion.tr>
               ))}
-            </div>
+            </tbody>
+          </table>
+        </div>
+
+        {showtimes.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-gray-500 text-lg">No showtimes found</div>
+            <div className="text-gray-400 text-sm mt-2">Add your first showtime to get started</div>
           </div>
         )}
       </div>
+
+      {/* Add Showtime Modal */}
+      <AddShowtimeModal
+        isOpen={isAddModalOpen}
+        onClose={() => setAddModalOpen(false)}
+        onSuccess={handleAddSuccess}
+      />
+
+      {/* Update Modal */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+            onClick={() => setModalOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="bg-gradient-to-br from-[#1a1c2b] to-[#151724] rounded-2xl border border-gray-800 shadow-2xl max-w-md w-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-6">
+                <h2 className="text-xl font-bold text-white mb-2">Edit Showtime</h2>
+                <p className="text-gray-400 mb-6">Update the showtime details</p>
+
+                <form onSubmit={handleUpdate} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">Date</label>
+                    <input
+                      type="date"
+                      value={editData.date}
+                      onChange={(e) => setEditData({ ...editData, date: e.target.value })}
+                      className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">Time</label>
+                    <input
+                      type="time"
+                      value={editData.time}
+                      onChange={(e) => setEditData({ ...editData, time: e.target.value })}
+                      className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">Hall</label>
+                    <input
+                      type="text"
+                      placeholder="Enter hall name"
+                      value={editData.hall}
+                      onChange={(e) => setEditData({ ...editData, hall: e.target.value })}
+                      className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">Price ($)</label>
+                    <input
+                      type="number"
+                      placeholder="Enter price"
+                      value={editData.price}
+                      onChange={(e) => setEditData({ ...editData, price: e.target.value })}
+                      className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div className="flex justify-end space-x-3 pt-4">
+                    <button
+                      type="button"
+                      onClick={() => setModalOpen(false)}
+                      className="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-xl text-white transition-colors duration-200"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 rounded-xl text-white font-medium transition-all duration-200 shadow-lg shadow-purple-600/25"
+                    >
+                      Update Showtime
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

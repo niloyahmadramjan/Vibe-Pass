@@ -23,12 +23,21 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(false)
   // State for user data from backend
   const [userData, setUserData] = useState(null)
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const router = useRouter()
+
+  // ========================= AUTHENTICATION PROTECTION =========================
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/login')
+    }
+  }, [user, authLoading, router])
 
   // ========================= EFFECT TO FETCH USER DATA =========================
 
   useEffect(() => {
+    if (!user) return // Don't fetch if no user
+
     const fetchUserData = async () => {
       try {
         const response = await axiosSecure.get('/api/user/info')
@@ -238,7 +247,9 @@ const ProfilePage = () => {
   }
 
   // ========================= LOADING STATE =========================
-  if (!user || !userData) return <LoadingSpinner />
+  if (authLoading || !user || !userData) {
+    return <LoadingSpinner />
+  }
 
   // ========================= RENDER =========================
   return (
