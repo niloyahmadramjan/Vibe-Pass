@@ -13,9 +13,9 @@ import { useRouter } from "next/navigation";
 import { FaCreditCard, FaUser, FaCalendarAlt, FaLock } from "react-icons/fa";
 
 export default function PaymentForm({ session }) {
-  const stripe = useStripe()
-  const elements = useElements()
-  const router = useRouter()
+  const stripe = useStripe();
+  const elements = useElements();
+  const router = useRouter();
   // console.log( "session",session)
 
   const [clientSecret, setClientSecret] = useState("");
@@ -40,10 +40,11 @@ export default function PaymentForm({ session }) {
   // ✅ Create PaymentIntent on load
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/payments`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: session.totalAmount * 100 ,
-        bookingId:session._id
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        amount: session.totalAmount * 100,
+        bookingId: session._id,
       }),
     })
       .then((res) => res.json())
@@ -87,7 +88,7 @@ export default function PaymentForm({ session }) {
               transactionId: paymentIntent.id,
               amount: paymentIntent.amount,
               status: paymentIntent.status,
-              bookingId:session._id,
+              bookingId: session._id,
               sessionTitle: session.movieTitle,
               userEmail: session.userEmail,
               userName: session.userName,
