@@ -440,7 +440,7 @@ export default function MovieSeatBooking() {
             </div>
 
             {/* Date Selection */}
-            <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700/50 shadow-xl">
+            {/* <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700/50 shadow-xl">
               <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-red-500">
                 <Calendar className="w-5 h-5" />
                 Select Date
@@ -465,7 +465,7 @@ export default function MovieSeatBooking() {
                   </button>
                 ))}
               </div>
-            </div>
+            </div> */}
 
             {/* Date & Showtimes */}
             <DateSelector
