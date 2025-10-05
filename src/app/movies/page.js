@@ -1,14 +1,18 @@
 'use client'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import LoadingSpinner from '../hooks/LoadingSpiner'
-
+import BookingLocationModal from '../components/BookingLocationModal'
 
 export default function MoviesPage() {
   const [movies, setMovies] = useState([])
   const [loading, setLoading] = useState(true)
-  const router = useRouter()
+
+  // 🔹 Modal States
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedMovie, setSelectedMovie] = useState(null)
+  const [selectionMode, setSelectionMode] = useState('auto')
+  const [selectedCinema, setSelectedCinema] = useState(null)
 
   useEffect(() => {
     async function fetchMovies() {
@@ -29,6 +33,14 @@ export default function MoviesPage() {
   }, [])
 
   if (loading) return <LoadingSpinner />
+
+  // 🔹 Handle Book Now
+  const handleBookNow = (movie) => {
+    setSelectedMovie(movie)
+    setSelectedCinema(null) // reset
+    setSelectionMode('auto') // default auto
+    setIsModalOpen(true)
+  }
 
   return (
     <div className="min-h-screen text-white px-4 md:px-6 py-10 pt-25 max-w-7xl mx-auto">
@@ -73,8 +85,9 @@ export default function MoviesPage() {
                   </span>
                 </div>
 
+                {/* 🔹 Book Now Modal Button */}
                 <button
-                  onClick={() => router.push(`/booking/${movie.id}`)}
+                  onClick={() => handleBookNow(movie)}
                   className="mt-4 w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow transition"
                 >
                   Book Now
@@ -84,6 +97,17 @@ export default function MoviesPage() {
           ))}
         </div>
       )}
+
+      {/* 🔹 Booking Modal */}
+      <BookingLocationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        movie={selectedMovie}
+        selectionMode={selectionMode}
+        setSelectionMode={setSelectionMode}
+        selectedCinema={selectedCinema}
+        setSelectedCinema={setSelectedCinema}
+      />
     </div>
   )
 }
