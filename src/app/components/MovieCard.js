@@ -7,6 +7,7 @@ import 'swiper/css'
 import 'swiper/css/navigation'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import BookingLocationModal from './BookingLocationModal' // ✅ modal import
 
 // 🔹 Loading Spinner
 function Spinner() {
@@ -26,26 +27,45 @@ export default function MovieCard() {
   const [loading, setLoading] = useState(true)
   const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY
   const router = useRouter()
+
+  // 🔹 Modal States
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedMovie, setSelectedMovie] = useState(null)
+  const [selectionMode, setSelectionMode] = useState('auto')
+  const [selectedCinema, setSelectedCinema] = useState(null)
+
   const categories = useMemo(
     () => [
-      { key: 'nowPlaying', label: 'Now Playing', url: `${BASE_URL}/movie/now_playing?api_key=${API_KEY}&language=en-US&page=1` },
-      { key: 'trending', label: 'Trending', url: `${BASE_URL}/trending/movie/week?api_key=${API_KEY}` },
-      { key: 'popular', label: 'Popular', url: `${BASE_URL}/movie/popular?api_key=${API_KEY}&language=en-US&page=1` },
-      { key: 'topRated', label: 'Top Rated', url: `${BASE_URL}/movie/top_rated?api_key=${API_KEY}&language=en-US&page=1` },
-      { key: 'upcoming', label: 'Upcoming', url: `${BASE_URL}/movie/upcoming?api_key=${API_KEY}&language=en-US&page=1` },
+      {
+        key: 'nowPlaying',
+        label: 'Now Playing',
+        url: `${BASE_URL}/movie/now_playing?api_key=${API_KEY}&language=en-US&page=1`,
+      },
+      {
+        key: 'trending',
+        label: 'Trending',
+        url: `${BASE_URL}/trending/movie/week?api_key=${API_KEY}`,
+      },
+      {
+        key: 'popular',
+        label: 'Popular',
+        url: `${BASE_URL}/movie/popular?api_key=${API_KEY}&language=en-US&page=1`,
+      },
+      {
+        key: 'topRated',
+        label: 'Top Rated',
+        url: `${BASE_URL}/movie/top_rated?api_key=${API_KEY}&language=en-US&page=1`,
+      },
+      {
+        key: 'upcoming',
+        label: 'Upcoming',
+        url: `${BASE_URL}/movie/upcoming?api_key=${API_KEY}&language=en-US&page=1`,
+      },
     ],
     [API_KEY]
   )
 
-
-
-  // const handleBookNow = (id) => {
-  //   // Movie er data pass kore seat booking page e jao
-  //   router.push(`/movies/${id}/seat-booking?movie=${encodeURIComponent(JSON.stringify({
-
-
-  //   }))}`)
-  // }
+  // 🔹 Fetch Movies
   useEffect(() => {
     const fetchAllMovies = async () => {
       setLoading(true)
@@ -74,6 +94,14 @@ export default function MovieCard() {
   const movies = moviesData[activeTab] || []
   if (loading) return <Spinner />
 
+  // 🔹 Handle Book Now
+  const handleBookNow = (movie) => {
+    setSelectedMovie(movie)
+    setSelectedCinema(null) // reset
+    setSelectionMode('auto') // default auto
+    setIsModalOpen(true)
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4">
       {/* Tab Buttons */}
@@ -83,10 +111,9 @@ export default function MovieCard() {
             key={cat.key}
             onClick={() => setActiveTab(cat.key)}
             className={`px-3 py-2 sm:px-4 sm:py-2 rounded-md text-sm sm:text-base font-semibold transition-colors duration-300 
-              ${
-                activeTab === cat.key
-                  ? 'bg-red-600 text-white'
-                  : 'bg-zinc-800 text-gray-300 hover:bg-red-500 hover:text-white'
+              ${activeTab === cat.key
+                ? 'bg-red-600 text-white'
+                : 'bg-zinc-800 text-gray-300 hover:bg-red-500 hover:text-white'
               }`}
           >
             {cat.label}
@@ -105,7 +132,7 @@ export default function MovieCard() {
           768: { slidesPerView: 4, spaceBetween: 16 },
           1024: { slidesPerView: 5, spaceBetween: 20 },
         }}
-        className="pb-10 "
+        className="pb-10"
       >
         {movies.length > 0 ? (
           movies.map((movie) => (
@@ -116,7 +143,6 @@ export default function MovieCard() {
                 border-red-400 hover:shadow-[0_0_15px_rgba(239,68,68,0.7)] group"
               >
                 {/* Poster */}
-
                 <div className="relative w-full h-[70%] sm:h-[67%]">
                   <Image
                     src={
@@ -135,31 +161,28 @@ export default function MovieCard() {
 
                 {/* Title + Buttons */}
                 <div className="p-2 flex flex-col justify-between">
-                  {/* Title */}
                   <p className="text-sm sm:text-base md:text-lg font-semibold truncate mb-2">
                     {movie.title}
                   </p>
 
-                  {/* Buttons Section */}
                   <div className="flex flex-col gap-2">
-                    {/* Book Now - hide on upcoming, hover effect on larger screens */}
+                    {/* Book Now */}
                     {activeTab !== 'upcoming' && (
-                      <Link href={`booking/${movie.id}`}> 
-                        <button
-                          className="w-10/12 flex justify-center  mx-auto py-1 rounded-lg  btn-secondary font-semibold 
-          hover:bg-red-700 transition duration-300
-          opacity-100 lg:opacity-0 group-hover:opacity-100" // small screens always visible
-                        >
-                          Book Now
-                        </button>
-                      </Link>
+                      <button
+                        onClick={() => handleBookNow(movie)}
+                        className="w-10/12 flex justify-center mx-auto py-1 rounded-lg btn-secondary font-semibold 
+                          hover:bg-red-700 transition duration-300
+                          opacity-100 lg:opacity-0 group-hover:opacity-100"
+                      >
+                        Book Now
+                      </button>
                     )}
 
-                    {/* Details - always visible on all devices */}
+                    {/* Details */}
                     <Link href={`/movies/${movie.id}`}>
                       <button
-                        className="w-10/12 flex justify-center  mx-auto py-1  text-white bg-red-600 rounded-lg 
-        hover:bg-red-700 transition duration-300"
+                        className="w-10/12 flex justify-center mx-auto py-1 text-white bg-red-600 rounded-lg 
+                          hover:bg-red-700 transition duration-300"
                       >
                         Details
                       </button>
@@ -175,6 +198,17 @@ export default function MovieCard() {
           </p>
         )}
       </Swiper>
+
+      {/* 🔹 Booking Modal */}
+      <BookingLocationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        movie={selectedMovie}
+        selectionMode={selectionMode}
+        setSelectionMode={setSelectionMode}
+        selectedCinema={selectedCinema}
+        setSelectedCinema={setSelectedCinema}
+      />
     </div>
   )
 }
