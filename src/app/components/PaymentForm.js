@@ -16,6 +16,7 @@ export default function PaymentForm({ session }) {
   const stripe = useStripe();
   const elements = useElements();
   const router = useRouter();
+  // console.log( "session",session)
 
   const [clientSecret, setClientSecret] = useState("");
   const [processing, setProcessing] = useState(false);
@@ -41,7 +42,10 @@ export default function PaymentForm({ session }) {
     fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/payments`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: session.totalAmount * 100 }),
+      body: JSON.stringify({
+        amount: session.totalAmount * 100,
+        bookingId: session._id,
+      }),
     })
       .then((res) => res.json())
       .then((data) => {
@@ -50,7 +54,7 @@ export default function PaymentForm({ session }) {
       .catch((err) => Swal.fire("Error", err.message, "error"));
   }, [session]);
 
-  // ✅ Handle Stripe payment
+  //  Handle Stripe payment
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!stripe || !elements || !clientSecret) return;
@@ -84,7 +88,7 @@ export default function PaymentForm({ session }) {
               transactionId: paymentIntent.id,
               amount: paymentIntent.amount,
               status: paymentIntent.status,
-              sessionId: session._id,
+              bookingId: session._id,
               sessionTitle: session.movieTitle,
               userEmail: session.userEmail,
               userName: session.userName,

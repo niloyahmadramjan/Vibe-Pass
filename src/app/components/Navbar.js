@@ -1,95 +1,102 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
-import { FiMenu, FiX, FiHome, FiInfo, FiCalendar, FiUser } from 'react-icons/fi'
-import { GiTheater } from 'react-icons/gi'
-import { RiMovie2Fill } from 'react-icons/ri'
-import Image from 'next/image'
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import {
+  FiMenu,
+  FiX,
+  FiHome,
+  FiInfo,
+  FiCalendar,
+  FiUser,
+} from "react-icons/fi";
+import { GiTheater } from "react-icons/gi";
+import { RiMovie2Fill } from "react-icons/ri";
+import Image from "next/image";
 
 // NextAuth + custom auth
-import { useSession, signOut } from 'next-auth/react'
-import { useAuth } from '@/app/context/AuthContext'
-import toast from 'react-hot-toast'
-import { FaFilm } from 'react-icons/fa'
+import { useSession, signOut } from "next-auth/react";
+import { useAuth } from "@/app/context/AuthContext";
+import toast from "react-hot-toast";
+import { FaFilm } from "react-icons/fa";
 
 export default function Navbar() {
-  const [open, setOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
-  const pathname = usePathname()
-  const router = useRouter()
+  const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
 
-  const { data: session, status } = useSession()
-  const { user, logout } = useAuth()
+  const { data: session, status } = useSession();
+  const { user, logout } = useAuth();
 
-  const [openDrop, setOpenDrop] = useState(false)
-  const [groupHover, setGroupHover] = useState(false)
-  const dropdownRef = useRef(null)
+  const [openDrop, setOpenDrop] = useState(false);
+  const [groupHover, setGroupHover] = useState(false);
+  const dropdownRef = useRef(null);
 
   // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setOpenDrop(false)
+        setOpenDrop(false);
       }
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Detect scroll to change navbar background
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20)
-    }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleLogout = async () => {
     if (session) {
-      await signOut({ redirect: false })
+      await signOut({ redirect: false });
     }
     if (user) {
-      await logout({ redirect: false })
-      toast.success('Logged out successfully!')
+      await logout({ redirect: false });
+      toast.success("Logged out successfully!");
     }
-    router.refresh()
-  }
+    router.refresh();
+  };
 
   const navLinks = [
-    { href: '/', label: 'Home', icon: <FiHome className="mr-1" /> },
+    { href: "/", label: "Home", icon: <FiHome className="mr-1" /> },
     {
-      href: '/movies',
-      label: 'Movies',
+      href: "/movies",
+      label: "Movies",
       icon: <RiMovie2Fill className="mr-1" />,
     },
     {
-      href: '/upcoming',
-      label: 'Upcoming',
+      href: "/upcoming",
+      label: "Upcoming",
       icon: <FiCalendar className="mr-1" />,
     },
     {
-      href: '/bangla-movies',
-      label: 'BanglaFlix',
+      href: "/bangla-movies",
+      label: "BanglaFlix",
       icon: <FaFilm className="mr-1" />,
     },
     {
-      href: '/location',
-      label: 'Theaters',
+      href: "/location",
+      label: "Theaters",
       icon: <GiTheater className="mr-1" />,
     },
-    { href: '/about', label: 'About', icon: <FiInfo className="mr-1" /> },
-  ]
+    { href: "/about", label: "About", icon: <FiInfo className="mr-1" /> },
+  ];
 
   return (
     <>
       <nav
         className={`fixed w-full z-999 transition-all duration-300 ${
           scrolled
-            ? 'bg-gray-950 !text-white shadow-lg border-b border-stone-700'
-            : 'bg-transparent !text-white'
+            ? "bg-gray-950 !text-white shadow-lg border-b border-stone-700"
+            : "bg-transparent !text-white"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -116,8 +123,8 @@ export default function Navbar() {
                   className={`relative flex items-center font-bold transition-all duration-300 ease-in-out   
                     ${
                       pathname === href
-                        ? 'border-b-4 border-blue-400 !text-blue-400'
-                        : '!text-gray-300 hover:text-blue-400'
+                        ? "border-b-4 border-blue-400 !text-blue-400"
+                        : "!text-gray-300 hover:text-blue-400"
                     }`}
                 >
                   {icon} {label}
@@ -127,7 +134,7 @@ export default function Navbar() {
 
             {/* Right - Auth (desktop) */}
             <div className="hidden lg:flex items-center">
-              {status === 'loading' ? (
+              {status === "loading" ? (
                 <div className="animate-spin h-6 w-6 rounded-full border-2 border-red-500 border-t-transparent"></div>
               ) : session || user ? (
                 <div className="flex items-center gap-3 relative group">
@@ -165,7 +172,7 @@ export default function Navbar() {
 
                     <svg
                       className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
-                        openDrop ? 'rotate-180' : ''
+                        openDrop ? "rotate-180" : ""
                       }`}
                       fill="none"
                       stroke="currentColor"
@@ -194,7 +201,7 @@ export default function Navbar() {
                           {session?.user?.image || user?.image ? (
                             <Image
                               src={session?.user?.image || user?.image}
-                              alt={session?.user?.name || user?.name || 'User'}
+                              alt={session?.user?.name || user?.name || "User"}
                               width={40}
                               height={40}
                               className="rounded-full border-2 border-red-500"
@@ -204,7 +211,7 @@ export default function Navbar() {
                               {(
                                 session?.user?.name?.[0] ||
                                 user?.name?.[0] ||
-                                'U'
+                                "U"
                               ).toUpperCase()}
                             </div>
                           )}
@@ -311,8 +318,8 @@ export default function Navbar() {
                         {/* Sign Out */}
                         <button
                           onClick={() => {
-                            handleLogout()
-                            setOpenDrop(false)
+                            handleLogout();
+                            setOpenDrop(false);
                           }}
                           className="flex items-center gap-3 w-full px-4 py-3 hover:bg-red-600 transition-colors text-white text-left"
                         >
@@ -373,7 +380,7 @@ export default function Navbar() {
         {/* Mobile Slide Menu */}
         <div
           className={`fixed top-0 right-0 h-full w-64 bg-gray-900 transform ${
-            open ? 'translate-x-0' : 'translate-x-full'
+            open ? "translate-x-0" : "translate-x-full"
           } transition-transform duration-300 ease-in-out z-40 shadow-xl flex flex-col`}
         >
           {/* Close Button & Logo */}
@@ -405,8 +412,8 @@ export default function Navbar() {
                 href={href}
                 className={`relative flex items-center font-bold transition-colors duration-200 ${
                   pathname === href
-                    ? 'border-b-4 border-blue-400 !text-blue-400'
-                    : '!text-gray-300 hover:text-blue-400'
+                    ? "border-b-4 border-blue-400 !text-blue-400"
+                    : "!text-gray-300 hover:text-blue-400"
                 }`}
               >
                 {icon} {label}
@@ -440,5 +447,5 @@ export default function Navbar() {
         </div>
       </nav>
     </>
-  )
+  );
 }
