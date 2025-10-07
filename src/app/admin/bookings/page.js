@@ -150,7 +150,7 @@ export default function BookingsPage() {
           const res = await axiosSecure.get("/api/ticket");
           setBookings(res.data || []);
 
-          Swal.fire("Deleted!", "The booking has been deleted.", "success");
+          
         } catch (error) {
           console.error("Error deleting booking:", error);
           toast.error("Failed to delete booking");
