@@ -110,6 +110,8 @@ function NewsLetter() {
                 ))}
               </div>
             </div>
+
+            
           </div>
 
           {/* Right Column - Newsletter Form */}

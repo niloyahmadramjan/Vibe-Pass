@@ -45,7 +45,7 @@ function MyBooking() {
     };
 
     fetchBookings();
-  }, [userEmail, axiosSecure]);
+  }, [userEmail]);
 
   const handleDelete = async (bookingId) => {
     Swal.fire({

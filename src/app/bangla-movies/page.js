@@ -1,13 +1,18 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import BookingLocationModal from '../components/BookingLocationModal'
 import LoadingSpinner from '../hooks/LoadingSpiner'
 
 export default function BanglaMoviesPage() {
   const [movies, setMovies] = useState([])
   const [loading, setLoading] = useState(true)
-  const router = useRouter()
+
+  // 🔹 Modal States
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedMovie, setSelectedMovie] = useState(null)
+  const [selectionMode, setSelectionMode] = useState('auto')
+  const [selectedCinema, setSelectedCinema] = useState(null)
 
   useEffect(() => {
     async function fetchBanglaMovies() {
@@ -26,8 +31,14 @@ export default function BanglaMoviesPage() {
     fetchBanglaMovies()
   }, [])
 
-  if (loading) {
-    return <LoadingSpinner/>
+  if (loading) return <LoadingSpinner />
+
+  // 🔹 Handle Book Now
+  const handleBookNow = (movie) => {
+    setSelectedMovie(movie)
+    setSelectedCinema(null) // reset
+    setSelectionMode('auto') // default auto
+    setIsModalOpen(true)
   }
 
   return (
@@ -44,7 +55,6 @@ export default function BanglaMoviesPage() {
             <div
               key={movie.id}
               className="group bg-gray-900 rounded-2xl overflow-hidden shadow-lg hover:scale-105 transform transition duration-300 cursor-pointer flex flex-col"
-              onClick={() => router.push(`/movies/${movie.id}`)}
             >
               <div className="relative w-full h-[300px]">
                 <Image
@@ -60,9 +70,7 @@ export default function BanglaMoviesPage() {
               </div>
 
               <div className="p-4 flex flex-col flex-grow">
-                <h2 className="text-lg font-semibold truncate">
-                  {movie.title}
-                </h2>
+                <h2 className="text-lg font-semibold truncate">{movie.title}</h2>
                 <p className="text-sm text-gray-400 mt-1">
                   {movie.release_date || 'N/A'}
                 </p>
@@ -80,20 +88,29 @@ export default function BanglaMoviesPage() {
                   </span>
                 </div>
 
+                {/* 🔹 Book Now Button */}
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    router.push(`/movies/${movie.id}`)
-                  }}
+                  onClick={() => handleBookNow(movie)}
                   className="mt-4 w-full px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition"
                 >
-                  View Details
+                  Book Now
                 </button>
               </div>
             </div>
           ))}
         </div>
       )}
+
+      {/* 🔹 Booking Modal */}
+      <BookingLocationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        movie={selectedMovie}
+        selectionMode={selectionMode}
+        setSelectionMode={setSelectionMode}
+        selectedCinema={selectedCinema}
+        setSelectedCinema={setSelectedCinema}
+      />
     </div>
   )
 }

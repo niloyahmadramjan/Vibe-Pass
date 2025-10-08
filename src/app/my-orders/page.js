@@ -71,7 +71,7 @@ function MyOrder() {
     };
 
     fetchBookings();
-  }, [userEmail, axiosSecure]);
+  }, [userEmail]);
 
   const handleViewDetails = (order) => {
     setSelectedOrder(order);

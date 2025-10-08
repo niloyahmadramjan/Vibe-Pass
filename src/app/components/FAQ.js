@@ -5,7 +5,7 @@ import { useState } from 'react'
 
 const QnA = () => {
   const [activeIndex, setActiveIndex] = useState(null)
-  const [selectedCategory, setSelectedCategory] = useState('all')
+  const [selectedCategory, setSelectedCategory] = useState('booking')
 
   const faqData = [
     {
@@ -81,7 +81,6 @@ const QnA = () => {
   ]
 
   const categories = [
-    { id: 'all', name: 'All Questions', count: faqData.length },
     {
       id: 'booking',
       name: 'Booking',
