@@ -51,7 +51,7 @@ export default function BookingLocationModal({
       {/* Holographic Effect Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 via-transparent to-blue-500/10 animate-pulse"></div>
 
-      <div className="relative w-full max-w-lg">
+      <div className="relative w-full max-w-3xl"> {/* Updated modal width */}
         {/* Floating Cinema Elements */}
         <div className="absolute -top-20 left-10 w-8 h-8 bg-yellow-400 rounded-full opacity-60 animate-float"></div>
         <div className="absolute -bottom-20 right-10 w-6 h-6 bg-red-400 rounded-full opacity-40 animate-float delay-1000"></div>
@@ -212,7 +212,7 @@ export default function BookingLocationModal({
                   </p>
                 </div>
 
-                {/* আপনার Original Book Button - Dynamic Movie ID সহ */}
+                {/* Original Book Button */}
                 <button
                   onClick={() => {
                     router.push(
