@@ -111,7 +111,7 @@ export default function PaymentForm({ session }) {
         );
         Swal.fire({
           icon: "success",
-          title: "Payment Successful 🎉",
+          title: "Payment Successful ",
           text: "Redirecting you to your tickets...",
           timer: 2000,
           showConfirmButton: false,
