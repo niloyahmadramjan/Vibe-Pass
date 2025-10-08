@@ -79,6 +79,7 @@ export default function BookingLocationModal({
           {selectionMode === 'manual' && (
             <div className="max-h-52 overflow-y-auto border border-gray-700 rounded-md p-2">
               <AllTheatersLocation
+                movieId={movie?._id || movie?.id}
                 onLocationSelect={(loc) => {
                   if (loc?.cinemas?.length > 0) {
                     setSelectedCinema({
@@ -89,6 +90,7 @@ export default function BookingLocationModal({
                   }
                 }}
               />
+
             </div>
           )}
 

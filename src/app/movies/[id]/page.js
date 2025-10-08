@@ -169,16 +169,18 @@ export default function MovieDetailsPage() {
         {/* Manual Select */}
         {selectionMode === "manual" && (
           <AllTheatersLocation
+            movieId={movie?._id || movie?.id}
             onLocationSelect={(loc) => {
               if (loc?.cinemas?.length > 0) {
                 setSelectedCinema({
                   name: loc.cinemas[0],
                   city: loc.region,
-                  district: loc.district
+                  district: loc.district,
                 })
               }
             }}
           />
+
         )}
 
         {/* Book Now Button */}
