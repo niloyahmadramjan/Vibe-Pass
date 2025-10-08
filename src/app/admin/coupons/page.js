@@ -10,6 +10,7 @@ import {
 import StatCard from "../components/StartCard";
 import UniversalTable from "../components/UniversalTable";
 import AdminLoading from "../components/AdminLoading";
+import Swal from "sweetalert2";
 
 export default function CouponsPage() {
   const [coupons, setCoupons] = useState([]);
@@ -25,7 +26,8 @@ export default function CouponsPage() {
     minAmount: "",
     expiryDate: "",
     usageLimit: "",
-    description: ""
+    description: "", 
+
   });
 
   useEffect(() => {
@@ -99,15 +101,29 @@ export default function CouponsPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Are you sure you want to delete this coupon?")) return;
-    try {
-      await axiosSecure.delete(`/api/coupons/${id}`);
-      toast.success("🗑️ Coupon deleted successfully");
-      fetchCoupons();
-    } catch (err) {
-      toast.error("❌ Failed to delete coupon");
-      console.error(err);
-    }
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This action cannot be undone!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axiosSecure.delete(`/api/coupons/${id}`);
+          // toast.success(" Coupon deleted successfully");
+          fetchCoupons();
+
+          Swal.fire("Deleted!", "Coupon has been removed.", "success");
+        } catch (err) {
+          console.error(err);
+          // toast.error("❌ Failed to delete coupon");
+          Swal.fire("Error!", "Something went wrong.", "error");
+        }
+      }
+    });
   };
 
   const copyToClipboard = (code) => {

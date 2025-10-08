@@ -1,324 +1,448 @@
-'use client';
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FiX, FiCalendar, FiClock, FiDollarSign, FiFilm, FiMapPin, FiMonitor } from 'react-icons/fi';
-import axiosSecure from '@/app/api/axiosHook/useAxiosSecure';
-import toast from 'react-hot-toast';
 
-export default function AddShowtimeModal({ isOpen, onClose, onSuccess }) {
-    const [formData, setFormData] = useState({
-        movieId: '',
-        date: '',
-        time: '',
-        hall: '',
-        price: '',
-        screen: 'Screen 1'
-    });
-    const [movies, setMovies] = useState([]);
-    const [loading, setLoading] = useState(false);
 
-    // Fetch movies for dropdown
-    useEffect(() => {
-        if (isOpen) {
-            fetchMovies();
-            // Set default date to today
-            const today = new Date().toISOString().split('T')[0];
-            setFormData(prev => ({ ...prev, date: today }));
-        }
-    }, [isOpen]);
+// "use client";
+// import { useState, useEffect } from "react";
+// import axiosSecure from "@/app/api/axiosHook/useAxiosSecure";
+// import { motion, AnimatePresence } from "framer-motion";
+// import { FiX, FiFilm, FiCalendar, FiClock, FiDollarSign, FiMapPin, FiGlobe, FiLayers, FiSearch } from "react-icons/fi";
+// import toast from "react-hot-toast";
+// import Image from "next/image";
 
-    const fetchMovies = async () => {
-        try {
-            const res = await axiosSecure.get('/api/movies');
-            setMovies(res.data || []);
-        } catch (error) {
-            console.error('Error fetching movies:', error);
-            toast.error('Failed to load movies');
-        }
-    };
+// const BASE_URL = 'https://api.themoviedb.org/3';
+// const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
-    };
+// export default function AddShowtimeModal({ isOpen, onClose, onSuccess }) {
+//     const [formData, setFormData] = useState({
+//         movieId: "",
+//         date: "",
+//         time: "",
+//         price: "",
+//         hall: "",
+//         language: "English",
+//         format: "2D",
+//         totalSeats: 100,
+//         availableSeats: 100
+//     });
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+//     const [tmdbMovies, setTmdbMovies] = useState([]);
+//     const [filteredMovies, setFilteredMovies] = useState([]);
+//     const [searchTerm, setSearchTerm] = useState("");
+//     const [selectedMovie, setSelectedMovie] = useState(null);
+//     const [loading, setLoading] = useState(false);
+//     const [movieLoading, setMovieLoading] = useState(false);
+//     const [activeCategory, setActiveCategory] = useState('nowPlaying');
 
-        // Validation
-        if (!formData.movieId || !formData.date || !formData.time || !formData.hall || !formData.price) {
-            toast.error('Please fill all required fields');
-            return;
-        }
+//     const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 
-        setLoading(true);
+//     const categories = [
+//         { key: 'nowPlaying', label: 'Now Playing', url: `${BASE_URL}/movie/now_playing?api_key=${API_KEY}&language=en-US&page=1` },
+//         { key: 'popular', label: 'Popular', url: `${BASE_URL}/movie/popular?api_key=${API_KEY}&language=en-US&page=1` },
+//         { key: 'topRated', label: 'Top Rated', url: `${BASE_URL}/movie/top_rated?api_key=${API_KEY}&language=en-US&page=1` },
+//         { key: 'upcoming', label: 'Upcoming', url: `${BASE_URL}/movie/upcoming?api_key=${API_KEY}&language=en-US&page=1` },
+//     ];
 
-        try {
-            await axiosSecure.post('/api/showtimes/add', formData);
-            toast.success(' Showtime added successfully!');
-            onSuccess();
-            onClose();
-            // Reset form
-            setFormData({
-                movieId: '',
-                date: new Date().toISOString().split('T')[0],
-                time: '',
-                hall: '',
-                price: '',
-                screen: 'Screen 1'
-            });
-        } catch (error) {
-            console.error('Error adding showtime:', error);
-            toast.error(error.response?.data?.message || '❌ Failed to add showtime');
-        } finally {
-            setLoading(false);
-        }
-    };
+//     // Fetch movies from TMDB when modal opens or category changes
+//     useEffect(() => {
+//         if (isOpen) {
+//             fetchTmdbMovies(activeCategory);
+//         }
+//     }, []);
 
-    const handleClose = () => {
-        setFormData({
-            movieId: '',
-            date: new Date().toISOString().split('T')[0],
-            time: '',
-            hall: '',
-            price: '',
-            screen: 'Screen 1'
-        });
-        onClose();
-    };
+//     // Filter movies based on search
+//     useEffect(() => {
+//         if (searchTerm) {
+//             const filtered = tmdbMovies.filter(movie =>
+//                 movie.title.toLowerCase().includes(searchTerm.toLowerCase())
+//             );
+//             setFilteredMovies(filtered);
+//         } else {
+//             setFilteredMovies(tmdbMovies);
+//         }
+//     }, [searchTerm, tmdbMovies]);
 
-    return (
-        <AnimatePresence>
-            {isOpen && (
-                <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <motion.div
-                        initial={{ scale: 0.9, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0.9, opacity: 0 }}
-                        className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl border border-gray-700 shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto"
-                    >
-                        {/* Header */}
-                        <div className="flex items-center justify-between p-6 border-b border-gray-700 sticky top-0 bg-gray-800/90 backdrop-blur-sm">
-                            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                                <FiFilm className="text-purple-400" />
-                                Add New Showtime
-                            </h2>
-                            <button
-                                onClick={handleClose}
-                                className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
-                                disabled={loading}
-                            >
-                                <FiX size={20} />
-                            </button>
-                        </div>
+//     const fetchTmdbMovies = async (categoryKey) => {
+//         try {
+//             setMovieLoading(true);
+//             const category = categories.find(cat => cat.key === categoryKey);
+//             const response = await fetch(category.url);
+//             const data = await response.json();
 
-                        {/* Form */}
-                        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                            {/* Movie Selection */}
-                            <div>
-                                <label className="flex items-center gap-2 text-gray-400 text-sm mb-2">
-                                    <FiFilm />
-                                    Select Movie *
-                                </label>
-                                <select
-                                    name="movieId"
-                                    value={formData.movieId}
-                                    onChange={handleChange}
-                                    required
-                                    disabled={loading}
-                                    className="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    <option value="">Choose a movie...</option>
-                                    {movies.map((movie) => (
-                                        <option key={movie._id} value={movie._id}>
-                                            {movie.title}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+//             setTmdbMovies(data.results || []);
+//             setFilteredMovies(data.results || []);
+//         } catch (error) {
+//             console.error('Error fetching TMDB movies:', error);
+//             toast.error('Failed to load movies from TMDB');
+//         } finally {
+//             setMovieLoading(false);
+//         }
+//     };
 
-                            <div className="grid grid-cols-2 gap-4">
-                                {/* Date */}
-                                <div>
-                                    <label className="flex items-center gap-2 text-gray-400 text-sm mb-2">
-                                        <FiCalendar />
-                                        Date *
-                                    </label>
-                                    <input
-                                        type="date"
-                                        name="date"
-                                        value={formData.date}
-                                        onChange={handleChange}
-                                        required
-                                        disabled={loading}
-                                        min={new Date().toISOString().split('T')[0]}
-                                        className="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    />
-                                </div>
+//     const handleMovieSelect = (movie) => {
+//         setSelectedMovie(movie);
+//         setFormData(prev => ({
+//             ...prev,
+//             movieId: movie.id, // TMDB movie ID
+//             language: movie.original_language || "English"
+//         }));
+//     };
 
-                                {/* Time */}
-                                <div>
-                                    <label className="flex items-center gap-2 text-gray-400 text-sm mb-2">
-                                        <FiClock />
-                                        Time *
-                                    </label>
-                                    <input
-                                        type="time"
-                                        name="time"
-                                        value={formData.time}
-                                        onChange={handleChange}
-                                        required
-                                        disabled={loading}
-                                        className="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    />
-                                </div>
-                            </div>
+//     const handleChange = (e) => {
+//         const { name, value } = e.target;
+//         setFormData(prev => ({
+//             ...prev,
+//             [name]: name === 'price' || name === 'totalSeats' || name === 'availableSeats'
+//                 ? Number(value)
+//                 : value
+//         }));
+//     };
 
-                            <div className="grid grid-cols-2 gap-4">
-                                {/* Hall.......................................................... */}
-                                <div>
-                                    <label className="flex items-center gap-2 text-gray-400 text-sm mb-2">
-                                        <FiMapPin />
-                                        Hall *
-                                    </label>
-                                    <select
-                                        name="hall"
-                                        value={formData.hall}
-                                        onChange={handleChange}
-                                        required
-                                        disabled={loading}
-                                        className="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        <option value="">Select Hall</option>
-                                        <option value="Main Hall">Main Hall</option>
-                                        <option value="IMAX Hall">IMAX Hall</option>
-                                        <option value="VIP Hall">VIP Hall</option>
-                                        <option value="Hall 1">Hall 1</option>
-                                        <option value="Hall 2">Hall 2</option>
-                                        <option value="Hall 3">Hall 3</option>
-                                    </select>
-                                </div>
 
-                                {/* Price............................................................ */}
-                                <div>
-                                    <label className="flex items-center gap-2 text-gray-400 text-sm mb-2">
-                                        <FiDollarSign />
-                                        Price *
-                                    </label>
-                                    <input
-                                        type="number"
-                                        name="price"
-                                        placeholder="15.00"
-                                        value={formData.price}
-                                        onChange={handleChange}
-                                        required
-                                        disabled={loading}
-                                        min="0"
-                                        step="0.01"
-                                        className="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    />
-                                </div>
-                            </div>
+//     const handleSubmit = async (e) => {
+//         e.preventDefault();
 
-                            {/* Screen ..........................................*/}
-                            <div>
-                                <label className="flex items-center gap-2 text-gray-400 text-sm mb-2">
-                                    <FiMonitor />
-                                    Screen
-                                </label>
-                                <select
-                                    name="screen"
-                                    value={formData.screen}
-                                    onChange={handleChange}
-                                    disabled={loading}
-                                    className="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    <option value="Screen 1">Screen 1</option>
-                                    <option value="Screen 2">Screen 2</option>
-                                    <option value="Screen 3">Screen 3</option>
-                                    <option value="Screen 4">Screen 4</option>
-                                    <option value="IMAX">IMAX</option>
-                                    <option value="VIP">VIP</option>
-                                </select>
-                            </div>
+//         if (!selectedMovie) {
+//             toast.error("Please select a movie");
+//             return;
+//         }
 
-                            {/* Form Preview ...........................................................*/}
-                            {(formData.movieId || formData.date || formData.time || formData.hall) && (
-                                <div className="bg-gray-700/50 rounded-xl p-4 border border-gray-600">
-                                    <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
-                                        <FiFilm className="text-purple-400" />
-                                        Showtime Preview
-                                    </h3>
-                                    <div className="space-y-2 text-sm">
-                                        {formData.movieId && (
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-400">Movie:</span>
-                                                <span className="text-white">
-                                                    {movies.find(m => m._id === formData.movieId)?.title}
-                                                </span>
-                                            </div>
-                                        )}
-                                        {formData.date && (
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-400">Date:</span>
-                                                <span className="text-white">
-                                                    {new Date(formData.date).toLocaleDateString()}
-                                                </span>
-                                            </div>
-                                        )}
-                                        {formData.time && (
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-400">Time:</span>
-                                                <span className="text-white">{formData.time}</span>
-                                            </div>
-                                        )}
-                                        {formData.hall && (
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-400">Hall:</span>
-                                                <span className="text-white">{formData.hall}</span>
-                                            </div>
-                                        )}
-                                        {formData.price && (
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-400">Price:</span>
-                                                <span className="text-green-400 font-semibold">${formData.price}</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
+//         //
+//         const showtimeData = {
+//             tmdbMovieId: selectedMovie.id.toString(), // New field
+//             movieId: selectedMovie.id.toString(),     // Old field (for compatibility)
+//             date: formData.date,
+//             time: formData.time,
+//             price: parseFloat(formData.price),
+//             hall: formData.hall,
+//             language: formData.language,
+//             format: formData.format,
+//             totalSeats: parseInt(formData.totalSeats),
+//             availableSeats: parseInt(formData.availableSeats),
+//             movieData: {
+//                 tmdbId: selectedMovie.id,
+//                 title: selectedMovie.title,
+//                 poster_path: selectedMovie.poster_path,
+//                 backdrop_path: selectedMovie.backdrop_path,
+//                 overview: selectedMovie.overview,
+//                 release_date: selectedMovie.release_date,
+//                 vote_average: selectedMovie.vote_average,
+//                 genre_ids: selectedMovie.genre_ids,
+//                 original_language: selectedMovie.original_language,
+//                 popularity: selectedMovie.popularity
+//             }
+//         };
 
-                            {/* Actions */}
-                            <div className="flex gap-3 pt-4">
-                                <button
-                                    type="button"
-                                    onClick={handleClose}
-                                    className="flex-1 px-4 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                    disabled={loading}
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                    disabled={loading}
-                                >
-                                    {loading ? (
-                                        <>
-                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                            Adding...
-                                        </>
-                                    ) : (
-                                        'Add Showtime'
-                                    )}
-                                </button>
-                            </div>
-                        </form>
-                    </motion.div>
-                </div>
-            )}
-        </AnimatePresence>
-    );
-}
+//         console.log('📤 Creating showtime with both IDs:', {
+//             tmdbMovieId: showtimeData.tmdbMovieId,
+//             movieId: showtimeData.movieId
+//         });
+
+//         setLoading(true);
+//         try {
+//             const response = await axiosSecure.post("/api/showtime", showtimeData);
+//             toast.success("Showtime added successfully!");
+//             onSuccess();
+//             handleClose();
+//         } catch (error) {
+//             console.error("Add showtime error:", error);
+//             toast.error(error.response?.data?.error || "Failed to add showtime");
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+//     const handleClose = () => {
+//         setFormData({
+//             movieId: "",
+//             date: "",
+//             time: "",
+//             price: "",
+//             hall: "",
+//             language: "English",
+//             format: "2D",
+//             totalSeats: 100,
+//             availableSeats: 100
+//         });
+//         setSelectedMovie(null);
+//         setSearchTerm("");
+//         setActiveCategory('nowPlaying');
+//         onClose();
+//     };
+
+//     const getTodayDate = () => {
+//         return new Date().toISOString().split('T')[0];
+//     };
+
+//     return (
+//         <AnimatePresence>
+//             {isOpen && (
+//                 <motion.div
+//                     initial={{ opacity: 0 }}
+//                     animate={{ opacity: 1 }}
+//                     exit={{ opacity: 0 }}
+//                     className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+//                     onClick={handleClose}
+//                 >
+//                     <motion.div
+//                         initial={{ scale: 0.9, opacity: 0, y: 20 }}
+//                         animate={{ scale: 1, opacity: 1, y: 0 }}
+//                         exit={{ scale: 0.9, opacity: 0, y: 20 }}
+//                         className="bg-gradient-to-br from-[#1a1c2b] to-[#151724] rounded-2xl border border-gray-800 shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+//                         onClick={(e) => e.stopPropagation()}
+//                     >
+//                         {/* Header */}
+//                         <div className="flex items-center justify-between p-6 border-b border-gray-800">
+//                             <div>
+//                                 <h2 className="text-2xl font-bold text-white">Add New Showtime</h2>
+//                                 <p className="text-gray-400 mt-1">Select movie from TMDB and create showtime</p>
+//                             </div>
+//                             <button
+//                                 onClick={handleClose}
+//                                 className="p-2 hover:bg-gray-800 rounded-xl transition-colors duration-200"
+//                             >
+//                                 <FiX size={24} className="text-gray-400" />
+//                             </button>
+//                         </div>
+
+//                         {/* Form */}
+//                         <form onSubmit={handleSubmit} className="p-6">
+//                             {/* Movie Selection Section */}
+//                             <div className="mb-6">
+//                                 <label className="flex items-center text-sm font-medium text-gray-400 mb-3">
+//                                     <FiFilm className="mr-2 text-purple-400" />
+//                                     Select Movie from TMDB *
+//                                 </label>
+
+//                                 {/* Category Tabs */}
+//                                 <div className="flex space-x-2 mb-4 overflow-x-auto">
+//                                     {categories.map((category) => (
+//                                         <button
+//                                             key={category.key}
+//                                             type="button"
+//                                             onClick={() => setActiveCategory(category.key)}
+//                                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeCategory === category.key
+//                                                     ? 'bg-purple-600 text-white'
+//                                                     : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+//                                                 }`}
+//                                         >
+//                                             {category.label}
+//                                         </button>
+//                                     ))}
+//                                 </div>
+
+//                                 {/* Search Box */}
+//                                 <div className="relative mb-4">
+//                                     <FiSearch className="absolute left-3 top-3 text-gray-400" />
+//                                     <input
+//                                         type="text"
+//                                         placeholder="Search movies..."
+//                                         value={searchTerm}
+//                                         onChange={(e) => setSearchTerm(e.target.value)}
+//                                         className="w-full pl-10 pr-4 py-2 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+//                                     />
+//                                 </div>
+
+//                                 {/* Selected Movie Preview */}
+//                                 {selectedMovie && (
+//                                     <div className="mb-4 p-4 bg-gray-800/30 rounded-xl border border-purple-500/30">
+//                                         <div className="flex items-center space-x-4">
+//                                             <Image
+//                                                 src={
+//                                                     selectedMovie.poster_path
+//                                                         ? `${IMG_URL}${selectedMovie.poster_path}`
+//                                                         : '/default-poster.jpg'
+//                                                 }
+//                                                 alt={selectedMovie.title}
+//                                                 width={60}
+//                                                 height={90}
+//                                                 className="rounded-lg object-cover"
+//                                             />
+//                                             <div>
+//                                                 <h3 className="text-white font-semibold">{selectedMovie.title}</h3>
+//                                                 <p className="text-gray-400 text-sm">
+//                                                     {new Date(selectedMovie.release_date).getFullYear()} •
+//                                                     Rating: {selectedMovie.vote_average}/10
+//                                                 </p>
+//                                                 <p className="text-purple-400 text-sm">Selected</p>
+//                                             </div>
+//                                         </div>
+//                                     </div>
+//                                 )}
+
+//                                 {/* Movies Grid */}
+//                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-64 overflow-y-auto">
+//                                     {movieLoading ? (
+//                                         <div className="col-span-2 text-center py-8">
+//                                             <div className="text-gray-400">Loading movies...</div>
+//                                         </div>
+//                                     ) : filteredMovies.length > 0 ? (
+//                                         filteredMovies.map((movie) => (
+//                                             <div
+//                                                 key={movie.id}
+//                                                 onClick={() => handleMovieSelect(movie)}
+//                                                 className={`p-3 rounded-lg border cursor-pointer transition-all ${selectedMovie?.id === movie.id
+//                                                         ? 'border-purple-500 bg-purple-500/10'
+//                                                         : 'border-gray-700 bg-gray-800/30 hover:border-gray-600'
+//                                                     }`}
+//                                             >
+//                                                 <div className="flex items-center space-x-3">
+//                                                     <Image
+//                                                         src={
+//                                                             movie.poster_path
+//                                                                 ? `${IMG_URL}${movie.poster_path}`
+//                                                                 : '/default-poster.jpg'
+//                                                         }
+//                                                         alt={movie.title}
+//                                                         width={40}
+//                                                         height={60}
+//                                                         className="rounded object-cover"
+//                                                     />
+//                                                     <div className="flex-1 min-w-0">
+//                                                         <h4 className="text-white font-medium text-sm truncate">
+//                                                             {movie.title}
+//                                                         </h4>
+//                                                         <p className="text-gray-400 text-xs">
+//                                                             {new Date(movie.release_date).getFullYear()} • ⭐ {movie.vote_average}
+//                                                         </p>
+//                                                     </div>
+//                                                 </div>
+//                                             </div>
+//                                         ))
+//                                     ) : (
+//                                         <div className="col-span-2 text-center py-8">
+//                                             <div className="text-gray-400">No movies found</div>
+//                                         </div>
+//                                     )}
+//                                 </div>
+//                             </div>
+
+//                             {/* Showtime Details */}
+//                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-gray-800 pt-6">
+//                                 {/* Date */}
+//                                 <div>
+//                                     <label className="flex items-center text-sm font-medium text-gray-400 mb-2">
+//                                         <FiCalendar className="mr-2 text-blue-400" />
+//                                         Date *
+//                                     </label>
+//                                     <input
+//                                         type="date"
+//                                         name="date"
+//                                         value={formData.date}
+//                                         onChange={handleChange}
+//                                         min={getTodayDate()}
+//                                         required
+//                                         className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+//                                     />
+//                                 </div>
+
+//                                 {/* Time */}
+//                                 <div>
+//                                     <label className="flex items-center text-sm font-medium text-gray-400 mb-2">
+//                                         <FiClock className="mr-2 text-green-400" />
+//                                         Time *
+//                                     </label>
+//                                     <input
+//                                         type="time"
+//                                         name="time"
+//                                         value={formData.time}
+//                                         onChange={handleChange}
+//                                         required
+//                                         className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+//                                     />
+//                                 </div>
+
+//                                 {/* Hall */}
+//                                 <div>
+//                                     <label className="flex items-center text-sm font-medium text-gray-400 mb-2">
+//                                         <FiMapPin className="mr-2 text-yellow-400" />
+//                                         Hall *
+//                                     </label>
+//                                     <input
+//                                         type="text"
+//                                         name="hall"
+//                                         placeholder="e.g., Hall A, IMAX, VIP"
+//                                         value={formData.hall}
+//                                         onChange={handleChange}
+//                                         required
+//                                         className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+//                                     />
+//                                 </div>
+
+//                                 {/* Price */}
+//                                 <div>
+//                                     <label className="flex items-center text-sm font-medium text-gray-400 mb-2">
+//                                         <FiDollarSign className="mr-2 text-emerald-400" />
+//                                         Price ($) *
+//                                     </label>
+//                                     <input
+//                                         type="number"
+//                                         name="price"
+//                                         placeholder="0.00"
+//                                         min="0"
+//                                         step="0.01"
+//                                         value={formData.price}
+//                                         onChange={handleChange}
+//                                         required
+//                                         className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+//                                     />
+//                                 </div>
+
+//                                 {/* Language */}
+//                                 <div>
+//                                     <label className="flex items-center text-sm font-medium text-gray-400 mb-2">
+//                                         <FiGlobe className="mr-2 text-cyan-400" />
+//                                         Language
+//                                     </label>
+//                                     <input
+//                                         type="text"
+//                                         name="language"
+//                                         value={formData.language}
+//                                         onChange={handleChange}
+//                                         className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+//                                     />
+//                                 </div>
+
+//                                 {/* Format */}
+//                                 <div>
+//                                     <label className="flex items-center text-sm font-medium text-gray-400 mb-2">
+//                                         <FiLayers className="mr-2 text-orange-400" />
+//                                         Format
+//                                     </label>
+//                                     <select
+//                                         name="format"
+//                                         value={formData.format}
+//                                         onChange={handleChange}
+//                                         className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+//                                     >
+//                                         <option value="2D">2D</option>
+//                                         <option value="3D">3D</option>
+//                                         <option value="IMAX">IMAX</option>
+//                                         <option value="4DX">4DX</option>
+//                                     </select>
+//                                 </div>
+//                             </div>
+
+//                             {/* Action Buttons */}
+//                             <div className="flex justify-end space-x-3 pt-6 mt-6 border-t border-gray-800">
+//                                 <button
+//                                     type="button"
+//                                     onClick={handleClose}
+//                                     disabled={loading}
+//                                     className="px-6 py-3 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 rounded-xl text-white transition-colors"
+//                                 >
+//                                     Cancel
+//                                 </button>
+//                                 <button
+//                                     type="submit"
+//                                     disabled={loading || !selectedMovie}
+//                                     className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:from-gray-600 disabled:to-gray-600 rounded-xl text-white font-medium transition-all"
+//                                 >
+//                                     {loading ? "Adding..." : "Add Showtime"}
+//                                 </button>
+//                             </div>
+//                         </form>
+//                     </motion.div>
+//                 </motion.div>
+//             )}
+//         </AnimatePresence>
+//     );
+// }
