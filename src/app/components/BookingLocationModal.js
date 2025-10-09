@@ -97,7 +97,7 @@ export default function BookingLocationModal({
             <button
               onClick={() => {
                 router.push(
-                  `/booking/${movie?.id}?cinema=${encodeURIComponent(
+                  `/booking/${movie?.tmdb_id}?cinema=${encodeURIComponent(
                     selectedCinema.name
                   )}&city=${selectedCinema.city}&district=${selectedCinema.district}`
                 )

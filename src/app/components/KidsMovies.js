@@ -19,6 +19,7 @@ function Spinner() {
 export default function KidsMovies() {
   const [movies, setMovies] = useState([])
   const [loading, setLoading] = useState(true)
+  const IMG_URL = 'https://image.tmdb.org/t/p/w500'
 
   // 🔹 Modal States
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -31,10 +32,13 @@ export default function KidsMovies() {
       setLoading(true)
       try {
         const res = await fetch(
-          `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&language=en-US&sort_by=popularity.desc&with_genres=16,10751&page=1`
+
+`          http://localhost:5000/api/movies/category/genreAnimation`
+          // `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&language=en-US&sort_by=popularity.desc&with_genres=16,10751&page=1`
         )
         const data = await res.json()
-        setMovies(data.results || [])
+        setMovies(data )
+        console.log(data.id)
       } catch (error) {
         console.error('Error fetching kids movies:', error)
       } finally {
@@ -77,7 +81,7 @@ export default function KidsMovies() {
         className="pb-10"
       >
         {movies.map((movie) => (
-          <SwiperSlide key={movie.id}>
+          <SwiperSlide key={movie.tmdb_id}>
             <div
               className="relative movie-card w-full h-[280px] sm:h-[330px] md:h-[380px] lg:h-[420px] 
                          border border-red-500/40 rounded-xl overflow-hidden bg-zinc-900 
@@ -86,8 +90,12 @@ export default function KidsMovies() {
             >
               {/* Poster */}
               <Image
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                alt={movie.title}
+                src={
+                  typeof movie.poster_path === "string" && movie.poster_path.startsWith("http")
+                    ? movie.poster_path // full URL (like i.ibb.co)
+                    : IMG_URL + movie.poster_path // TMDB partial path
+                }
+                alt={movie.title || "Movie Poster"}
                 fill
                 className="object-cover"
               />

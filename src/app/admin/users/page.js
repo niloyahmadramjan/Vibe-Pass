@@ -1,6 +1,5 @@
 'use client'
-
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useState, useMemo } from 'react'
 import {
   FiUsers,
   FiSearch,
@@ -14,6 +13,8 @@ import {
   FiUser,
   FiDollarSign,
   FiStar,
+  FiShield,
+  FiUserCheck,
 } from 'react-icons/fi'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
@@ -21,31 +22,81 @@ import axiosSecure from '@/app/api/axiosHook/useAxiosSecure'
 import AdminLoading from '../components/AdminLoading'
 import StatCard from '../components/StartCard'
 import Image from 'next/image'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 export default function UserManagementPage() {
-  const [users, setUsers] = useState([])
-  const [bookings, setBookings] = useState([])
-  const [filteredUsers, setFilteredUsers] = useState([])
-  const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [roleFilter, setRoleFilter] = useState('all')
   const [selectedUser, setSelectedUser] = useState(null)
   const [isEditModalOpen, setEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false)
-  const [userStats, setUserStats] = useState({
-    totalUsers: 0,
-    activeUsers: 0,
-    newUsers: 0,
-    totalRevenue: 0,
+  const queryClient = useQueryClient()
+
+  // TanStack Query for users
+  const {
+    data: users = [],
+    isLoading: usersLoading,
+    isError: usersError,
+    error: usersErrorData
+  } = useQuery({
+    queryKey: ['users'],
+    queryFn: async () => {
+      const response = await axiosSecure.get('/api/auth')
+      return response.data
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
-  useEffect(() => {
-    fetchUsers()
-    fetchBookings()
-  }, [])
+  // TanStack Query for bookings
+  const {
+    data: bookings = [],
+    isLoading: bookingsLoading
+  } = useQuery({
+    queryKey: ['bookings'],
+    queryFn: async () => {
+      const response = await axiosSecure.get('/api/ticket')
+      return response.data
+    },
+    staleTime: 5 * 60 * 1000,
+  })
+
+  // Update user mutation
+  const updateUserMutation = useMutation({
+    mutationFn: async ({ userId, updates }) => {
+      const response = await axiosSecure.put(`/api/auth/${userId}`, updates)
+      return response.data
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+      toast.success('✅ User updated successfully')
+      setEditModalOpen(false)
+    },
+    onError: (error) => {
+      console.error('Error updating user:', error)
+      toast.error(error.response?.data?.message || 'Failed to update user')
+    },
+  })
+
+  // Delete user mutation
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId) => {
+      const response = await axiosSecure.delete(`/api/auth/${userId}`)
+      return response.data
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+      toast.success('🗑️ User deleted successfully')
+      setDeleteModalOpen(false)
+    },
+    onError: (error) => {
+      console.error('Error deleting user:', error)
+      toast.error(error.response?.data?.message || 'Failed to delete user')
+    },
+  })
 
   // Calculate user stats
-  const calculateStats = useCallback(() => {
+  const userStats = useMemo(() => {
     const totalUsers = users.length
     const activeUsers = users.filter((user) => user.emailVerified).length
     const oneWeekAgo = new Date()
@@ -57,12 +108,16 @@ export default function UserManagementPage() {
       (sum, booking) => sum + (booking.totalAmount || 0),
       0
     )
-    setUserStats({ totalUsers, activeUsers, newUsers, totalRevenue })
+    const adminUsers = users.filter(user => user.role === 'admin').length
+
+    return { totalUsers, activeUsers, newUsers, totalRevenue, adminUsers }
   }, [users, bookings])
 
   // Filter users
-  const filterUsers = useCallback(() => {
+  const filteredUsers = useMemo(() => {
     let filtered = [...users]
+
+    // Search filter
     if (searchTerm) {
       filtered = filtered.filter(
         (user) =>
@@ -71,46 +126,25 @@ export default function UserManagementPage() {
           user.phone?.includes(searchTerm)
       )
     }
+
+    // Status filter
     if (statusFilter === 'verified') {
       filtered = filtered.filter((user) => user.emailVerified)
     } else if (statusFilter === 'unverified') {
       filtered = filtered.filter((user) => !user.emailVerified)
     }
-    setFilteredUsers(filtered)
-  }, [users, searchTerm, statusFilter])
 
-  useEffect(() => {
-    filterUsers()
-    calculateStats()
-  }, [users, bookings, searchTerm, statusFilter, filterUsers, calculateStats])
-
-  const fetchUsers = async () => {
-    try {
-      setLoading(true)
-      const response = await axiosSecure.get('/api/auth')
-      setUsers(response.data)
-    } catch (error) {
-      console.error('Error fetching users:', error)
-      toast.error('Failed to load users')
-    } finally {
-      setLoading(false)
+    // Role filter
+    if (roleFilter !== 'all') {
+      filtered = filtered.filter((user) => user.role === roleFilter)
     }
-  }
 
-  const fetchBookings = async () => {
-    try {
-      const response = await axiosSecure.get('/api/ticket')
-      setBookings(response.data)
-    } catch (error) {
-      console.error('Error fetching bookings:', error)
-    }
-  }
+    return filtered
+  }, [users, searchTerm, statusFilter, roleFilter])
 
-  const getUserBookings = (userId) =>
-    bookings.filter((b) => b.userId === userId)
-
+  // Get user booking stats
   const getUserStats = (userId) => {
-    const userBookings = getUserBookings(userId)
+    const userBookings = bookings.filter((b) => b.userId === userId)
     const totalBookings = userBookings.length
     const totalSpent = userBookings.reduce(
       (sum, b) => sum + (b.totalAmount || 0),
@@ -119,6 +153,7 @@ export default function UserManagementPage() {
     const completedBookings = userBookings.filter(
       (b) => b.status === 'completed'
     ).length
+
     return { totalBookings, totalSpent, completedBookings }
   }
 
@@ -132,40 +167,34 @@ export default function UserManagementPage() {
     setDeleteModalOpen(true)
   }
 
-  const updateUserStatus = async (userId, updates) => {
-    toast.success('Not created api')
-    // try {
-    //   await axiosSecure.patch(`/api/auth/${userId}`, updates);
-    //   toast.success('User updated successfully');
-    //   fetchUsers();
-    //   setEditModalOpen(false);
-    // } catch (error) {
-    //   console.error('Error updating user:', error);
-    //   toast.error('Failed to update user');
-    // }
+  const updateUser = async (userId, updates) => {
+    updateUserMutation.mutate({ userId, updates })
   }
 
-  // Delete user
   const deleteUser = async () => {
     if (!selectedUser) return
-    try {
-      await axiosSecure.delete(`/api/auth/${selectedUser._id}`)
-      toast.success('User deleted successfully')
-      setDeleteModalOpen(false)
-      fetchUsers()
-    } catch (error) {
-      console.error('Error deleting user:', error)
-      toast.error('Failed to delete user')
-    }
+    deleteUserMutation.mutate(selectedUser._id)
   }
 
-  // PDF download
   const exportUsers = () => {
-    toast.success('Not add on the time')
+    toast.success('Export feature coming soon!')
   }
+
+  const loading = usersLoading || bookingsLoading
 
   if (loading) {
     return <AdminLoading />
+  }
+
+  if (usersError) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <h2 className="text-xl font-bold text-red-400 mb-2">Error Loading Users</h2>
+          <p className="text-gray-400">{usersErrorData?.message || 'Failed to load users'}</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -181,7 +210,7 @@ export default function UserManagementPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
         <StatCard
           title="Total Users"
           value={userStats.totalUsers}
@@ -210,6 +239,13 @@ export default function UserManagementPage() {
           icon={<FiDollarSign />}
           color="from-orange-500 to-red-500"
         />
+        <StatCard
+          title="Admin Users"
+          value={userStats.adminUsers}
+          subtitle="Administrators"
+          icon={<FiShield />}
+          color="from-indigo-500 to-purple-500"
+        />
       </div>
 
       {/* Filters and Search */}
@@ -234,9 +270,20 @@ export default function UserManagementPage() {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
-              <option value="all">All Users</option>
+              <option value="all">All Status</option>
               <option value="verified">Verified</option>
               <option value="unverified">Unverified</option>
+            </select>
+
+            {/* Role Filter */}
+            <select
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+              className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All Roles</option>
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
             </select>
           </div>
 
@@ -265,6 +312,9 @@ export default function UserManagementPage() {
                 </th>
                 <th className="text-left py-4 px-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">
                   Status
+                </th>
+                <th className="text-left py-4 px-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">
+                  Role
                 </th>
                 <th className="text-left py-4 px-6 text-gray-400 font-semibold text-sm uppercase tracking-wider">
                   Bookings
@@ -331,11 +381,10 @@ export default function UserManagementPage() {
                     {/* Status */}
                     <td className="py-4 px-6">
                       <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                          user.emailVerified
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${user.emailVerified
                             ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                             : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
-                        }`}
+                          }`}
                       >
                         {user.emailVerified ? (
                           <>
@@ -346,6 +395,28 @@ export default function UserManagementPage() {
                           <>
                             <FiX className="mr-1" />
                             Unverified
+                          </>
+                        )}
+                      </span>
+                    </td>
+
+                    {/* Role */}
+                    <td className="py-4 px-6">
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${user.role === 'admin'
+                            ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                            : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                          }`}
+                      >
+                        {user.role === 'admin' ? (
+                          <>
+                            <FiShield className="mr-1" />
+                            Admin
+                          </>
+                        ) : (
+                          <>
+                            <FiUser className="mr-1" />
+                            User
                           </>
                         )}
                       </span>
@@ -365,7 +436,7 @@ export default function UserManagementPage() {
                     <td className="py-4 px-6">
                       <div className="text-center">
                         <p className="text-white font-bold">
-                          ${stats.totalSpent}
+                          ${stats.totalSpent.toLocaleString()}
                         </p>
                         <p className="text-gray-400 text-xs">Lifetime</p>
                       </div>
@@ -425,7 +496,8 @@ export default function UserManagementPage() {
         <EditUserModal
           user={selectedUser}
           onClose={() => setEditModalOpen(false)}
-          onSave={updateUserStatus}
+          onSave={updateUser}
+          loading={updateUserMutation.isPending}
         />
       )}
 
@@ -435,6 +507,7 @@ export default function UserManagementPage() {
           user={selectedUser}
           onClose={() => setDeleteModalOpen(false)}
           onConfirm={deleteUser}
+          loading={deleteUserMutation.isPending}
         />
       )}
     </div>
@@ -442,11 +515,12 @@ export default function UserManagementPage() {
 }
 
 // Edit User Modal Component
-function EditUserModal({ user, onClose, onSave }) {
+function EditUserModal({ user, onClose, onSave, loading }) {
   const [formData, setFormData] = useState({
     name: user.name || '',
     email: user.email || '',
     phone: user.phone || '',
+    role: user.role || 'user',
     emailVerified: user.emailVerified || false,
     phoneVerified: user.phoneVerified || false,
   })
@@ -454,6 +528,13 @@ function EditUserModal({ user, onClose, onSave }) {
   const handleSubmit = (e) => {
     e.preventDefault()
     onSave(user._id, formData)
+  }
+
+  const toggleRole = () => {
+    setFormData(prev => ({
+      ...prev,
+      role: prev.role === 'admin' ? 'user' : 'admin'
+    }))
   }
 
   return (
@@ -465,7 +546,7 @@ function EditUserModal({ user, onClose, onSave }) {
       >
         <div className="p-6">
           <h2 className="text-xl font-bold text-white mb-2">Edit User</h2>
-          <p className="text-gray-400 mb-6">Update user information</p>
+          <p className="text-gray-400 mb-6">Update user information and role</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -479,6 +560,7 @@ function EditUserModal({ user, onClose, onSave }) {
                   setFormData({ ...formData, name: e.target.value })
                 }
                 className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                required
               />
             </div>
 
@@ -493,6 +575,7 @@ function EditUserModal({ user, onClose, onSave }) {
                   setFormData({ ...formData, email: e.target.value })
                 }
                 className="w-full p-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                required
               />
             </div>
 
@@ -510,6 +593,29 @@ function EditUserModal({ user, onClose, onSave }) {
               />
             </div>
 
+            {/* Role Toggle */}
+            <div className="flex items-center justify-between p-4 bg-gray-800/30 rounded-xl border border-gray-700">
+              <div>
+                <p className="text-white font-medium">User Role</p>
+                <p className="text-gray-400 text-sm">
+                  Current: <span className="capitalize">{formData.role}</span>
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={toggleRole}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${formData.role === 'admin'
+                    ? 'bg-purple-600'
+                    : 'bg-gray-600'
+                  }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.role === 'admin' ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                />
+              </button>
+            </div>
+
             <div className="flex items-center space-x-3">
               <input
                 type="checkbox"
@@ -522,18 +628,35 @@ function EditUserModal({ user, onClose, onSave }) {
               <label className="text-sm text-gray-400">Email Verified</label>
             </div>
 
+            <div className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                checked={formData.phoneVerified}
+                onChange={(e) =>
+                  setFormData({ ...formData, phoneVerified: e.target.checked })
+                }
+                className="rounded bg-gray-700 border-gray-600 text-purple-500 focus:ring-purple-500"
+              />
+              <label className="text-sm text-gray-400">Phone Verified</label>
+            </div>
+
             <div className="flex justify-end space-x-3 pt-4">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-xl text-white transition-colors"
+                disabled={loading}
+                className="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-xl text-white transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-xl text-white font-medium transition-colors"
+                disabled={loading}
+                className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-xl text-white font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
               >
+                {loading && (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                )}
                 Save Changes
               </button>
             </div>
@@ -545,7 +668,7 @@ function EditUserModal({ user, onClose, onSave }) {
 }
 
 // Delete Confirmation Modal Component
-function DeleteConfirmationModal({ user, onClose, onConfirm }) {
+function DeleteConfirmationModal({ user, onClose, onConfirm, loading }) {
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <motion.div
@@ -568,14 +691,19 @@ function DeleteConfirmationModal({ user, onClose, onConfirm }) {
           <div className="flex justify-center space-x-3">
             <button
               onClick={onClose}
-              className="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-xl text-white transition-colors"
+              disabled={loading}
+              className="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-xl text-white transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               onClick={onConfirm}
-              className="px-6 py-3 bg-red-600 hover:bg-red-700 rounded-xl text-white font-medium transition-colors"
+              disabled={loading}
+              className="px-6 py-3 bg-red-600 hover:bg-red-700 rounded-xl text-white font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
             >
+              {loading && (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              )}
               Delete User
             </button>
           </div>

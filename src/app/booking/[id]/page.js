@@ -37,7 +37,7 @@ export default function MovieSeatBooking() {
   const id = params.id
   const { user } = useAuth()
   const searchParams = useSearchParams()
-
+console.log(id)
   // States
   const [movieData, setMovieData] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -61,26 +61,27 @@ export default function MovieSeatBooking() {
   useEffect(() => {
     const loadMovieData = async () => {
       try {
-        setLoading(true)
-        const res = await fetch(
-          `https://api.themoviedb.org/3/movie/${id}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&append_to_response=videos`
-        )
+        setLoading(true);
 
-        if (res.ok) {
-          const movie = await res.json()
-          setMovieData(movie)
-        } else throw new Error('Failed to fetch movie data')
+        const res = await axiosSecure.get(`/api/movies/${id}`);
+
+        if (res.status === 200) {
+          setMovieData(res.data); 
+        } else {
+          throw new Error("Failed to fetch movie data");
+        }
       } catch (error) {
-        console.error(error)
-        toast.error('Error loading movie data. Redirecting...')
-        setTimeout(() => router.push(`/movies/${id}`), 2000)
+        console.error(error);
+        toast.error("Error loading movie data. Redirecting...");
+        setTimeout(() => router.push(`/movies/${id}`), 2000);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    if (id) loadMovieData()
-  }, [id, router])
+    if (id) loadMovieData();
+  }, [id, router]);
+
 
   // ✅ Fetch reserved seats when showtime changes
   // ✅ CORRECT VERSION
@@ -407,8 +408,12 @@ export default function MovieSeatBooking() {
                   <Image
                     width={500}
                     height={200}
-                    src={`https://image.tmdb.org/t/p/w500${movieData.backdrop_path}`}
-                    alt={movieData.title}
+                    src={
+                      movieData.backdrop_path.startsWith("http")
+                        ? movieData.backdrop_path
+                        : `https://image.tmdb.org/t/p/w500${movieData.backdrop_path}`
+                    }
+                    alt={movieData.title || "Movie Backdrop"}
                     className="w-full h-full object-cover"
                   />
                 </div>

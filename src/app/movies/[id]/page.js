@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react'
 export default function MovieDetailsPage() {
   const params = useParams()
   const id = params.id
+  console.log(id)
   const [movie, setMovie] = useState(null)
   const [showTrailer, setShowTrailer] = useState(false)
   const [hallData, setHallData] = useState([])
@@ -19,7 +20,7 @@ export default function MovieDetailsPage() {
   const [selectedCinema, setSelectedCinema] = useState(null)
   const [selectionMode, setSelectionMode] = useState('auto')
   const router = useRouter()
-
+  const IMG_URL = "https://image.tmdb.org/t/p/w500";
   // Fetch Hall Data
   useEffect(() => {
     const fetchHallData = async () => {
@@ -36,20 +37,19 @@ export default function MovieDetailsPage() {
   // Fetch TMDB Movie Details
   useEffect(() => {
     async function fetchMovie() {
+      if (!id) return
       try {
         setLoading(true)
-        const res = await fetch(
-          `https://api.themoviedb.org/3/movie/${id}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&append_to_response=videos,credits`
-        )
-        const data = await res.json()
-        setMovie(data)
+        const res = await axiosSecure.get(`/api/movies/${id}`)
+        setMovie(res.data)
       } catch (err) {
-        console.error('Error fetching movie details:', err)
+        console.error("Error fetching movie details:", err)
       } finally {
         setLoading(false)
       }
     }
-    if (id) fetchMovie()
+
+    fetchMovie()
   }, [id])
 
   // Auto Detect nearby theater
@@ -106,10 +106,13 @@ export default function MovieDetailsPage() {
       <div className="relative w-full h-96 sm:h-80 md:h-96 lg:h-[500px] xl:h-[600px] overflow-hidden">
         <Image
           fill
-          src={`https://image.tmdb.org/t/p/original${
-            movie.backdrop_path || movie.poster_path
-          }`}
-          alt={movie.title}
+          src={
+            typeof movie.poster_path === "string" && movie.poster_path.startsWith("http")
+              ? movie.poster_path // full URL (like i.ibb.co)
+              : IMG_URL + movie.poster_path // TMDB partial path
+          }
+         
+          alt={movie.title || "Movie Poster"}
           className="object-cover w-full h-full"
           priority
           sizes="(max-width: 640px) 100vw, (max-width: 768px) 100vw, (max-width: 1024px) 100vw, 100vw"
@@ -461,7 +464,7 @@ export default function MovieDetailsPage() {
                 <button
                   onClick={() =>
                     router.push(
-                      `/booking/${movie.id}?cinema=${encodeURIComponent(
+                      `/booking/${movie.tmdb_id}?cinema=${encodeURIComponent(
                         selectedCinema.name
                       )}&city=${selectedCinema.city}&district=${
                         selectedCinema.district

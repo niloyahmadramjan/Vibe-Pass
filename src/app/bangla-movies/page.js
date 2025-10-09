@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import BookingLocationModal from '../components/BookingLocationModal'
 import LoadingSpinner from '../hooks/LoadingSpiner'
+import axiosSecure from '../api/axiosHook/useAxiosSecure'
 
 export default function BanglaMoviesPage() {
   const [movies, setMovies] = useState([])
@@ -13,23 +14,30 @@ export default function BanglaMoviesPage() {
   const [selectedMovie, setSelectedMovie] = useState(null)
   const [selectionMode, setSelectionMode] = useState('auto')
   const [selectedCinema, setSelectedCinema] = useState(null)
+  const IMG_URL = 'https://image.tmdb.org/t/p/w500'
 
   useEffect(() => {
     async function fetchBanglaMovies() {
       try {
-        const res = await fetch(
-          `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&with_original_language=bn&sort_by=popularity.desc`
-        )
-        const data = await res.json()
-        setMovies(data.results || [])
+        setLoading(true);
+
+        const res = await axiosSecure.get("/api/movies/category/banglaFilm");
+
+        if (res.status === 200) {
+          setMovies(res.data); // results from your API
+        } else {
+          throw new Error("Failed to load Bangla movies");
+        }
       } catch (error) {
-        console.error('Failed to load Bangla movies:', error)
+        console.error("Failed to load Bangla movies:", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
-    fetchBanglaMovies()
-  }, [])
+
+    fetchBanglaMovies();
+  }, []);
+
 
   if (loading) return <LoadingSpinner />
 
@@ -53,17 +61,17 @@ export default function BanglaMoviesPage() {
         <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {movies.map((movie) => (
             <div
-              key={movie.id}
+              key={movie.tmdb_id}
               className="group bg-gray-900 rounded-2xl overflow-hidden shadow-lg hover:scale-105 transform transition duration-300 cursor-pointer flex flex-col"
             >
               <div className="relative w-full h-[300px]">
                 <Image
                   src={
-                    movie.poster_path
-                      ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-                      : '/no-poster.png'
+                    typeof movie.poster_path === "string" && movie.poster_path.startsWith("http")
+                      ? movie.poster_path // full URL (like i.ibb.co)
+                      : IMG_URL + movie.poster_path // TMDB partial path
                   }
-                  alt={movie.title}
+                  alt={movie.title || "Movie Poster"}
                   fill
                   className="object-cover group-hover:opacity-90 transition"
                 />
