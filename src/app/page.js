@@ -9,6 +9,9 @@ import FAQ from "./components/FAQ";
 import MovieExperienceSection from "./components/Experience";
 import LoyaltyRewards from "./components/LoyaltyRewards";
 import NewsLetter from "./components/NewsLetter";
+import UpcomingEvent from "./components/UpcomingEvent";
+import AutoLocation from "./components/NearbyHome";
+
 
 export default function home() {
   return (
@@ -16,10 +19,12 @@ export default function home() {
       <Hero />
       <MovieCard />
       <KidsMovies />
-      <UpcomingMovie></UpcomingMovie>
+      <UpcomingMovie />
       <MovieExperienceSection />
       <LoyaltyRewards />
-      <NewsLetter/>
+      <UpcomingEvent />
+      <AutoLocation/>
+      <NewsLetter />
       <FAQ />
     </main>
   );

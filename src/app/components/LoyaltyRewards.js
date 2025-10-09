@@ -118,22 +118,23 @@ export default function LoyaltyRewards() {
             <button
               onClick={handleJoinProgram}
               disabled={isJoining}
-              className="btn-primary"
+              className="btn-primary w-full sm:w-full md:w-auto lg:w-auto"
             >
               {isJoining ? (
-                <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Joining...</span>
+                <div className="flex items-center justify-center gap-2 sm:gap-3">
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span className="text-sm sm:text-base">Joining...</span>
                 </div>
               ) : (
-                "Join Rewards Program 🎁"
+                <span className="text-sm sm:text-base">
+                  Join Rewards Program 🎁
+                </span>
               )}
-              
             </button>
           </div>
 
           {/* ===== STATS ===== */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-16">
             {programStats.map((stat, i) => (
               <motion.div
                 key={i}
