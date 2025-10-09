@@ -96,7 +96,7 @@ export default function MovieDetailsPage() {
   if (!movie)
     return (
       <div className="p-6 text-center text-red-500 bg-gray-900 min-h-screen">
-        ❌ Movie not found!
+         Movie not found!
       </div>
     )
 
@@ -112,7 +112,8 @@ export default function MovieDetailsPage() {
               : IMG_URL + movie.poster_path // TMDB partial path
           }
          
-          alt={movie.title || "Movie Poster"}
+          
+          alt={movie.title}
           className="object-cover w-full h-full"
           priority
           sizes="(max-width: 640px) 100vw, (max-width: 768px) 100vw, (max-width: 1024px) 100vw, 100vw"
@@ -412,21 +413,19 @@ export default function MovieDetailsPage() {
               <div className="flex gap-2 sm:gap-2 mb-4 sm:mb-6 p-1 bg-gray-800 rounded-lg mx-2">
                 <button
                   onClick={() => setSelectionMode('auto')}
-                  className={`flex-1 py-2 px-2 sm:px-3 rounded-md font-semibold transition-all text-xs sm:text-sm ${
-                    selectionMode === 'auto'
-                      ? 'bg-red-600 text-white shadow-lg'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
+                  className={`flex-1 py-2 px-2 sm:px-3 rounded-md font-semibold transition-all text-xs sm:text-sm ${selectionMode === 'auto'
+                    ? 'bg-red-600 text-white shadow-lg'
+                    : 'text-gray-400 hover:text-white'
+                    }`}
                 >
                   Auto
                 </button>
                 <button
                   onClick={() => setSelectionMode('manual')}
-                  className={`flex-1 py-2 px-2 sm:px-3 rounded-md font-semibold transition-all text-xs sm:text-sm ${
-                    selectionMode === 'manual'
-                      ? 'bg-red-600 text-white shadow-lg'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
+                  className={`flex-1 py-2 px-2 sm:px-3 rounded-md font-semibold transition-all text-xs sm:text-sm ${selectionMode === 'manual'
+                    ? 'bg-red-600 text-white shadow-lg'
+                    : 'text-gray-400 hover:text-white'
+                    }`}
                 >
                   Manual
                 </button>
@@ -446,9 +445,10 @@ export default function MovieDetailsPage() {
               {selectionMode === 'manual' && (
                 <div className="mb-4">
                   <AllTheatersLocation
+                    movieId={movie?.id}
                     onLocationSelect={(loc) => {
                       if (loc?.cinemas?.length > 0) {
-                        setSelectedCinema({
+                        handleCinemaSelect({
                           name: loc.cinemas[0],
                           city: loc.region,
                           district: loc.district,
@@ -456,6 +456,7 @@ export default function MovieDetailsPage() {
                       }
                     }}
                   />
+
                 </div>
               )}
 
@@ -466,8 +467,7 @@ export default function MovieDetailsPage() {
                     router.push(
                       `/booking/${movie.tmdb_id}?cinema=${encodeURIComponent(
                         selectedCinema.name
-                      )}&city=${selectedCinema.city}&district=${
-                        selectedCinema.district
+                      )}&city=${selectedCinema.city}&district=${selectedCinema.district
                       }`
                     )
                   }
@@ -495,9 +495,6 @@ export default function MovieDetailsPage() {
             </div>
           </div>
 
-
-
-          
         </div>
       </div>
     </div>

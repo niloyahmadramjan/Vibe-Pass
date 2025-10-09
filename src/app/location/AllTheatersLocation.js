@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'
 import { locations } from '../lib/locations'
 import SeatMap from '../components/SeatMap'
 
-export default function AllTheatersLocation() {
+export default function AllTheatersLocation({ movieId }) {
   const [selectedDivision, setSelectedDivision] = useState('')
   const [selectedDistrict, setSelectedDistrict] = useState('')
   const [districts, setDistricts] = useState([])
@@ -77,9 +77,10 @@ export default function AllTheatersLocation() {
 
   // ✅ Book Now click করলে redirect হবে booking page এ
   const handleBookNow = () => {
-    if (!selectedCinema || !selectedLocation) return
+    if (!selectedCinema || !selectedLocation || !movieId) return
+
     router.push(
-      `/booking/1311031?cinema=${encodeURIComponent(
+      `/booking/${movieId}?cinema=${encodeURIComponent(
         selectedCinema
       )}&city=${encodeURIComponent(selectedLocation.city)}&district=${encodeURIComponent(
         selectedLocation.district
@@ -147,7 +148,7 @@ export default function AllTheatersLocation() {
       {selectedLocation && (
         <div className="rounded-xl p-4 border border-gray-700 bg-[#111111]">
           <h2 className="text-lg font-semibold mb-3 border-b border-gray-700 pb-1">
-            🎬 {selectedLocation.district}, {selectedLocation.region}
+             {selectedLocation.district}, {selectedLocation.region}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {selectedLocation.cinemas.map((cinema, index) => (

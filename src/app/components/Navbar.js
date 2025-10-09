@@ -134,21 +134,6 @@ export default function Navbar() {
                   {icon} {label}
                 </Link>
               ))}
-
-              {/* Admin Dashboard Link - Desktop */}
-              {/* {isAdmin && (
-                <Link
-                  href="/admin"
-                  className={`relative flex items-center font-bold transition-all duration-300 ease-in-out   
-                    ${
-                      pathname === '/admin'
-                        ? 'border-b-4 border-purple-400 !text-purple-400'
-                        : '!text-gray-300 hover:text-purple-400 hover:border-b-4 hover:border-purple-400'
-                    }`}
-                >
-                  <FiSettings className="mr-1" /> Dashboard
-                </Link>
-              )} */}
             </div>
 
             {/* Right - Auth (desktop) */}
@@ -395,7 +380,7 @@ export default function Navbar() {
 
         {/* Mobile Slide Menu */}
         <div
-          className={`fixed top-0 right-0 h-full w-64 bg-gray-900 transform ${
+          className={`fixed top-0 right-0 h-full w-64 sm:w-72 bg-gray-900 transform ${
             open ? 'translate-x-0' : 'translate-x-full'
           } transition-transform duration-300 ease-in-out z-40 shadow-xl flex flex-col`}
         >
@@ -420,15 +405,15 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* Links */}
-          <div className="flex-1 flex flex-col p-4">
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
             {/* Main Navigation Links */}
             <div className="space-y-4 mb-6">
               {navLinks.map(({ href, label, icon }) => (
                 <Link
                   key={href}
                   href={href}
-                  className={`relative flex items-center font-bold transition-colors duration-200 py-2 px-3 rounded-lg ${
+                  className={`flex items-center font-bold transition-colors duration-200 py-2 px-3 rounded-lg ${
                     pathname === href
                       ? 'bg-blue-900/30 border-l-4 border-blue-400 !text-blue-400'
                       : '!text-gray-300 hover:text-blue-400 hover:bg-gray-800 hover:border-l-4 hover:border-blue-400'
@@ -450,7 +435,7 @@ export default function Navbar() {
               {isAdmin && (
                 <Link
                   href="/admin"
-                  className={`relative flex items-center font-bold transition-colors duration-200 py-2 px-3 rounded-lg ${
+                  className={`flex items-center font-bold transition-colors duration-200 py-2 px-3 rounded-lg ${
                     pathname === '/admin'
                       ? 'bg-purple-900/30 border-l-4 border-purple-400 !text-purple-400'
                       : '!text-gray-300 hover:text-purple-400 hover:bg-gray-800 hover:border-l-4 hover:border-purple-400'
@@ -473,110 +458,32 @@ export default function Navbar() {
 
             {/* User Menu Links - Only show when logged in */}
             {(session || user) && (
-              <div className="border-t border-gray-700 pt-6">
-                <h3 className="text-gray-400 text-sm font-semibold uppercase tracking-wider mb-4 px-3">
+              <div className="border-t border-gray-700 pt-6 space-y-3">
+                <h3 className="text-gray-400 text-sm font-semibold uppercase tracking-wider mb-2 px-3">
                   My Account
                 </h3>
-                <div className="space-y-3">
+                {[
+                  { href: '/profile', label: 'MY PROFILE' },
+                  { href: '/my-orders', label: 'MY ORDERS' },
+                  { href: '/my-booking', label: 'MY BOOKING' },
+                  { href: '/my-rewards', label: 'MY REWARDS' },
+                  { href: '/my-wallet', label: 'MY WALLET' },
+                ].map(({ href, label }) => (
                   <Link
-                    href="/profile"
-                    className="flex items-center gap-3 px-3 py-3 hover:bg-gray-800 transition-colors text-white rounded-lg"
+                    key={href}
+                    href={href}
                     onClick={() => setOpen(false)}
+                    className="block px-3 py-3 rounded-lg text-white hover:bg-gray-800 transition-colors font-medium"
                   >
-                    <FiUser className="w-5 h-5 text-gray-400" />
-                    <span className="font-medium">MY PROFILE</span>
+                    {label}
                   </Link>
-
-                  <Link
-                    href="/my-orders"
-                    className="flex items-center gap-3 px-3 py-3 hover:bg-gray-800 transition-colors text-white rounded-lg"
-                    onClick={() => setOpen(false)}
-                  >
-                    <svg
-                      className="w-5 h-5 text-gray-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"
-                      />
-                    </svg>
-                    <span className="font-medium">MY ORDERS</span>
-                  </Link>
-
-                  <Link
-                    href="/my-booking"
-                    className="flex items-center gap-3 px-3 py-3 hover:bg-gray-800 transition-colors text-white rounded-lg"
-                    onClick={() => setOpen(false)}
-                  >
-                    <svg
-                      className="w-5 h-5 text-gray-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 7V3m8 4V3m-9 8h10m-11 8h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2zm7-5l2 2 4-4"
-                      />
-                    </svg>
-                    <span className="font-medium">My Booking</span>
-                  </Link>
-
-                  <Link
-                    href="/my-rewards"
-                    className="flex items-center gap-3 px-3 py-3 hover:bg-gray-800 transition-colors text-white rounded-lg"
-                    onClick={() => setOpen(false)}
-                  >
-                    <svg
-                      className="w-5 h-5 text-gray-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"
-                      />
-                    </svg>
-                    <span className="font-medium">MY REWARDS</span>
-                  </Link>
-
-                  <Link
-                    href="/my-wallet"
-                    className="flex items-center gap-3 px-3 py-3 hover:bg-gray-800 transition-colors text-white rounded-lg"
-                    onClick={() => setOpen(false)}
-                  >
-                    <svg
-                      className="w-5 h-5 text-gray-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                      />
-                    </svg>
-                    <span className="font-medium">MY WALLET</span>
-                  </Link>
-                </div>
+                ))}
               </div>
             )}
           </div>
 
           {/* Auth Section (mobile bottom) */}
-          <div className="mt-auto p-4 border-t border-gray-800">
+          <div className="p-4 border-t border-gray-800 bg-gray-950">
             {session || user ? (
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
@@ -599,7 +506,7 @@ export default function Navbar() {
             ) : (
               <Link
                 href="/login"
-                className="w-full btn btn-primary flex items-center justify-center px-4 py-2 rounded-md font-bold bg-red-600 hover:bg-red-700 text-white transition-colors duration-200"
+                className="w-full flex items-center justify-center px-4 py-2 rounded-md font-bold bg-red-600 hover:bg-red-700 text-white transition-colors duration-200"
                 onClick={() => setOpen(false)}
               >
                 <FiUser className="mr-2" /> Login
