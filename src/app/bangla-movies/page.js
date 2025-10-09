@@ -61,7 +61,7 @@ export default function BanglaMoviesPage() {
         <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {movies.map((movie) => (
             <div
-              key={movie.tmdb_id}
+              key={movie.id}
               className="group bg-gray-900 rounded-2xl overflow-hidden shadow-lg hover:scale-105 transform transition duration-300 cursor-pointer flex flex-col"
             >
               <div className="relative w-full h-[300px]">

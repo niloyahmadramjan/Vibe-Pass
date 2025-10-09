@@ -1,6 +1,6 @@
 'use client';
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+// import 'jspdf-autotable';
 
 class TicketPDF {
   static generatePDF(ticket) {

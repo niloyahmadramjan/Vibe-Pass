@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react'
 export default function MovieDetailsPage() {
   const params = useParams()
   const id = params.id
-  console.log(id)
+  // console.log(id)
   const [movie, setMovie] = useState(null)
   const [showTrailer, setShowTrailer] = useState(false)
   const [hallData, setHallData] = useState([])
@@ -465,7 +465,7 @@ export default function MovieDetailsPage() {
                 <button
                   onClick={() =>
                     router.push(
-                      `/booking/${movie.tmdb_id}?cinema=${encodeURIComponent(
+                      `/booking/${movie.id}?cinema=${encodeURIComponent(
                         selectedCinema.name
                       )}&city=${selectedCinema.city}&district=${selectedCinema.district
                       }`

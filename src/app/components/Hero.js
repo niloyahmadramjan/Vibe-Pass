@@ -9,13 +9,13 @@ import 'swiper/css/pagination'
 import axiosSecure from '../api/axiosHook/useAxiosSecure'
 
 export default function HeroSection() {
-const [movies, setMovies] = useState([])
-const [trailerKey, setTrailerKey] = useState(null)
-const router = useRouter()
-const [trailerUrl, setTrailerUrl] = useState("")
+  const [movies, setMovies] = useState([])
+  const [trailerKey, setTrailerKey] = useState(null)
+  const router = useRouter()
+  const [trailerUrl, setTrailerUrl] = useState("")
 
-const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY
-  const url = 'https://image.tmdb.org/t/p/w500'
+  // const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY
+  // const url = 'https://image.tmdb.org/t/p/w500'
 
   useEffect(() => {
     async function fetchMovies() {
@@ -35,8 +35,8 @@ const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY
           ...(bollywoodData || []),
         ].filter((m) => m.backdrop_path)
 
-        // Remove duplicates by tmdb_id
-        const unique = Array.from(new Map(merged.map((m) => [m.tmdb_id, m])).values())
+        // Remove duplicates by id
+        const unique = Array.from(new Map(merged.map((m) => [m.id, m])).values())
 
         // Pick top movies for hero section
         setMovies(unique.slice(9, 25))
@@ -58,7 +58,7 @@ const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY
       const res = await axiosSecure.get(`/api/movies/${tmdbId}/videos`);
 
       if (res.status === 200) {
-        const results = res.data.results ;
+        const results = res.data.results;
 
         const trailer = results.find(
           (v) => v.type === "Trailer" && v.site === "YouTube"
@@ -81,18 +81,18 @@ const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY
 
   return (
     <section className="w-full h-[44vh] lg:h-[80vh] relative mb-5 md:mb-10 pt-16 md:pt-0">
-       <Swiper
-      modules={[Autoplay, Pagination]}
-      autoplay={{
-        delay: 3000,
-        disableOnInteraction: false,
-        pauseOnMouseEnter: true,
-      }}
-      pagination={{ clickable: true }}
-      loop={true}
-      className="w-full h-full custom-swiper">
+      <Swiper
+        modules={[Autoplay, Pagination]}
+        autoplay={{
+          delay: 3000,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: true,
+        }}
+        pagination={{ clickable: true }}
+        loop={true}
+        className="w-full h-full custom-swiper">
         {movies.map((movie) => (
-          <SwiperSlide key={movie.tmdb_id}>
+          <SwiperSlide key={movie.id}>
             <div
               className="w-full h-[40vh] lg:h-[100vh] bg-cover bg-center relative flex items-center"
               style={{
@@ -116,13 +116,13 @@ const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY
                     </p>
                     <div className="flex gap-4 ">
                       <button
-                        onClick={() => fetchTrailer(movie.tmdb_id)}
+                        onClick={() => fetchTrailer(movie.id)}
                         className=" px-2 lg:px-5 py-0 lg:py-3 rounded-lg border border-white bg-white/20 backdrop-blur-sm hover:bg-white hover:text-black transition text-sm"
                       >
                         Watch Trailer
                       </button>
                       <button
-                        onClick={() => router.push(`/movies/${movie.tmdb_id}`)}
+                        onClick={() => router.push(`/movies/${movie.id}`)}
                         className=" px-2 lg:px-5 py-1 lg:py-3  rounded-lg bg-red-600 hover:bg-red-700 transition"
                       >
                         Book Now

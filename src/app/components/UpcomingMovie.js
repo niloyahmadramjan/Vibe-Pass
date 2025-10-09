@@ -75,7 +75,7 @@ export default function UpcomingMovie() {
         }}
       >
         {upcoming.map((movie) => (
-          <SwiperSlide key={movie.tmdb_id}>
+          <SwiperSlide key={movie.id}>
             <div
               className="relative movie-card border rounded-lg overflow-hidden 
                          bg-zinc-900 text-white transition-all duration-300 cursor-pointer
@@ -108,7 +108,7 @@ export default function UpcomingMovie() {
                   {movie.title}
                 </p>
                 <Link
-                  href={`/movies/${movie.tmdb_id}`}
+                  href={`/movies/${movie.id}`}
                   className="px-3 py-1.5 sm:px-4  btn-secondary text-xs sm:text-sm font-semibold rounded-lg shadow-lg transition duration-300"
                 >
                   Details

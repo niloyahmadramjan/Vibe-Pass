@@ -115,7 +115,7 @@ export default function MoviesPage() {
           <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {movies.map((movie) => (
               <div
-                key={movie.tmdb_id}
+                key={movie.id}
                 className="bg-gray-900 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl hover:scale-105 transform transition duration-300 flex flex-col"
               >
                 {/* Poster Image */}
@@ -171,8 +171,8 @@ export default function MoviesPage() {
                 onClick={handlePrevPages}
                 disabled={visiblePageNumbers[0] === 1}
                 className={`px-4 py-2 rounded-lg font-semibold transition ${visiblePageNumbers[0] === 1
-                    ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                    : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
+                  ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                  : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
                   }`}
               >
                 &larr; Prev
@@ -199,8 +199,8 @@ export default function MoviesPage() {
                   key={pageNum}
                   onClick={() => setPage(pageNum)}
                   className={`px-4 py-2 rounded-lg font-semibold transition ${pageNum === page
-                      ? 'bg-red-600 text-white shadow-lg'
-                      : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
+                    ? 'bg-red-600 text-white shadow-lg'
+                    : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
                     }`}
                 >
                   {pageNum}
@@ -227,8 +227,8 @@ export default function MoviesPage() {
                 onClick={handleNextPages}
                 disabled={visiblePageNumbers[visiblePageNumbers.length - 1] === totalPages}
                 className={`px-4 py-2 rounded-lg font-semibold transition ${visiblePageNumbers[visiblePageNumbers.length - 1] === totalPages
-                    ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                    : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
+                  ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                  : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
                   }`}
               >
                 Next &rarr;

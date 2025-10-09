@@ -33,11 +33,10 @@ export default function KidsMovies() {
       try {
         const res = await fetch(
 
-`          http://localhost:5000/api/movies/category/genreAnimation`
-          // `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&language=en-US&sort_by=popularity.desc&with_genres=16,10751&page=1`
+          `          http://localhost:5000/api/movies/category/genreAnimation`
         )
         const data = await res.json()
-        setMovies(data )
+        setMovies(data)
         console.log(data.id)
       } catch (error) {
         console.error('Error fetching kids movies:', error)
@@ -47,7 +46,7 @@ export default function KidsMovies() {
     }
     fetchMovies()
   }, [])
-
+  console.log(movies)
   if (loading) return <Spinner />
 
   // 🔹 Handle Book Now
@@ -81,7 +80,7 @@ export default function KidsMovies() {
         className="pb-10"
       >
         {movies.map((movie) => (
-          <SwiperSlide key={movie.tmdb_id}>
+          <SwiperSlide key={movie.id}>
             <div
               className="relative movie-card w-full h-[280px] sm:h-[330px] md:h-[380px] lg:h-[420px] 
                          border border-red-500/40 rounded-xl overflow-hidden bg-zinc-900 

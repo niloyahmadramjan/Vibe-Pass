@@ -54,7 +54,7 @@ export default function MovieCard() {
           categories.map(async (cat) => {
             const res = await axiosSecure.get(`/api/movies/category/${cat.key}`)
             return { key: cat.key, movies: res.data || [] }
-        
+
           })
         )
 
@@ -119,7 +119,7 @@ export default function MovieCard() {
       >
         {movies.length > 0 ? (
           movies.map((movie) => (
-            <SwiperSlide key={movie.tmdb_id}>
+            <SwiperSlide key={movie.id}>
               <div
                 className="relative movie-card w-full h-[350px] md:h-[380px] lg:h-[410px] 
                 border rounded-md overflow-hidden bg-zinc-900 text-white transition-all duration-300 cursor-pointer
@@ -129,17 +129,14 @@ export default function MovieCard() {
                 <div className="relative w-full h-[70%] sm:h-[67%]">
                   <Image
                     src={
-                      movie.poster_path
-                        ? movie.poster_path.startsWith("http")
-                          ? movie.poster_path // already a full URL
-                          : IMG_URL + movie.poster_path // partial TMDB path
-                        : "/default-poster.jpg" // fallback if no path
+                      typeof movie.poster_path === "string" && movie.poster_path.startsWith("http")
+                        ? movie.poster_path // full URL (like i.ibb.co)
+                        : IMG_URL + movie.poster_path // TMDB partial path
                     }
                     alt={movie.title || "Movie Poster"}
                     fill
                     className="object-cover"
-                    placeholder="blur"
-                    blurDataURL="/default-poster.jpg"
+             
                   />
 
                   <div className="absolute inset-0 bg-red-500 opacity-0 group-hover:opacity-20 transition duration-300"></div>
@@ -165,7 +162,7 @@ export default function MovieCard() {
                     )}
 
                     {/* Details */}
-                    <Link href={`/movies/${movie.tmdb_id}`}>
+                    <Link href={`/movies/${movie.id}`}>
                       <button
                         className="w-10/12 flex justify-center mx-auto py-1 text-white bg-red-600 rounded-lg 
                           hover:bg-red-700 transition duration-300"

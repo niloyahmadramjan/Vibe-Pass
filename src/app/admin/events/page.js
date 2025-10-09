@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import axiosSecure from '@/app/api/axiosHook/useAxiosSecure';
 import { motion } from 'framer-motion';
-import {FiPlus, FiCalendar,FiUsers,FiDollarSign, FiEdit,FiTrash2,FiEye,  FiSearch, FiClock,FiMapPin,FiSave, FiX,FiImage,FiUpload} from 'react-icons/fi';
+import { FiPlus, FiCalendar, FiUsers, FiDollarSign, FiEdit, FiTrash2, FiEye, FiSearch, FiClock, FiMapPin, FiSave, FiX, FiImage, FiUpload, FiInfo, FiTag, FiUser, FiBarChart2 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import AdminLoading from '../components/AdminLoading';
 import { useAuth } from "@/app/context/AuthContext";
@@ -13,6 +13,7 @@ export default function EventsManagement() {
     const [events, setEvents] = useState([]);
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [showEditForm, setShowEditForm] = useState(false);
+    const [showViewModal, setShowViewModal] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -52,7 +53,6 @@ export default function EventsManagement() {
 
     const handleEditEvent = async (eventId, updatedData) => {
         try {
-
             const response = await axiosSecure.put(`/api/events/${eventId}`, updatedData);
             const updatedEvent = response.data.data || response.data;
 
@@ -95,15 +95,8 @@ export default function EventsManagement() {
     };
 
     const handleViewClick = (event) => {
-        toast.success(
-            <div className="flex flex-col">
-                <span className="font-semibold">👀 Viewing: {event.title}</span>
-                <span className="text-sm opacity-90">
-                    {event.eventType} • {new Date(event.date).toLocaleDateString()} • {event.location}
-                </span>
-            </div>,
-            { duration: 3000 }
-        );
+        setSelectedEvent(event);
+        setShowViewModal(true);
     };
 
     // Filter events for search
@@ -224,11 +217,227 @@ export default function EventsManagement() {
                     onSubmit={handleEditEvent}
                 />
             )}
+
+            {/* View Event Details Modal */}
+            {showViewModal && selectedEvent && (
+                <EventDetailsModal
+                    event={selectedEvent}
+                    onClose={() => {
+                        setShowViewModal(false);
+                        setSelectedEvent(null);
+                    }}
+                />
+            )}
         </div>
     );
 }
 
-// Table Row Component
+// Event Details Modal Component
+const EventDetailsModal = ({ event, onClose }) => {
+    const eventDate = new Date(event.date);
+    const isPastEvent = eventDate < new Date();
+
+    const getStatusColor = () => {
+        if (isPastEvent) return 'bg-gray-500 text-white';
+        if (event.bookingOpen) return 'bg-green-500 text-white';
+        return 'bg-yellow-500 text-white';
+    };
+
+    const getStatusText = () => {
+        if (isPastEvent) return 'Event Ended';
+        if (event.bookingOpen) return 'Booking Open';
+        return 'Booking Closed';
+    };
+
+    const handleBackdropClick = (e) => {
+        if (e.target === e.currentTarget) {
+            onClose();
+        }
+    };
+
+    const DetailItem = ({ icon, label, value, className = "" }) => (
+        <div className={`flex items-start gap-3 p-3 bg-gray-800/50 rounded-lg ${className}`}>
+            <div className="text-purple-400 mt-1 flex-shrink-0">
+                {icon}
+            </div>
+            <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-400">{label}</p>
+                <p className="text-white font-medium truncate">{value || 'Not specified'}</p>
+            </div>
+        </div>
+    );
+
+    return (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" onClick={handleBackdropClick}>
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-gray-900 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+            >
+                {/* Header */}
+                <div className="relative">
+                    {event.poster ? (
+                        <div className="h-48 w-full relative">
+                            <Image
+                                src={event.poster}
+                                alt={event.title}
+                                fill
+                                className="object-cover"
+                                onError={(e) => {
+                                    e.target.style.display = 'none';
+                                }}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent"></div>
+                        </div>
+                    ) : (
+                        <div className="h-32 bg-gradient-to-r from-purple-600 to-blue-600 flex items-center justify-center">
+                            <FiCalendar className="text-white text-4xl" />
+                        </div>
+                    )}
+
+                    <div className="absolute top-4 right-4 flex gap-2">
+                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor()}`}>
+                            {getStatusText()}
+                        </span>
+                        {event.isFeatured && (
+                            <span className="px-3 py-1 bg-yellow-500 text-yellow-900 rounded-full text-sm font-bold">
+                                Featured
+                            </span>
+                        )}
+                    </div>
+
+                    <button
+                        onClick={onClose}
+                        className="absolute top-4 left-4 p-2 bg-black/50 text-white rounded-lg hover:bg-black/70 transition-colors"
+                    >
+                        <FiX size={20} />
+                    </button>
+
+                    <div className="p-6 pt-4">
+                        <h2 className="text-3xl font-bold text-white mb-2">{event.title}</h2>
+                        <p className="text-gray-400 text-lg mb-4">{event.eventType}</p>
+
+                        {event.description && (
+                            <div className="mb-6">
+                                <p className="text-white leading-relaxed">{event.description}</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Content */}
+                <div className="p-6 overflow-y-auto max-h-[calc(90vh-300px)]">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                        {/* Left Column */}
+                        <div className="space-y-4">
+                            <DetailItem
+                                icon={<FiCalendar size={18} />}
+                                label="Date & Time"
+                                value={`${eventDate.toLocaleDateString()} at ${event.time}`}
+                            />
+
+                            <DetailItem
+                                icon={<FiClock size={18} />}
+                                label="Duration"
+                                value={`${event.duration} minutes`}
+                            />
+
+                            <DetailItem
+                                icon={<FiMapPin size={18} />}
+                                label="Location"
+                                value={event.location}
+                            />
+
+                            <DetailItem
+                                icon={<FiTag size={18} />}
+                                label="Hall & Screen"
+                                value={`${event.hall} - ${event.screen}`}
+                            />
+                        </div>
+
+                        {/* Right Column */}
+                        <div className="space-y-4">
+                            <DetailItem
+                                icon={<FiDollarSign size={18} />}
+                                label="Ticket Price"
+                                value={`$${event.price}`}
+                            />
+
+                            <DetailItem
+                                icon={<FiUsers size={18} />}
+                                label="Capacity"
+                                value={`${event.availableSeats || 0} / ${event.capacity || 0} seats available`}
+                            />
+
+                            <DetailItem
+                                icon={<FiBarChart2 size={18} />}
+                                label="Event Type"
+                                value={event.eventType}
+                            />
+
+                            <DetailItem
+                                icon={<FiInfo size={18} />}
+                                label="Booking Status"
+                                value={event.bookingOpen ? 'Open for bookings' : 'Bookings closed'}
+                                className={event.bookingOpen ? 'bg-green-500/10 border border-green-500/20' : 'bg-red-500/10 border border-red-500/20'}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Additional Information */}
+                    <div className="bg-gray-800/30 rounded-xl p-4 border border-gray-700">
+                        <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                            <FiInfo className="text-blue-400" />
+                            Event Summary
+                        </h3>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                            <div className="bg-gray-700/50 rounded-lg p-3">
+                                <p className="text-2xl font-bold text-white">{event.duration}</p>
+                                <p className="text-sm text-gray-400">Minutes</p>
+                            </div>
+                            <div className="bg-gray-700/50 rounded-lg p-3">
+                                <p className="text-2xl font-bold text-white">${event.price}</p>
+                                <p className="text-sm text-gray-400">Per Ticket</p>
+                            </div>
+                            <div className="bg-gray-700/50 rounded-lg p-3">
+                                <p className="text-2xl font-bold text-white">{event.capacity}</p>
+                                <p className="text-sm text-gray-400">Total Seats</p>
+                            </div>
+                            <div className="bg-gray-700/50 rounded-lg p-3">
+                                <p className="text-2xl font-bold text-white">{event.availableSeats}</p>
+                                <p className="text-sm text-gray-400">Available</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Created Info */}
+                    {event.createdAt && (
+                        <div className="mt-4 text-center">
+                            <p className="text-sm text-gray-500">
+                                Event created on {new Date(event.createdAt).toLocaleDateString()}
+                            </p>
+                        </div>
+                    )}
+                </div>
+
+                {/* Footer */}
+                <div className="p-6 border-t border-gray-700 bg-gray-800/30">
+                    <div className="flex justify-end">
+                        <button
+                            onClick={onClose}
+                            className="px-6 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </motion.div>
+        </div>
+    );
+};
+
+// Table Row Component (Updated with better view button)
 const TableRow = ({ event, index, onView, onEdit, onDelete }) => {
     const eventDate = new Date(event.date);
     const isPastEvent = eventDate < new Date();
@@ -357,7 +566,7 @@ const TableRow = ({ event, index, onView, onEdit, onDelete }) => {
                     <button
                         onClick={() => onView(event)}
                         className="p-2 text-blue-400 hover:text-blue-300 hover:bg-blue-600/20 rounded-lg transition-colors"
-                        title="View Event"
+                        title="View Event Details"
                     >
                         <FiEye size={16} />
                     </button>
@@ -381,7 +590,7 @@ const TableRow = ({ event, index, onView, onEdit, onDelete }) => {
     );
 };
 
-// Event Creation Form Component
+// Event Creation Form Component (Keep the existing one)
 const EventCreationForm = ({ onClose, onSubmit, event }) => {
     const { user } = useAuth();
     const [formData, setFormData] = useState({

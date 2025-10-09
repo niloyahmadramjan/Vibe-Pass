@@ -21,7 +21,7 @@ export default function AddMoviesPage() {
     video: false,
     vote_average: "",
     vote_count: "",
-    tmdb_id: "", // New field
+    id: "", // New field
     category: "" // New field
   });
 
@@ -121,7 +121,7 @@ export default function AddMoviesPage() {
         video: false,
         vote_average: 0,
         vote_count: 0,
-        tmdb_id: "", // Reset new field
+        id: "", // Reset new field
         category: "" // Reset new field
       });
 
@@ -145,7 +145,7 @@ export default function AddMoviesPage() {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 }
   };
-
+  console.log(formData)
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0c0c14] via-[#0f1018] to-[#1e1233] py-8 px-4">
       <motion.div
@@ -205,8 +205,8 @@ export default function AddMoviesPage() {
                     </label>
                     <input
                       type="number"
-                      name="tmdb_id"
-                      value={formData.tmdb_id}
+                      name="id"
+                      value={formData.id}
                       onChange={handleChange}
                       className="w-full px-4 py-3 bg-[#1e1f29]/80 border border-gray-700/50 rounded-xl text-white placeholder-gray-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300"
                       placeholder="Enter TMDB ID"
@@ -560,7 +560,7 @@ export default function AddMoviesPage() {
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <span className="text-gray-400">TMDB ID:</span>
-                      <p className="text-white font-medium truncate">{formData.tmdb_id || 'Not set'}</p>
+                      <p className="text-white font-medium truncate">{formData.id || 'Not set'}</p>
                     </div>
                     <div>
                       <span className="text-gray-400">Category:</span>

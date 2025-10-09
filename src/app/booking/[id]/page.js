@@ -56,6 +56,7 @@ console.log(id)
   const [loadingShowtimes, setLoadingShowtimes] = useState(false)
 
   const theaterName = searchParams.get('cinema') || 'Default Theater'
+  const IMG_URL = 'https://image.tmdb.org/t/p/w500'
 
   // Load movie data from TMDB API
   useEffect(() => {
@@ -409,9 +410,9 @@ console.log(id)
                     width={500}
                     height={200}
                     src={
-                      movieData.backdrop_path.startsWith("http")
-                        ? movieData.backdrop_path
-                        : `https://image.tmdb.org/t/p/w500${movieData.backdrop_path}`
+                      typeof movieData.poster_path === "string" && movieData.poster_path.startsWith("http")
+                        ? movieData.poster_path // full URL (like i.ibb.co)
+                        : IMG_URL + movieData.poster_path // TMDB partial path
                     }
                     alt={movieData.title || "Movie Backdrop"}
                     className="w-full h-full object-cover"

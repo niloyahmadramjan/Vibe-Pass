@@ -22,6 +22,8 @@ import axiosSecure from '@/app/api/axiosHook/useAxiosSecure'
 import AdminLoading from '../components/AdminLoading'
 import StatCard from '../components/StartCard'
 import Image from 'next/image'
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'  // ✅ must be this exact lin
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 export default function UserManagementPage() {
@@ -143,18 +145,30 @@ export default function UserManagementPage() {
   }, [users, searchTerm, statusFilter, roleFilter])
 
   // Get user booking stats
-  const getUserStats = (userId) => {
-    const userBookings = bookings.filter((b) => b.userId === userId)
-    const totalBookings = userBookings.length
+  // Get user booking stats - FIXED VERSION
+  const getUserStats = (userEmail) => {
+    const userBookings = bookings.filter((b) => b.userEmail === userEmail);
+    const totalBookings = userBookings.length;
     const totalSpent = userBookings.reduce(
       (sum, b) => sum + (b.totalAmount || 0),
       0
-    )
-    const completedBookings = userBookings.filter(
-      (b) => b.status === 'completed'
-    ).length
+    );
 
-    return { totalBookings, totalSpent, completedBookings }
+    // Status breakdown
+    const confirmedBookings = userBookings.filter(b => b.status === 'confirmed').length;
+    const pendingBookings = userBookings.filter(b => b.status === 'pending').length;
+    const cancelledBookings = userBookings.filter(b => b.status === 'cancelled').length;
+    const completedBookings = userBookings.filter(b => b.status === 'completed').length;
+
+    return {
+      totalBookings,
+      totalSpent,
+      completedBookings,
+      confirmedBookings,
+      pendingBookings,
+      cancelledBookings,
+      avgSpendingPerBooking: totalBookings > 0 ? (totalSpent / totalBookings).toFixed(2) : 0
+    };
   }
 
   const handleEditUser = (user) => {
@@ -176,9 +190,95 @@ export default function UserManagementPage() {
     deleteUserMutation.mutate(selectedUser._id)
   }
 
+  // import jsPDF from 'jspdf';
+  // import 'jspdf-autotable';
+
   const exportUsers = () => {
-    toast.success('Export feature coming soon!')
-  }
+    try {
+      const exportData = filteredUsers.length ? filteredUsers : users;
+
+      if (!exportData.length) {
+        toast.error('No users available to export');
+        return;
+      }
+
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'A4' });
+
+      doc.setFontSize(18);
+      doc.text('User Export Report', 40, 40);
+      doc.setFontSize(11);
+      doc.setTextColor(100);
+      doc.text(`Generated on: ${new Date().toLocaleString()}`, 40, 60);
+
+      const tableColumn = [
+        'Name',
+        'Email',
+        'Phone',
+        'Role',
+        'Verified',
+        'Created At',
+        'Total Bookings',
+        'Total Spent',
+        'Confirmed',
+        'Pending',
+        'Cancelled',
+        'Avg Spending'
+      ];
+
+      const tableRows = exportData.map((user) => {
+        const stats = getUserStats(user.email); // ✅ Email দিয়ে match
+
+        return [
+          user.name || 'N/A',
+          user.email || 'N/A',
+          user.phone || 'N/A',
+          user.role || 'N/A',
+          user.emailVerified ? 'Verified ✅' : 'Unverified ❌',
+          new Date(user.createdAt).toLocaleDateString(),
+          stats.totalBookings,
+          `$${stats.totalSpent.toLocaleString()}`,
+          stats.confirmedBookings,
+          stats.pendingBookings,
+          stats.cancelledBookings,
+          `$${stats.avgSpendingPerBooking}`
+        ];
+      });
+
+      // ✅ Correct way to call autoTable
+      autoTable(doc, {
+        head: [tableColumn],
+        body: tableRows,
+        startY: 80,
+        styles: { fontSize: 9, cellPadding: 5 },
+        headStyles: {
+          fillColor: [60, 141, 188],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+        },
+        alternateRowStyles: { fillColor: [245, 245, 245] },
+        margin: { left: 40, right: 40 },
+        didDrawPage: (data) => {
+          const pageCount = doc.internal.getNumberOfPages();
+          const pageSize = doc.internal.pageSize;
+          const pageHeight = pageSize.height ?? pageSize.getHeight();
+          doc.setFontSize(10);
+          doc.text(
+            `Page ${data.pageNumber} of ${pageCount}`,
+            data.settings.margin.left,
+            pageHeight - 10
+          );
+        },
+      });
+
+      doc.save(`users_export_${new Date().toISOString().slice(0, 10)}.pdf`);
+      toast.success('✅ PDF exported successfully!');
+    } catch (error) {
+      console.error('PDF export failed:', error);
+      toast.error('❌ Failed to export users');
+    }
+  };
+
+
 
   const loading = usersLoading || bookingsLoading
 
@@ -293,7 +393,7 @@ export default function UserManagementPage() {
             className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
           >
             <FiDownload size={18} />
-            Export CSV
+            All user 
           </button>
         </div>
       </div>
@@ -332,7 +432,7 @@ export default function UserManagementPage() {
             </thead>
             <tbody className="divide-y divide-gray-800">
               {filteredUsers.map((user, index) => {
-                const stats = getUserStats(user._id)
+                const stats = getUserStats(user.email); // ✅ Email দিয়ে match করবে
                 return (
                   <motion.tr
                     key={user._id}
@@ -382,8 +482,8 @@ export default function UserManagementPage() {
                     <td className="py-4 px-6">
                       <span
                         className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${user.emailVerified
-                            ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                            : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                          ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                          : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
                           }`}
                       >
                         {user.emailVerified ? (
@@ -404,8 +504,8 @@ export default function UserManagementPage() {
                     <td className="py-4 px-6">
                       <span
                         className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${user.role === 'admin'
-                            ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                            : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                          ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                          : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
                           }`}
                       >
                         {user.role === 'admin' ? (
@@ -422,23 +522,33 @@ export default function UserManagementPage() {
                       </span>
                     </td>
 
-                    {/* Bookings */}
+                    {/* Bookings - Enhanced */}
                     <td className="py-4 px-6">
                       <div className="text-center">
-                        <p className="text-white font-bold">
+                        <p className="text-white font-bold text-lg">
                           {stats.totalBookings}
                         </p>
-                        <p className="text-gray-400 text-xs">Total</p>
+
                       </div>
                     </td>
 
-                    {/* Spent */}
+                    {/* Spent - Enhanced */}
                     <td className="py-4 px-6">
                       <div className="text-center">
-                        <p className="text-white font-bold">
+                        <p className="text-white font-bold text-lg">
                           ${stats.totalSpent.toLocaleString()}
                         </p>
-                        <p className="text-gray-400 text-xs">Lifetime</p>
+                        <div className="text-gray-400 text-xs mt-1">
+                          {stats.totalBookings > 0 ? (
+                            <>
+                              <span>Avg: ${stats.avgSpendingPerBooking}</span>
+                              <br />
+                              {/* <span>Bookings: {stats.totalBookings}</span> */}
+                            </>
+                          ) : (
+                            <span>No bookings</span>
+                          )}
+                        </div>
                       </div>
                     </td>
 
@@ -474,7 +584,7 @@ export default function UserManagementPage() {
                       </div>
                     </td>
                   </motion.tr>
-                )
+                );
               })}
             </tbody>
           </table>

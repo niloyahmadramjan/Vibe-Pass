@@ -2,16 +2,7 @@
 import { useEffect, useState } from "react";
 import axiosSecure from "@/app/api/axiosHook/useAxiosSecure";
 import { motion } from "framer-motion";
-import {
-    FiDollarSign,
-    FiUsers,
-    FiShoppingCart,
-    FiActivity,
-    FiTrendingUp,
-    FiFilm,
-    FiStar,
-    FiBarChart2,
-    FiTag
+import { FiDollarSign,FiUsers,FiShoppingCart,FiActivity,FiTrendingUp,FiFilm,FiStar,FiBarChart2,FiTag
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 import StatCard from "../components/StartCard";

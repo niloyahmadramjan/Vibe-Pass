@@ -74,7 +74,7 @@ function UpcomingMoviesContent() {
         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {movies.map((movie) => (
             <div
-              key={movie.tmdb_id}
+              key={movie.id}
               className="relative bg-gray-900 rounded-xl overflow-hidden group shadow-lg hover:scale-[1.03] hover:shadow-2xl transform transition duration-300"
             >
               <div className="relative w-full h-[280px]">
@@ -104,13 +104,13 @@ function UpcomingMoviesContent() {
 
                 <div className="flex gap-2">
                   <button
-                    onClick={() => router.push(`/movies/${movie.tmdb_id}`)}
+                    onClick={() => router.push(`/movies/${movie.id}`)}
                     className="mt-auto flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg shadow-md transition"
                   >
                     Details
                   </button>
                   <button
-                    onClick={() => handleWatchTrailer(movie.tmdb_id)}
+                    onClick={() => handleWatchTrailer(movie.id)}
                     className="mt-auto flex-1 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-semibold rounded-lg shadow-md transition"
                   >
                     ▶ Trailer
@@ -130,11 +130,10 @@ function UpcomingMoviesContent() {
             <button
               key={p}
               onClick={() => router.push(`/upcoming?page=${p}`)}
-              className={`px-4 py-2 rounded-lg font-semibold transition ${
-                p === page
+              className={`px-4 py-2 rounded-lg font-semibold transition ${p === page
                   ? 'bg-red-600 text-white shadow-lg'
                   : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
-              }`}
+                }`}
             >
               {p}
             </button>
