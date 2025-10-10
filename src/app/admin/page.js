@@ -11,8 +11,12 @@ import {
 } from 'recharts';
 import StarCardtDeshbord from './components/StartCardDeshbord';
 import Image from 'next/image';
-
-const COLORS = ['#8B5CF6', '#7C3AED', '#6D28D9', '#5B21B6', '#4C1D95', '#3730A3'];
+const COLORS = [
+  "#8884d8", "#82ca9d", "#ffc658", "#ff7f50", "#00C49F", "#0088FE", "#FFBB28", "#FF8042",
+  "#A28DFF", "#FF69B4", "#7FDBFF", "#3D9970", "#B10DC9", "#39CCCC", "#FFDC00",
+  "#FF851B", "#85144b", "#F012BE", "#0074D9", "#2ECC40", "#01FF70", "#AAAAAA"
+];
+// const COLORS = ['#8B5CF6', '#7C3AED', '#6D28D9', '#5B21B6', '#4C1D95', '#3730A3'];
 
 const genreOptions = [
   { id: 16, name: "Animation" },
@@ -531,33 +535,44 @@ export default function AdminHomePage() {
             </div>
           </div>
           <div className="h-72">
-            {genreData.length > 0 ? (
+            {genreData && genreData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={genreData}
                     cx="50%"
                     cy="50%"
-                    outerRadius={80}
-                    fill="#8884d8"
+                    outerRadius={100}
+                    innerRadius={50}
+                    paddingAngle={2}
                     dataKey="value"
                     nameKey="name"
                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                     labelLine={false}
                   >
                     {genreData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]} // automatically picks next color
+                        stroke="#0f0f1a"
+                        strokeWidth={1}
+                      />
                     ))}
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: 'gray',
-                      border: '1px solid #374151',
-                      borderRadius: '8px',
-                      color: '#FFFFFF'
+                      backgroundColor: "gray",
+                      border: "1px solid #374151",
+                      borderRadius: "8px",
+                      color: "#fff",
                     }}
                   />
-                  <Legend />
+                  {/* <Legend
+                    layout="horizontal"
+                    verticalAlign="bottom"
+                    align="center"
+                    wrapperStyle={{ color: "#ccc", fontSize: "12px" }}
+                  /> */}
                 </PieChart>
               </ResponsiveContainer>
             ) : (
