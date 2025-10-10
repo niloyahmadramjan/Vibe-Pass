@@ -35,7 +35,10 @@ export default function RootLayout({ children }) {
         <SessionProviderWrapper>
           <AuthProvider>
             <ReactQueryProvider>
-              <LayoutWrapper>{children}</LayoutWrapper>
+              <LayoutWrapper>
+                {children}
+
+              </LayoutWrapper>
               <Toaster position="top-center" reverseOrder={false} />
             </ReactQueryProvider>
           </AuthProvider>

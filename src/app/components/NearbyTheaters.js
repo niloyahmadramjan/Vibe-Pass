@@ -18,8 +18,8 @@ export default function TheatersNear({ selectedCinema, setSelectedCinema }) {
     const a =
       Math.sin(dLat / 2) ** 2 +
       Math.cos((lat1 * Math.PI) / 180) *
-        Math.cos((lat2 * Math.PI) / 180) *
-        Math.sin(dLon / 2) ** 2
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) ** 2
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
     return R * c
   }
@@ -54,9 +54,9 @@ export default function TheatersNear({ selectedCinema, setSelectedCinema }) {
   if (!nearest) return <p className="text-gray-400">📍 Detecting nearby theaters...</p>
 
   const handleCinemaClick = (cinema, index) => {
-    setSelectedCinema({ 
-      name: cinema, 
-      lat: nearest.latitude + index * 0.001, 
+    setSelectedCinema({
+      name: cinema,
+      lat: nearest.latitude + index * 0.001,
       lng: nearest.longitude + index * 0.001,
       district: nearest.district,
       city: nearest.city
@@ -75,9 +75,8 @@ export default function TheatersNear({ selectedCinema, setSelectedCinema }) {
           <li
             key={i}
             onClick={() => handleCinemaClick(cinema, i)}
-            className={`p-2 bg-gray-700 rounded cursor-pointer hover:bg-gray-600 transition ${
-              selectedCinema?.name === cinema ? 'ring-2 ring-[#E50914]' : ''
-            }`}
+            className={`p-2 bg-gray-700 rounded cursor-pointer hover:bg-gray-600 transition ${selectedCinema?.name === cinema ? 'ring-2 ring-[#E50914]' : ''
+              }`}
           >
             {cinema}
           </li>

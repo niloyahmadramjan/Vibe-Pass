@@ -9,6 +9,7 @@ import { Navigation } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import Link from 'next/link'
+import axiosSecure from '../api/axiosHook/useAxiosSecure'
 
 // Simple Loading Spinner Component
 function Spinner() {
@@ -35,27 +36,21 @@ export default function UpcomingMovie() {
   useEffect(() => {
     const fetchUpcoming = async () => {
       try {
-        // 🔹 Call TMDB upcoming API (page=1 means first set of movies)
-        const res = await fetch(
-          `${BASE_URL}/movie/upcoming?api_key=${API_KEY}&language=en-US&page=1`
-        )
-
-        // 🔹 Convert response into JSON
-        const data = await res.json()
+        // 🔹 Use axiosSecure to call your backend API
+        const res = await axiosSecure.get("/api/movies/category/upcoming")
 
         // 🔹 Store results (movies list) in state
-        setUpcoming(data.results || [])
+        setUpcoming(res.data || [])
       } catch (error) {
-        console.error('Error fetching upcoming movies:', error)
+        console.error("Error fetching upcoming movies:", error)
       } finally {
         // 🔹 Stop loading spinner whether success or fail
         setLoading(false)
       }
     }
 
-    // Call fetch function when component loads
     fetchUpcoming()
-  }, [API_KEY])
+  }, [])
 
   if (loading) return <Spinner />
 
@@ -90,11 +85,11 @@ export default function UpcomingMovie() {
               <div className="relative w-full h-[200px] sm:h-[250px] md:h-[300px] lg:h-[350px]">
                 <Image
                   src={
-                    movie.poster_path
-                      ? IMG_URL + movie.poster_path
-                      : '/no-poster.png'
+                    typeof movie.poster_path === "string" && movie.poster_path.startsWith("http")
+                      ? movie.poster_path // full URL (like i.ibb.co)
+                      : IMG_URL + movie.poster_path // TMDB partial path
                   }
-                  alt={movie.title}
+                  alt={movie.title || "Movie Poster"}
                   width={240}
                   height={260}
                   className="object-cover w-full h-full"

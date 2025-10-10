@@ -46,11 +46,13 @@ export default function PaymentsPage() {
             );
             setPayments(sortedPayments);
 
-            const chartData = Object.entries(revenueRes.data).map(([day, amount]) => ({
-                day,
-                amount
-            }));
-            setRevenueData(chartData);
+            // API returns array of objects like [{ name: "Fri", revenue: 0 }, ...]
+            setRevenueData(revenueRes.data.map(item => ({
+                day: item.name,
+                amount: item.revenue
+            })));
+;
+            // setRevenueData(chartData);
 
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -164,13 +166,18 @@ export default function PaymentsPage() {
                 }
             ];
         } else {
-            return revenueData.map(item => ({
-                ...item,
-                count: weeklyPayments.filter(payment => {
-                    const paymentDay = new Date(payment.createdAt).toLocaleDateString('en-US', { weekday: 'long' });
-                    return paymentDay.toLowerCase() === item.day.toLowerCase();
-                }).length
-            }));
+            return revenueData.map(item => {
+                const normalizedItemDay = item.day.slice(0, 3).toLowerCase(); // e.g. "Mon"
+                const count = weeklyPayments.filter(payment => {
+                    const paymentDay = new Date(payment.createdAt)
+                        .toLocaleDateString('en-US', { weekday: 'short' })
+                        .toLowerCase(); // e.g. "mon"
+                    return paymentDay === normalizedItemDay;
+                }).length;
+
+                return { ...item, count };
+            });
+
         }
     };
 
@@ -463,7 +470,7 @@ export default function PaymentsPage() {
                                 {activeTab === 'today' ? "Today's Unpaid" : "Weekly Unpaid"}
                                 <span className="text-sm text-orange-400 ml-2">(Latest First)</span>
                             </h2>
-                            <span className="bg-red-500/20 text-red-400 px-8  py-2 rounded-full text-sm">
+                            <span className="bg-red-500/20 text-red-400 px-8  py-2 rounded-xl text-sm">
                                 {unpaidBookings.length} pending
                             </span>
                         </div>
@@ -524,7 +531,7 @@ export default function PaymentsPage() {
                                 {activeTab === 'today' ? "Today's Refunds" : "Weekly Refunds"}
                                 <span className="text-sm text-red-400 ml-2">(Latest First)</span>
                             </h2>
-                            <span className="bg-red-500/20 text-red-400 px-8 py-1 rounded-full text-sm">
+                            <span className="bg-red-500/20 text-red-400 px-8 py-1 rounded-xl text-sm">
                                 {refundedPayments.length} refunds
                             </span>
                         </div>
