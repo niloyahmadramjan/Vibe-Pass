@@ -19,10 +19,12 @@ export default function AddMoviesPage() {
     release_date: "",
     title: "",
     video: false,
-    vote_average: 0,
-    vote_count: 0
+    vote_average: "",
+    vote_count: "",
+    id: "", // New field
+    category: "" // New field
   });
-// console.log(formData)
+
   const [uploading, setUploading] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
 
@@ -38,6 +40,18 @@ export default function AddMoviesPage() {
     { id: 18, name: "Drama" },
     { id: 27, name: "Horror" },
     { id: 878, name: "Sci-Fi" }
+  ];
+
+  const categoryOptions = [
+    "nowPlaying",
+    "trending",
+    "popular",
+    "topRated",
+    "upcoming",
+    "genreAction",
+    "genreIndia",
+    "genreAnimation",
+    "banglaFilm"
   ];
 
   const handleChange = (e) => {
@@ -90,9 +104,7 @@ export default function AddMoviesPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axiosSecure.post("/api/movies/add", formData);
-      // console.log(' Movie added:', response.data);
-
+      const response = await axiosSecure.post("/api/movies/", formData);
       toast.success(' Movie added successfully!', { duration: 3000 });
 
       setFormData({
@@ -108,7 +120,9 @@ export default function AddMoviesPage() {
         title: "",
         video: false,
         vote_average: 0,
-        vote_count: 0
+        vote_count: 0,
+        id: "", // Reset new field
+        category: "" // Reset new field
       });
 
     } catch (error) {
@@ -116,7 +130,6 @@ export default function AddMoviesPage() {
       toast.error('Failed to add movie', { duration: 3000 });
     }
   };
- 
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -132,7 +145,7 @@ export default function AddMoviesPage() {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 }
   };
-
+  console.log(formData)
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0c0c14] via-[#0f1018] to-[#1e1233] py-8 px-4">
       <motion.div
@@ -144,7 +157,7 @@ export default function AddMoviesPage() {
         {/* Header */}
         <motion.div variants={itemVariants} className="text-center mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 bg-clip-text text-transparent mb-4">
-             Add New Movie
+            Add New Movie
           </h1>
           <p className="text-gray-400 text-lg">Fill in the details to add a masterpiece to the collection</p>
         </motion.div>
@@ -158,7 +171,7 @@ export default function AddMoviesPage() {
                 onClick={() => setActiveTab(tab)}
                 className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${activeTab === tab
                   ? 'bg-gradient-to-r from-purple-600 to-purple-600/30 hover:from-purple-600/40 hover:to-purple-600/50  text-white shadow-lg'
-                    : 'text-gray-400 hover:text-white'
+                  : 'text-gray-400 hover:text-white'
                   }`}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -184,6 +197,45 @@ export default function AddMoviesPage() {
                 animate={{ opacity: 1, x: 0 }}
                 className="space-y-6"
               >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className=" text-sm font-semibold text-gray-300 mb-3 flex items-center">
+                      <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
+                      TMDB ID *
+                    </label>
+                    <input
+                      type="number"
+                      name="id"
+                      value={formData.id}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-[#1e1f29]/80 border border-gray-700/50 rounded-xl text-white placeholder-gray-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300"
+                      placeholder="Enter TMDB ID"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className=" text-sm font-semibold text-gray-300 mb-3 flex items-center">
+                      <span className="w-2 h-2 bg-indigo-500 rounded-full mr-2"></span>
+                      Category *
+                    </label>
+                    <select
+                      name="category"
+                      value={formData.category}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-[#1e1f29]/80 border border-gray-700/50 rounded-xl text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all duration-300"
+                      required
+                    >
+                      <option value="">Select Category</option>
+                      {categoryOptions.map(category => (
+                        <option key={category} value={category}>
+                          {category.charAt(0).toUpperCase() + category.slice(1)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className=" text-sm font-semibold text-gray-300 mb-3 flex items-center">
@@ -292,7 +344,7 @@ export default function AddMoviesPage() {
                     <input
                       type="number"
                       step="0.1"
-                      min=""
+                      min="0"
                       max="10"
                       name="vote_average"
                       value={formData.vote_average}
@@ -369,15 +421,13 @@ export default function AddMoviesPage() {
                       className="mt-6 flex justify-center"
                     >
                       <div className="relative group">
-                      
                         <Image
-                          src={formData.poster_path}  
-                          alt={formData.title}        
-                          width={150}                    
-                          height={150}                   
+                          src={formData.poster_path}
+                          alt={formData.title}
+                          width={150}
+                          height={150}
                           className="object-cover rounded-xl border-2 border-purple-500/50 shadow-2xl transition-transform duration-300 group-hover:scale-105"
                         />
-
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
                           <span className="text-white text-sm font-medium">Poster Preview</span>
                         </div>
@@ -418,7 +468,7 @@ export default function AddMoviesPage() {
                     </label>
                     <input
                       type="number"
-                      min=""
+                      min="0"
                       name="vote_count"
                       value={formData.vote_count}
                       onChange={handleChange}
@@ -466,8 +516,8 @@ export default function AddMoviesPage() {
                       </p>
                     </div>
                     <div className={`px-3 py-1 rounded-full text-xs font-medium ${formData.adult
-                        ? 'bg-red-500/20 text-red-400 border border-red-500/30'
-                        : 'bg-green-500/20 text-green-400 border border-green-500/30'
+                      ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                      : 'bg-green-500/20 text-green-400 border border-green-500/30'
                       }`}>
                       {formData.adult ? 'Rated R' : 'General'}
                     </div>
@@ -493,8 +543,8 @@ export default function AddMoviesPage() {
                       </p>
                     </div>
                     <div className={`px-3 py-1 rounded-full text-xs font-medium ${formData.video
-                        ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                        : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                      ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                      : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
                       }`}>
                       {formData.video ? 'Video Available' : 'No Video'}
                     </div>
@@ -504,10 +554,18 @@ export default function AddMoviesPage() {
                 {/* Summary Card */}
                 <div className="bg-gradient-to-r from-purple-500/10 to-indigo-500/10 border border-purple-500/20 rounded-2xl p-6">
                   <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-                    <span className="w-3 h-3bg-gradient-to-r from-purple-600 to-purple-600/30 hover:from-purple-600/40 hover:to-purple-600/50 rounded-full mr-2"></span>
+                    <span className="w-3 h-3 bg-gradient-to-r from-purple-600 to-purple-600/30 hover:from-purple-600/40 hover:to-purple-600/50 rounded-full mr-2"></span>
                     Movie Summary
                   </h3>
                   <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-400">TMDB ID:</span>
+                      <p className="text-white font-medium truncate">{formData.id || 'Not set'}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-400">Category:</span>
+                      <p className="text-white font-medium">{formData.category || 'Not set'}</p>
+                    </div>
                     <div>
                       <span className="text-gray-400">Title:</span>
                       <p className="text-white font-medium truncate">{formData.title || 'Not set'}</p>
@@ -542,8 +600,8 @@ export default function AddMoviesPage() {
                 }}
                 disabled={activeTab === 'basic'}
                 className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 border ${activeTab === 'basic'
-                    ? 'bg-gray-800/30 text-gray-500 border-gray-700/30 cursor-not-allowed'
-                    : 'bg-gray-800/50 text-gray-300 border-gray-700/50 hover:bg-gray-700/50'
+                  ? 'bg-gray-800/30 text-gray-500 border-gray-700/30 cursor-not-allowed'
+                  : 'bg-gray-800/50 text-gray-300 border-gray-700/50 hover:bg-gray-700/50'
                   }`}
               >
                 ← Previous
@@ -566,9 +624,8 @@ export default function AddMoviesPage() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   type="submit"
-                    className="px-8 py-3 bg-gradient-to-r from-purple-600 to-purple-600/30 hover:from-purple-600/40 hover:to-purple-600/50  text-white font-semibold rounded-xl shadow-lg hover:shadow-purple-500/25 transition-all duration-300 flex items-center space-x-2"
+                  className="px-8 py-3 bg-gradient-to-r from-purple-600 to-purple-600/30 hover:from-purple-600/40 hover:to-purple-600/50  text-white font-semibold rounded-xl shadow-lg hover:shadow-purple-500/25 transition-all duration-300 flex items-center space-x-2"
                 >
-                
                   <span>Add Movie</span>
                 </motion.button>
               )}
@@ -576,7 +633,7 @@ export default function AddMoviesPage() {
           </div>
         </motion.form>
       </motion.div>
+      <Toaster />
     </div>
   );
 }
-

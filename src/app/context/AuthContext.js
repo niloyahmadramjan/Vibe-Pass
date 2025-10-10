@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import axiosSecure from '../api/axiosHook/useAxiosSecure'
 
 const AuthContext = createContext(null)

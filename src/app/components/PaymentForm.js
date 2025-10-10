@@ -16,7 +16,7 @@ export default function PaymentForm({ session }) {
   const stripe = useStripe();
   const elements = useElements();
   const router = useRouter();
-  // console.log( "session",session)
+  // console.log("session", session._id)
 
   const [clientSecret, setClientSecret] = useState("");
   const [processing, setProcessing] = useState(false);
@@ -43,8 +43,9 @@ export default function PaymentForm({ session }) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        amount: session.totalAmount * 100,
+        amount: session.totalAmount ,
         bookingId: session._id,
+        
       }),
     })
       .then((res) => res.json())
@@ -111,7 +112,7 @@ export default function PaymentForm({ session }) {
         );
         Swal.fire({
           icon: "success",
-          title: "Payment Successful 🎉",
+          title: "Payment Successful ",
           text: "Redirecting you to your tickets...",
           timer: 2000,
           showConfirmButton: false,

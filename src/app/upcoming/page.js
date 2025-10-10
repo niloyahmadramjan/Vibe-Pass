@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import LoadingSpinner from '../hooks/LoadingSpiner'
+import axiosSecure from '../api/axiosHook/useAxiosSecure'
 
 function UpcomingMoviesContent() {
   const [movies, setMovies] = useState([])
@@ -11,50 +12,53 @@ function UpcomingMoviesContent() {
   const [totalPages, setTotalPages] = useState(1)
   const [showTrailer, setShowTrailer] = useState(false)
   const [trailerUrl, setTrailerUrl] = useState('')
+  const IMG_URL = 'https://image.tmdb.org/t/p/w500'
 
   const router = useRouter()
   const searchParams = useSearchParams()
   const page = Number(searchParams.get('page')) || 1
 
+  // ✅ Fetch upcoming movies from your backend API
   useEffect(() => {
-    async function fetchMovies() {
+    const fetchMovies = async () => {
       try {
-        setLoading(true)
-        const res = await fetch(
-          `https://api.themoviedb.org/3/movie/upcoming?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&page=${page}`
-        )
-        const data = await res.json()
-        setMovies(data.results || [])
-        setTotalPages(data.total_pages)
+        setLoading(true);
+        const res = await axiosSecure.get(`/api/movies/category/upcoming?page=${page}`);
+        setMovies(res.data || []);
+        setTotalPages(res.data.total_pages || 1);
       } catch (error) {
-        console.error('Failed to fetch upcoming movies', error)
+        console.error("Failed to fetch upcoming movies:", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
-    fetchMovies()
-  }, [page])
+    };
+    fetchMovies();
+  }, [page]);
 
-  // ✅ Fetch Trailer URL from TMDB
-  async function handleWatchTrailer(movieId) {
+  // ✅ Fetch trailer from your backend (optional)
+  // Backend route: /api/movies/:id/videos
+  const handleWatchTrailer = async (tmdbId) => {
     try {
-      const res = await fetch(
-        `https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&language=en-US`
-      )
-      const data = await res.json()
-      const trailer = data.results.find(
-        (v) => v.type === 'Trailer' && v.site === 'YouTube'
-      )
+      console.log("🎥 Fetching trailer for TMDB ID:", tmdbId);
+
+      // call from backend
+      const res = await axiosSecure.get(`/api/movies/${tmdbId}/videos`);
+      const results = res.data.results || [];
+
+      const trailer = results.find(
+        (v) => v.type === "Trailer" && v.site === "YouTube"
+      );
+
       if (trailer) {
-        setTrailerUrl(`https://www.youtube.com/embed/${trailer.key}?autoplay=1`)
-        setShowTrailer(true)
+        setTrailerUrl(`https://www.youtube.com/embed/${trailer.key}?autoplay=1`);
+        setShowTrailer(true);
       } else {
-        alert('Trailer not available!')
+        alert("Trailer not available!");
       }
     } catch (error) {
-      console.error('Failed to fetch trailer', error)
+      console.error("🎬 Failed to fetch trailer:", error);
     }
-  }
+  };
 
   if (loading) return <LoadingSpinner />
 
@@ -76,18 +80,19 @@ function UpcomingMoviesContent() {
               <div className="relative w-full h-[280px]">
                 <Image
                   src={
-                    movie.poster_path
-                      ? `https://image.tmdb.org/t/p/w500${movie.backdrop_path}`
-                      : '/placeholder.jpg'
+                    typeof movie.poster_path === "string" && movie.poster_path.startsWith("http")
+                      ? movie.poster_path // full URL (like i.ibb.co)
+                      : IMG_URL + movie.poster_path // TMDB partial path
                   }
-                  alt={movie.title}
+                  alt={movie.title || "Movie Poster"}
                   fill
                   className="object-cover group-hover:scale-110 transition-transform duration-500"
                 />
                 <div className="absolute top-3 left-3 bg-red-600 px-2 py-1 rounded-md text-sm font-bold shadow-md">
-                  {movie.vote_average.toFixed(1)}
+                  {movie.vote_average?.toFixed(1)}
                 </div>
               </div>
+
 
               <div className="p-4 flex flex-col flex-1">
                 <h3 className="text-lg font-semibold truncate">
@@ -125,11 +130,10 @@ function UpcomingMoviesContent() {
             <button
               key={p}
               onClick={() => router.push(`/upcoming?page=${p}`)}
-              className={`px-4 py-2 rounded-lg font-semibold transition ${
-                p === page
+              className={`px-4 py-2 rounded-lg font-semibold transition ${p === page
                   ? 'bg-red-600 text-white shadow-lg'
                   : 'bg-gray-800 hover:bg-gray-700 text-gray-300'
-              }`}
+                }`}
             >
               {p}
             </button>

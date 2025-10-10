@@ -148,7 +148,7 @@ export default function AllTheatersLocation({ movieId }) {
       {selectedLocation && (
         <div className="rounded-xl p-4 border border-gray-700 bg-[#111111]">
           <h2 className="text-lg font-semibold mb-3 border-b border-gray-700 pb-1">
-            🎬 {selectedLocation.district}, {selectedLocation.region}
+             {selectedLocation.district}, {selectedLocation.region}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {selectedLocation.cinemas.map((cinema, index) => (

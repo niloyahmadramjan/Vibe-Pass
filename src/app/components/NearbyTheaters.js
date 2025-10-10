@@ -67,7 +67,7 @@ export default function TheatersNear({ selectedCinema, setSelectedCinema }) {
   return (
     <div className="bg-gray-800 p-4 rounded-lg shadow-md space-y-4 max-w-7xl mx-auto my-10">
       <h3 className="text-lg font-bold mb-2">
-        🎬 Theaters near {nearest.city}, {nearest.district}
+         Theaters near {nearest.city}, {nearest.district}
       </h3>
 
       <ul className="space-y-2">

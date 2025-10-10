@@ -1,46 +1,41 @@
+
 'use client';
-import { useEffect, useState } from 'react';
-import {
-     FiUser, FiFilm, FiCalendar, FiClock,
-    FiDollarSign, FiMapPin, FiSearch, FiFilter,
-    FiCheckCircle, FiXCircle, FiEye, FiDownload,
-    FiRefreshCw, FiBarChart2, FiUsers, FiShoppingCart
+import { useState } from 'react';
+import { FiUser, FiFilm, FiCalendar, FiClock,FiDollarSign, FiSearch, FiRefreshCw,FiCheckCircle, FiXCircle, FiEye, FiDownload, FiShoppingCart
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import AdminLoading from '../components/AdminLoading';
 import axiosSecure from '@/app/api/axiosHook/useAxiosSecure';
 import { FaTicketAlt } from 'react-icons/fa';
+import { useQuery } from '@tanstack/react-query';
+import TicketPDF from '../components/TicketPDF';
 
 export default function TicketManagement() {
-    const [tickets, setTickets] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [selectedDate, setSelectedDate] = useState('');
     const [viewModalOpen, setViewModalOpen] = useState(false);
     const [selectedTicket, setSelectedTicket] = useState(null);
-
-    // Fetch tickets
-    useEffect(() => {
-        fetchTickets();
-    }, []);
-
-    const fetchTickets = async () => {
-        try {
-            const response = await axiosSecure.get('/api/ticket');
-            // Sort by latest first
-            const sortedTickets = response.data.sort((a, b) =>
-                new Date(b.createdAt) - new Date(a.createdAt)
-            );
-            setTickets(sortedTickets);
-        } catch (error) {
-            console.error('Error fetching tickets:', error);
-            toast.error('Failed to load tickets');
-        } finally {
-            setLoading(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const ticketsPerPage = 10;
+    console.log(statusFilter)
+    // Fetch tickets using React Query
+    const { data: tickets = [], isLoading, error, refetch } = useQuery({
+        queryKey: ['tickets'],
+        queryFn: async () => {
+            try {
+                const response = await axiosSecure.get('/api/ticket');
+                // Sort by latest first
+                return response.data.sort((a, b) =>
+                    new Date(b.createdAt) - new Date(a.createdAt)
+                );
+            } catch (error) {
+                console.error('Error fetching tickets:', error);
+                throw new Error('Failed to load tickets');
+            }
         }
-    };
-
+    });
+    console.log(tickets)
     // Filter tickets
     const filteredTickets = tickets.filter(ticket => {
         const matchesSearch =
@@ -53,6 +48,11 @@ export default function TicketManagement() {
 
         return matchesSearch && matchesStatus && matchesDate;
     });
+
+    // Pagination
+    const totalPages = Math.ceil(filteredTickets.length / ticketsPerPage);
+    const startIndex = (currentPage - 1) * ticketsPerPage;
+    const currentTickets = filteredTickets.slice(startIndex, startIndex + ticketsPerPage);
 
     // Calculate statistics
     const stats = {
@@ -92,10 +92,10 @@ export default function TicketManagement() {
         setViewModalOpen(true);
     };
 
-    // Download ticket as PDF (mock function)
+    // Download ticket as PDF
     const handleDownloadTicket = (ticket) => {
+        TicketPDF.generatePDF(ticket);
         toast.success(`Downloading ticket for ${ticket.userName}`);
-        // Here you would implement actual PDF download logic
     };
 
     // Format time
@@ -108,8 +108,24 @@ export default function TicketManagement() {
         return `${formattedHour}:${minutes} ${ampm}`;
     };
 
-    if (loading) {
+    if (isLoading) {
         return <AdminLoading />;
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-[#0c0c14] via-[#0f1018] to-[#1e1233] p-6 flex items-center justify-center">
+                <div className="text-center">
+                    <h2 className="text-2xl font-bold text-red-400 mb-4">Error Loading Tickets</h2>
+                    <button
+                        onClick={() => refetch()}
+                        className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-xl text-white transition-colors"
+                    >
+                        Retry
+                    </button>
+                </div>
+            </div>
+        );
     }
 
     return (
@@ -131,7 +147,7 @@ export default function TicketManagement() {
                             <p className="text-3xl font-bold text-white mt-2">{stats.totalTickets}</p>
                         </div>
                         <div className="p-3 bg-purple-500/20 rounded-xl">
-                            {/* <FiTicket className="text-purple-400 text-2xl" /> */}
+                            <FaTicketAlt className="text-purple-400 text-2xl" />
                         </div>
                     </div>
                 </div>
@@ -164,7 +180,7 @@ export default function TicketManagement() {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-gray-400 text-sm">Total Revenue</p>
-                            <p className="text-3xl font-bold text-white mt-2">${stats.totalRevenue}</p>
+                            <p className="text-3xl font-bold text-white mt-2">${stats.totalRevenue.toFixed(2)}</p>
                         </div>
                         <div className="p-3 bg-blue-500/20 rounded-xl">
                             <FiDollarSign className="text-blue-400 text-2xl" />
@@ -195,9 +211,10 @@ export default function TicketManagement() {
                         className="px-4 py-3 bg-gray-800 border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
                     >
                         <option value="all">All Status</option>
-                        <option value="paid">Confirmed</option>
-                        <option value="pending">Pending</option>
+                        <option value="paid">Paid</option>
+                        <option value="unpaid">Unpaid</option>
                         <option value="cancelled">Cancelled</option>
+
                     </select>
 
                     {/* Date Filter */}
@@ -214,6 +231,7 @@ export default function TicketManagement() {
                             setSearchTerm('');
                             setStatusFilter('all');
                             setSelectedDate('');
+                            setCurrentPage(1);
                         }}
                         className="px-4 py-3 bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-xl text-white transition-colors flex items-center justify-center gap-2"
                     >
@@ -224,7 +242,7 @@ export default function TicketManagement() {
             </div>
 
             {/* Tickets Table */}
-            <div className="bg-gradient-to-br from-gray-900 to-gray-900/55 rounded-2xl border border-gray-700 shadow-2xl overflow-hidden">
+            <div className="bg-gradient-to-br from-gray-900 to-gray-900/55 rounded-2xl border border-gray-700 shadow-2xl overflow-hidden mb-6">
                 <div className="overflow-x-auto">
                     <table className="w-full">
                         <thead>
@@ -238,7 +256,7 @@ export default function TicketManagement() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-700">
-                            {filteredTickets.map((ticket) => (
+                            {currentTickets.map((ticket) => (
                                 <tr key={ticket._id} className="hover:bg-gray-800/50 transition-colors">
                                     <td className="px-6 py-4">
                                         <div>
@@ -313,6 +331,42 @@ export default function TicketManagement() {
                     </div>
                 )}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-4">
+                    <button
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:text-gray-500 rounded-xl text-white transition-colors"
+                    >
+                        Previous
+                    </button>
+
+                    <div className="flex gap-2">
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                            <button
+                                key={page}
+                                onClick={() => setCurrentPage(page)}
+                                className={`px-4 py-2 rounded-xl transition-colors ${currentPage === page
+                                    ? 'bg-purple-600 text-white'
+                                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                    }`}
+                            >
+                                {page}
+                            </button>
+                        ))}
+                    </div>
+
+                    <button
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                        className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:text-gray-500 rounded-xl text-white transition-colors"
+                    >
+                        Next
+                    </button>
+                </div>
+            )}
 
             {/* Ticket Details Modal */}
             {viewModalOpen && selectedTicket && (
