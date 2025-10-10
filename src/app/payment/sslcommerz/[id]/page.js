@@ -42,11 +42,13 @@ export default function SSLCommerzPayment() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+              transactionId: session._id, // temp until backend generates real one
               amount: session.totalAmount,
-              userName: session.userName,
-              userEmail: session.userEmail,
+              status: 'INITIATED',
               bookingId: session._id,
-              movieTitle: session.movieTitle,
+              sessionTitle: session.movieTitle,
+              userEmail: session.userEmail,
+              userName: session.userName,
               theaterName: session.theaterName,
               showTime: session.showTime,
               selectedSeats: session.selectedSeats,
@@ -56,13 +58,14 @@ export default function SSLCommerzPayment() {
         )
 
         const data = await res.json()
+        console.log(data)
 
         if (data.url) {
           // ✅ Redirect to SSLCommerz payment page
           window.location.href = data.url
         } else {
           Swal.fire('Error', 'Payment session creation failed', 'error')
-          router.push('/tickets')
+          // router.push('/tickets')
         }
       } catch (err) {
         console.error('SSLCommerz init error:', err)
@@ -71,7 +74,7 @@ export default function SSLCommerzPayment() {
           err.message || 'Failed to initialize payment',
           'error'
         )
-        router.push('/tickets')
+        // router.push('/tickets')
       } finally {
         setLoading(false)
       }
@@ -91,7 +94,6 @@ export default function SSLCommerzPayment() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center text-white font-[Inter]">
       <div className="flex flex-col items-center">
-       
         <p className="mt-4 text-lg font-semibold text-gray-300">
           Initializing SSLCommerz payment, please wait...
         </p>
