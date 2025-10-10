@@ -11,8 +11,12 @@ import {
 } from 'recharts';
 import StarCardtDeshbord from './components/StartCardDeshbord';
 import Image from 'next/image';
-
-const COLORS = ['#8B5CF6', '#7C3AED', '#6D28D9', '#5B21B6', '#4C1D95', '#3730A3'];
+const COLORS = [
+  "#8884d8", "#82ca9d", "#ffc658", "#ff7f50", "#00C49F", "#0088FE", "#FFBB28", "#FF8042",
+  "#A28DFF", "#FF69B4", "#7FDBFF", "#3D9970", "#B10DC9", "#39CCCC", "#FFDC00",
+  "#FF851B", "#85144b", "#F012BE", "#0074D9", "#2ECC40", "#01FF70", "#AAAAAA"
+];
+// const COLORS = ['#8B5CF6', '#7C3AED', '#6D28D9', '#5B21B6', '#4C1D95', '#3730A3'];
 
 const genreOptions = [
   { id: 16, name: "Animation" },
@@ -66,65 +70,90 @@ export default function AdminHomePage() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        // Users - Fixed to handle single user object
+        // 🧩 USERS — fixed to handle single user object or array
         const usersRes = await axiosSecure.get("/api/auth");
         const usersArray = Array.isArray(usersRes.data) ? usersRes.data : [usersRes.data];
         setUsersData(usersArray);
         setSummary(prev => ({ ...prev, totalUsers: usersArray.length }));
 
-        // Revenue
+        // 💰 REVENUE — fixed for array response
         const revenueRes = await axiosSecure.get("/api/payments/weekly-revenue");
-        const revenueData = revenueRes.data || {};
-        setRevenueData(Object.entries(revenueData).map(([day, revenue]) => ({
-          name: day,
-          revenue: Number(revenue) || 0
-        })));
-        const totalRevenue = Object.values(revenueData).reduce((sum, val) => sum + Number(val), 0);
+        const revenueArray = Array.isArray(revenueRes.data) ? revenueRes.data : [];
+
+        // If no data returned, fallback to empty week
+        setRevenueData(
+          revenueArray.length > 0
+            ? revenueArray
+            : [
+              { name: "Mon", revenue: 0 },
+              { name: "Tue", revenue: 0 },
+              { name: "Wed", revenue: 0 },
+              { name: "Thu", revenue: 0 },
+              { name: "Fri", revenue: 0 },
+              { name: "Sat", revenue: 0 },
+              { name: "Sun", revenue: 0 },
+            ]
+        );
+
+        const totalRevenue = revenueArray.reduce(
+          (sum, item) => sum + (item.revenue || 0),
+          0
+        );
         setSummary(prev => ({ ...prev, totalRevenue }));
 
-        // Bookings
+        // 🎟️ BOOKINGS — converts backend object into chart-friendly array
         const bookingsRes = await axiosSecure.get("/api/ticket/weekly-bookings");
         const bookingsData = bookingsRes.data || {};
-        setBookingsData(Object.entries(bookingsData).map(([day, count]) => ({
+        const bookingsArray = Object.entries(bookingsData).map(([day, count]) => ({
           day,
-          bookings: parseInt(count, 10) || 0
-        })));
-        const totalBookings = Object.values(bookingsData).reduce((sum, val) => sum + Number(val), 0);
+          bookings: parseInt(count, 10) || 0,
+        }));
+        setBookingsData(bookingsArray);
+
+        const totalBookings = bookingsArray.reduce(
+          (sum, b) => sum + b.bookings,
+          0
+        );
         setSummary(prev => ({ ...prev, totalBookings }));
 
-        // Movies
+        // 🎬 MOVIES — safely load and count
         const moviesRes = await axiosSecure.get("/api/movies");
         const moviesArray = Array.isArray(moviesRes.data) ? moviesRes.data : [];
         setMoviesData(moviesArray);
         setSummary(prev => ({ ...prev, totalMovies: moviesArray.length }));
 
-        // Coupons
+        // 🏷️ COUPONS — safely handle missing API
         try {
           const couponsRes = await axiosSecure.get("/api/coupons");
-          const couponsArray = Array.isArray(couponsRes.data) ? couponsRes.data : [];
+          const couponsArray = Array.isArray(couponsRes.data)
+            ? couponsRes.data
+            : [];
           setCouponsData(couponsArray);
           setSummary(prev => ({ ...prev, totalCoupons: couponsArray.length }));
         } catch (error) {
-          console.log("Coupons API not available");
+          console.log("⚠️ Coupons API not available");
         }
 
-        // Payments
+        // 💳 PAYMENTS — safely handle missing API
         try {
           const paymentsRes = await axiosSecure.get("/api/payments");
-          const paymentsArray = Array.isArray(paymentsRes.data) ? paymentsRes.data : [];
+          const paymentsArray = Array.isArray(paymentsRes.data)
+            ? paymentsRes.data
+            : [];
           setPaymentsData(paymentsArray);
           setSummary(prev => ({ ...prev, activePayments: paymentsArray.length }));
         } catch (error) {
-          console.log("Payments API not available");
+          console.log("⚠️ Payments API not available");
         }
 
       } catch (error) {
-        console.error("Error fetching dashboard data:", error);
+        console.error("❌ Error fetching dashboard data:", error);
       }
     };
 
     fetchDashboardData();
   }, []);
+
 
   // Prepare genre data for pie chart using genre_ids
   const genreData = moviesData.reduce((acc, movie) => {
@@ -506,33 +535,44 @@ export default function AdminHomePage() {
             </div>
           </div>
           <div className="h-72">
-            {genreData.length > 0 ? (
+            {genreData && genreData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={genreData}
                     cx="50%"
                     cy="50%"
-                    outerRadius={80}
-                    fill="#8884d8"
+                    outerRadius={100}
+                    innerRadius={50}
+                    paddingAngle={2}
                     dataKey="value"
                     nameKey="name"
                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                     labelLine={false}
                   >
                     {genreData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]} // automatically picks next color
+                        stroke="#0f0f1a"
+                        strokeWidth={1}
+                      />
                     ))}
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: 'gray',
-                      border: '1px solid #374151',
-                      borderRadius: '8px',
-                      color: '#FFFFFF'
+                      backgroundColor: "gray",
+                      border: "1px solid #374151",
+                      borderRadius: "8px",
+                      color: "#fff",
                     }}
                   />
-                  <Legend />
+                  {/* <Legend
+                    layout="horizontal"
+                    verticalAlign="bottom"
+                    align="center"
+                    wrapperStyle={{ color: "#ccc", fontSize: "12px" }}
+                  /> */}
                 </PieChart>
               </ResponsiveContainer>
             ) : (

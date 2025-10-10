@@ -19,6 +19,7 @@ function Spinner() {
 export default function KidsMovies() {
   const [movies, setMovies] = useState([])
   const [loading, setLoading] = useState(true)
+  const IMG_URL = 'https://image.tmdb.org/t/p/w500'
 
   // 🔹 Modal States
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -31,10 +32,12 @@ export default function KidsMovies() {
       setLoading(true)
       try {
         const res = await fetch(
-          `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&language=en-US&sort_by=popularity.desc&with_genres=16,10751&page=1`
+
+          `          http://localhost:5000/api/movies/category/genreAnimation`
         )
         const data = await res.json()
-        setMovies(data.results || [])
+        setMovies(data)
+        console.log(data.id)
       } catch (error) {
         console.error('Error fetching kids movies:', error)
       } finally {
@@ -43,7 +46,7 @@ export default function KidsMovies() {
     }
     fetchMovies()
   }, [])
-
+  console.log(movies)
   if (loading) return <Spinner />
 
   // 🔹 Handle Book Now
@@ -86,8 +89,12 @@ export default function KidsMovies() {
             >
               {/* Poster */}
               <Image
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                alt={movie.title}
+                src={
+                  typeof movie.poster_path === "string" && movie.poster_path.startsWith("http")
+                    ? movie.poster_path // full URL (like i.ibb.co)
+                    : IMG_URL + movie.poster_path // TMDB partial path
+                }
+                alt={movie.title || "Movie Poster"}
                 fill
                 className="object-cover"
               />

@@ -64,7 +64,7 @@ const teamMembers = [
     role: 'Frontend Developer',
     skills: ['React', 'Next.js', 'Tailwind CSS'],
     bio: 'Passionate frontend developer focused on building responsive, user-friendly interfaces with modern web technologies.',
-    photo: 'https://i.ibb.co/848Hr24Z/done4.png',
+    photo: 'https://i.ibb.co.com/848Hr24Z/done4.png',
     github: 'https://github.com/Zihad-pro',
     linkedin: 'https://www.linkedin.com/in/zubaed',
   },
@@ -114,7 +114,7 @@ export default function AboutSection() {
     <section className="text-white py-16 px-6 md:px-20">
       <div className="relative w-full h-[60vh] flex items-center justify-center text-center px-6 mb-10">
         <Image
-          src="https://i.ibb.co/cK3r4vZJ/Zk-RCOGZId3c.jpg"
+          src="https://i.ibb.co.com/cK3r4vZJ/Zk-RCOGZId3c.jpg"
           alt="Cinema Background"
           fill
           className="object-cover opacity-30"

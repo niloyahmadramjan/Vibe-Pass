@@ -8,6 +8,7 @@ import 'swiper/css/navigation'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import BookingLocationModal from './BookingLocationModal' // ✅ modal import
+import axiosSecure from '../api/axiosHook/useAxiosSecure'
 
 // 🔹 Loading Spinner
 function Spinner() {
@@ -23,7 +24,7 @@ const IMG_URL = 'https://image.tmdb.org/t/p/w500'
 
 export default function MovieCard() {
   const [moviesData, setMoviesData] = useState({})
-  const [activeTab, setActiveTab] = useState('nowPlaying')
+  const [activeTab, setActiveTab] = useState('topRated')
   const [loading, setLoading] = useState(true)
   const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY
   const router = useRouter()
@@ -33,36 +34,15 @@ export default function MovieCard() {
   const [selectedMovie, setSelectedMovie] = useState(null)
   const [selectionMode, setSelectionMode] = useState('auto')
   const [selectedCinema, setSelectedCinema] = useState(null)
-
   const categories = useMemo(
     () => [
-      {
-        key: 'nowPlaying',
-        label: 'Now Playing',
-        url: `${BASE_URL}/movie/now_playing?api_key=${API_KEY}&language=en-US&page=1`,
-      },
-      {
-        key: 'trending',
-        label: 'Trending',
-        url: `${BASE_URL}/trending/movie/week?api_key=${API_KEY}`,
-      },
-      {
-        key: 'popular',
-        label: 'Popular',
-        url: `${BASE_URL}/movie/popular?api_key=${API_KEY}&language=en-US&page=1`,
-      },
-      {
-        key: 'topRated',
-        label: 'Top Rated',
-        url: `${BASE_URL}/movie/top_rated?api_key=${API_KEY}&language=en-US&page=1`,
-      },
-      {
-        key: 'upcoming',
-        label: 'Upcoming',
-        url: `${BASE_URL}/movie/upcoming?api_key=${API_KEY}&language=en-US&page=1`,
-      },
+      { key: "topRated", label: "Top Rated" },
+      { key: "trending", label: "Trending" },
+      { key: "popular", label: "Popular" },
+      { key: "nowPlaying", label: "Now Playing" },
+      { key: "upcoming", label: "Upcoming" }
     ],
-    [API_KEY]
+    []
   )
 
   // 🔹 Fetch Movies
@@ -72,22 +52,25 @@ export default function MovieCard() {
       try {
         const results = await Promise.all(
           categories.map(async (cat) => {
-            const res = await fetch(cat.url)
-            const data = await res.json()
-            return { key: cat.key, movies: data.results || [] }
+            const res = await axiosSecure.get(`/api/movies/category/${cat.key}`)
+            return { key: cat.key, movies: res.data || [] }
+
           })
         )
+
         const dataObj = results.reduce((acc, cur) => {
           acc[cur.key] = cur.movies
           return acc
         }, {})
+
         setMoviesData(dataObj)
       } catch (error) {
-        console.error('Error fetching movies:', error)
+        console.error("Error fetching movies:", error)
       } finally {
         setLoading(false)
       }
     }
+
     fetchAllMovies()
   }, [categories])
 
@@ -146,16 +129,16 @@ export default function MovieCard() {
                 <div className="relative w-full h-[70%] sm:h-[67%]">
                   <Image
                     src={
-                      movie.poster_path
-                        ? IMG_URL + movie.poster_path
-                        : '/no-poster.png'
+                      typeof movie.poster_path === "string" && movie.poster_path.startsWith("http")
+                        ? movie.poster_path // full URL (like i.ibb.co)
+                        : IMG_URL + movie.poster_path // TMDB partial path
                     }
-                    alt={movie.title || 'No title'}
+                    alt={movie.title || "Movie Poster"}
                     fill
                     className="object-cover"
-                    placeholder="blur"
-                    blurDataURL="/blur-placeholder.png"
+             
                   />
+
                   <div className="absolute inset-0 bg-red-500 opacity-0 group-hover:opacity-20 transition duration-300"></div>
                 </div>
 
