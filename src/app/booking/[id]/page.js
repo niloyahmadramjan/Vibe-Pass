@@ -18,6 +18,9 @@ import {
   MapPin,
   Ticket,
   CreditCard,
+  Globe,
+  Shield,
+  Clock,
 } from './components/Icons'
 import DateSelector from './components/DateSelector'
 import Showtimes from './components/Showtimes'
@@ -30,6 +33,163 @@ import SuccessModal from './components/SuccessModal'
 import { seatSections } from './utils/seatData'
 import { showtimes } from './utils/showtimes'
 import { getSeatSection, formatTime, getDateOptions } from './utils/helpers'
+
+// Payment Options Modal Component
+const PaymentOptionsModal = ({ bookingData, onClose, onPaymentSelect }) => {
+  const [selectedOption, setSelectedOption] = useState(null)
+
+  const paymentMethods = [
+    {
+      id: 'stripe',
+      name: 'International Payment',
+      description: 'Pay with Credit/Debit Card (Visa, MasterCard, Amex)',
+      icon: Globe,
+      color: 'from-blue-500 to-purple-600',
+      borderColor: 'border-blue-500/50',
+      bgColor: 'bg-blue-500/10',
+      features: [
+        'Secure International Payment',
+        'Multiple Currency Support',
+        'Instant Processing',
+      ],
+    },
+    {
+      id: 'sslcommerz',
+      name: 'Bangladesh Payment',
+      description: 'Pay with bKash, Nagad, Rocket, or Local Bank Cards',
+      icon: Shield,
+      color: 'from-green-500 to-teal-600',
+      borderColor: 'border-green-500/50',
+      bgColor: 'bg-green-500/10',
+      features: ['Local Payment Methods', 'BDT Currency', 'Fast Processing'],
+    },
+  ]
+
+  const handleContinue = () => {
+    if (!selectedOption) {
+      toast.error('Please select a payment method')
+      return
+    }
+    onPaymentSelect(selectedOption)
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-gray-800 rounded-2xl border border-gray-700/50 shadow-2xl max-w-md w-full mx-auto">
+        {/* Header */}
+        <div className="p-6 border-b border-gray-700/50">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-white">
+              Choose Payment Method
+            </h2>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-gray-700/50"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+          <p className="text-gray-400 mt-2">
+            Select your preferred payment gateway
+          </p>
+        </div>
+
+        {/* Payment Options */}
+        <div className="p-6 space-y-4">
+          {paymentMethods.map((method) => (
+            <div
+              key={method.id}
+              onClick={() => setSelectedOption(method.id)}
+              className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
+                selectedOption === method.id
+                  ? `${method.borderColor} ${method.bgColor} transform scale-105`
+                  : 'border-gray-600/50 bg-gray-700/30 hover:bg-gray-600/30'
+              }`}
+            >
+              <div className="flex items-start space-x-4">
+                <div
+                  className={`w-12 h-12 rounded-lg bg-gradient-to-r ${method.color} flex items-center justify-center flex-shrink-0`}
+                >
+                  <method.icon className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-semibold text-white text-lg">
+                      {method.name}
+                    </h3>
+                    <div
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                        selectedOption === method.id
+                          ? 'border-white bg-white'
+                          : 'border-gray-400'
+                      }`}
+                    >
+                      {selectedOption === method.id && (
+                        <div className="w-2 h-2 rounded-full bg-gradient-to-r from-red-500 to-red-600"></div>
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-gray-300 text-sm mb-3">
+                    {method.description}
+                  </p>
+                  <div className="space-y-1">
+                    {method.features.map((feature, index) => (
+                      <div key={index} className="flex items-center space-x-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-current opacity-60"></div>
+                        <span className="text-xs text-gray-400">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div className="p-6 border-t border-gray-700/50">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-gray-400">Total Amount</span>
+            <span className="text-2xl font-bold text-green-400">
+              ৳{bookingData?.totalAmount || 0}
+            </span>
+          </div>
+          <div className="flex space-x-3">
+            <button
+              onClick={onClose}
+              className="flex-1 py-3 px-4 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors font-semibold"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleContinue}
+              disabled={!selectedOption}
+              className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
+                selectedOption
+                  ? 'bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 transform hover:scale-105'
+                  : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+              }`}
+            >
+              Continue to Pay
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function MovieSeatBooking() {
   const params = useParams()
@@ -54,6 +214,7 @@ export default function MovieSeatBooking() {
   const [reservedSeatsState, setReservedSeatsState] = useState([])
   const [availableShowtimes, setAvailableShowtimes] = useState([])
   const [loadingShowtimes, setLoadingShowtimes] = useState(false)
+  const [showPaymentOptions, setShowPaymentOptions] = useState(false) // New state
 
   const theaterName = searchParams.get('cinema') || 'Default Theater'
 
@@ -83,7 +244,6 @@ export default function MovieSeatBooking() {
   }, [id, router])
 
   // ✅ Fetch reserved seats when showtime changes
-  // ✅ CORRECT VERSION
   useEffect(() => {
     const fetchReservedSeats = async () => {
       if (!id || !selectedTime || !selectedDate) return
@@ -92,7 +252,7 @@ export default function MovieSeatBooking() {
         const res = await axiosSecure.get('/api/ticket/reserved-seats', {
           params: {
             movieId: id,
-            showTime: selectedTime.time, // ✅ Changed from 'showtime'
+            showTime: selectedTime.time,
             showDate: selectedDate,
           },
         })
@@ -142,11 +302,9 @@ export default function MovieSeatBooking() {
       showtime: selectedTime.time,
       showDate: selectedDate,
     })
-    // console.log(`🔵 Joined room: ${room}`)
 
     // Listen for seat updates
     socket.on('reservedSeatsUpdate', (data) => {
-      // console.log('🔴 Reserved seats updated:', data.reservedSeats)
       setReservedSeatsState(data.reservedSeats)
     })
 
@@ -233,10 +391,23 @@ export default function MovieSeatBooking() {
     }
   }
 
-  // ✅ Handle payment
+  // ✅ NEW: Handle payment method selection
+  const handlePaymentMethodSelect = (paymentMethod) => {
+    setShowPaymentOptions(false)
+
+    if (paymentMethod === 'stripe') {
+      router.push(`/payment/stripe/${bookingData._id}`)
+    } else if (paymentMethod === 'sslcommerz') {
+      router.push(`/payment/sslcommerz/${bookingData._id}`)
+    }
+  }
+
+  // ✅ UPDATED: Handle payment (now shows payment options)
   const handlePayment = (payNow = false) => {
-    if (payNow && bookingData) router.push(`/payment/${bookingData._id}`)
-    else {
+    if (payNow && bookingData) {
+      // Show payment options modal instead of direct redirect
+      setShowPaymentOptions(true)
+    } else {
       setBookingSuccess(false)
       setBookingData(null)
       setPaymentTimer(600)
@@ -248,9 +419,7 @@ export default function MovieSeatBooking() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="text-red-500 text-xl mb-4">
-            ❌ Movie data not found!
-          </div>
+          <div className="text-red-500 text-xl mb-4">Movie data not found!</div>
           <button
             onClick={() => router.push('/movies')}
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -439,34 +608,6 @@ export default function MovieSeatBooking() {
               </div>
             </div>
 
-            {/* Date Selection */}
-            {/* <div className="bg-gray-800 rounded-2xl p-6 border border-gray-700/50 shadow-xl">
-              <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-red-500">
-                <Calendar className="w-5 h-5" />
-                Select Date
-              </h3>
-              <div className="grid grid-cols-2 gap-3">
-                {getDateOptions().map((date) => (
-                  <button
-                    key={date.value}
-                    onClick={() => setSelectedDate(date.value)}
-                    className={`p-3 rounded-lg text-center transition-all ${
-                      selectedDate === date.value
-                        ? 'bg-red-600 border-red-500'
-                        : 'bg-gray-700/50 border-gray-600/50 hover:bg-gray-600/50'
-                    } border-2`}
-                  >
-                    <div className="font-semibold">
-                      {date.label.split(' ')[0]}
-                    </div>
-                    <div className="text-sm">
-                      {date.label.split(' ').slice(1).join(' ')}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div> */}
-
             {/* Date & Showtimes */}
             <DateSelector
               dateOptions={getDateOptions()}
@@ -474,11 +615,11 @@ export default function MovieSeatBooking() {
               setSelectedDate={setSelectedDate}
             />
             <Showtimes
-              showtimes={availableShowtimes} // ✅ Changed from static
+              showtimes={availableShowtimes}
               selectedTime={selectedTime}
               setSelectedTime={setSelectedTime}
               selectedDate={selectedDate}
-              loading={loadingShowtimes} // ✅ Added
+              loading={loadingShowtimes}
               toast={toast}
             />
 
@@ -588,6 +729,14 @@ export default function MovieSeatBooking() {
             formatTime={formatTime}
             onPayNow={() => handlePayment(true)}
             onPayLater={() => handlePayment(false)}
+          />
+        )}
+        {/* NEW: Payment Options Modal */}
+        {showPaymentOptions && bookingData && (
+          <PaymentOptionsModal
+            bookingData={bookingData}
+            onClose={() => setShowPaymentOptions(false)}
+            onPaymentSelect={handlePaymentMethodSelect}
           />
         )}
       </div>
