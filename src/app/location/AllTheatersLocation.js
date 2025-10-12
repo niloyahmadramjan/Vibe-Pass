@@ -20,7 +20,7 @@ export default function AllTheatersLocation({ movieId }) {
 
   const uniqueDivisions = [...new Set(locations.map((loc) => loc.region))]
 
-  // Division select হলে District filter হবে
+
   useEffect(() => {
     if (selectedDivision) {
       const filteredDistricts = locations
@@ -37,7 +37,7 @@ export default function AllTheatersLocation({ movieId }) {
     }
   }, [selectedDivision])
 
-  // District select হলে Location update হবে
+
   useEffect(() => {
     if (selectedDistrict && selectedDivision) {
       const loc = locations.find(
@@ -70,12 +70,11 @@ export default function AllTheatersLocation({ movieId }) {
     }
   }
 
-  // Cinema select করলে update হবে
   const handleSelectCinema = (cinema) => {
     setSelectedCinema(cinema)
   }
 
-  // ✅ Book Now click করলে redirect হবে booking page এ
+
   const handleBookNow = () => {
     if (!selectedCinema || !selectedLocation || !movieId) return
 
@@ -148,7 +147,7 @@ export default function AllTheatersLocation({ movieId }) {
       {selectedLocation && (
         <div className="rounded-xl p-4 border border-gray-700 bg-[#111111]">
           <h2 className="text-lg font-semibold mb-3 border-b border-gray-700 pb-1">
-             {selectedLocation.district}, {selectedLocation.region}
+            {selectedLocation.district}, {selectedLocation.region}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {selectedLocation.cinemas.map((cinema, index) => (

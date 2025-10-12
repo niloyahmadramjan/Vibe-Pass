@@ -24,8 +24,8 @@ function MyOrder() {
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-    const [bookings, setBookings] = useState([]);
-// payment data
+  const [bookings, setBookings] = useState([]);
+  // payment data
   useEffect(() => {
     if (!userEmail) {
       setLoading(false);
@@ -162,6 +162,8 @@ function MyOrder() {
     paymentStatus: order.status || "paid",
     transactionId: order.transactionId || order.providerPaymentId,
   });
+
+
 
   if (loading) return <LoadingSpinner />;
 
@@ -375,7 +377,7 @@ function MyOrder() {
                     </div>
                   </div>
 
-                 
+
                   <div className="flex items-center space-x-3">
                     <FiUser className="text-purple-400 text-lg" />
                     <div>

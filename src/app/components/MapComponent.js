@@ -14,7 +14,7 @@ export default function MapComponent({ selectedDivision, hallData }) {
     if (selectedDivision) {
       const division = hallData.find((div) => div.name === selectedDivision)
 
-      // পুরানো marker clear
+
       map.eachLayer((layer) => {
         if (layer instanceof L.Marker) map.removeLayer(layer)
       })
