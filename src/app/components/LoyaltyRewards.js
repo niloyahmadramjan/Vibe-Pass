@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   FiStar,
@@ -15,7 +15,12 @@ import CountUp from "react-countup";
 
 export default function LoyaltyRewards() {
   const [isJoining, setIsJoining] = useState(false);
+  const [hydrated, setHydrated] = useState(false); // 👈 added
   const router = useRouter();
+
+  useEffect(() => {
+    setHydrated(true); // ensures this runs only on client
+  }, []);
 
   const handleJoinProgram = () => {
     setIsJoining(true);
@@ -67,6 +72,9 @@ export default function LoyaltyRewards() {
     { icon: FiTrendingUp, end: 200, suffix: "+", label: "Points Earned" },
     { icon: FiClock, end: 24, suffix: "/7", label: "Access Anytime" },
   ];
+
+  // Prevent rendering until client-side hydration finishes
+  if (!hydrated) return null;
 
   return (
     <div className="min-h-screen py-20 px-6 text-white font-sans">
@@ -150,7 +158,6 @@ export default function LoyaltyRewards() {
                     duration={2.5}
                     separator=","
                     suffix={stat.suffix}
-                    enableScrollSpy
                   />
                 </h3>
                 <p className="text-gray-400 text-lg mt-2">{stat.label}</p>

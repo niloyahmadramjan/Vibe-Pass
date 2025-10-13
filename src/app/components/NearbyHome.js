@@ -1,7 +1,10 @@
+
 "use client";
-import React from "react";
+
+import React, { useEffect, useState } from "react";
 import { FiMapPin, FiPlayCircle } from "react-icons/fi";
 
+// Static theater list
 const theaters = [
   { name: "VibePass Cinema Downtown", distance: "0.5 mi", screens: 12 },
   { name: "VibePass IMAX Center", distance: "1.2 mi", screens: 8 },
@@ -9,6 +12,15 @@ const theaters = [
 ];
 
 export default function NearbyHome() {
+
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
+  if (!hydrated) return null; // Prevent server/client mismatch
+
   return (
     <div className="bg-black text-white py-16 px-4 sm:px-6 lg:px-8 min-h-screen">
       <div className="max-w-6xl mx-auto">

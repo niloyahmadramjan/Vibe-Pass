@@ -1,5 +1,6 @@
 "use client";
-import { useState, useRef } from "react";
+
+import { useState, useEffect, useRef } from "react";
 import {
   FiMail,
   FiCheck,
@@ -14,16 +15,23 @@ import {
   FiPlay,
   FiArrowRight,
 } from "react-icons/fi";
-import axiosSecure from "../api/axiosHook/useAxiosSecure";
 import Swal from "sweetalert2";
+import axiosSecure from "../api/axiosHook/useAxiosSecure";
 
 function NewsLetter() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
-
   const [message, setMessage] = useState({ type: "", text: "" });
+  const [mounted, setMounted] = useState(false);
   const formRef = useRef(null);
+
+  // ✅ Fix hydration mismatch by delaying render until mounted
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,7 +50,6 @@ function NewsLetter() {
       });
 
       if (response.data.success) {
-        // ✅ SweetAlert success popup
         Swal.fire({
           title: "🎉 Subscribed Successfully!",
           text: "Welcome to our cinema family! You'll receive exclusive updates.",
@@ -52,7 +59,6 @@ function NewsLetter() {
           color: "#fff",
         });
 
-        // ✅ Reset form and disable button
         setIsSubscribed(true);
         setEmail("");
         setMessage({
@@ -128,51 +134,26 @@ function NewsLetter() {
     },
   ];
 
-  const stats = [
-    {
-      icon: FiUsers,
-      value: "50K+",
-      label: "Movie Lovers",
-      color: "text-blue-400",
-    },
-    {
-      icon: FiHeart,
-      value: "99%",
-      label: "Satisfaction",
-      color: "text-rose-400",
-    },
-    { icon: FiClock, value: "24/7", label: "Updates", color: "text-amber-400" },
-    {
-      icon: FiPlay,
-      value: "1K+",
-      label: "Screenings",
-      color: "text-emerald-400",
-    },
-  ];
-
   return (
     <div className="min-h-screen py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Background Elements */}
+      {/* Animated background */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-red-500/5 rounded-full blur-3xl animate-float-slow"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl animate-float-slower"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/3 rounded-full blur-3xl animate-pulse-slow"></div>
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]"></div>
       </div>
 
       <div className="max-w-6xl mx-auto relative z-10">
-        {/* Header */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl mb-6 shadow-2xl shadow-red-500/20 hover:shadow-red-500/30 transition-all duration-500 hover:scale-105 group">
-            <FiMail className="text-white text-2xl group-hover:scale-110 transition-transform duration-300" />
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl mb-6 shadow-2xl shadow-red-500/20 hover:scale-105 transition-all">
+            <FiMail className="text-white text-2xl" />
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight tracking-tight">
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
             Never Miss a{" "}
-            <span className="bg-gradient-to-r from-red-500 via-orange-500 to-red-600 bg-clip-text text-transparent bg-300% animate-gradient">
+            <span className="bg-gradient-to-r from-red-500 via-orange-500 to-red-600 bg-clip-text text-transparent animate-gradient bg-300%">
               Blockbuster
             </span>
           </h1>
-          <p className="text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed font-light">
+          <p className="text-lg text-slate-300 max-w-2xl mx-auto">
             Join thousands of cinephiles who get exclusive early access to
             ticket sales, special screenings, and behind-the-scenes content.
           </p>
@@ -182,42 +163,23 @@ function NewsLetter() {
           {/* Features */}
           <div className="space-y-6">
             <div className="bg-white/5 backdrop-blur-lg rounded-3xl p-8 border border-white/10 shadow-2xl">
-              <div className="flex items-center space-x-3 mb-8">
-                <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg">
-                  <FiStar className="text-white text-lg" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-white">
-                    Premium Benefits
-                  </h2>
-                  <p className="text-slate-400 text-sm">
-                    Exclusive member advantages
-                  </p>
-                </div>
-              </div>
+              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                <FiStar className="text-red-500" /> Premium Benefits
+              </h2>
               <div className="space-y-4">
-                {features.map((feature, index) => (
+                {features.map((f, i) => (
                   <div
-                    key={index}
-                    className="group cursor-pointer animate-fade-in-up"
-                    style={{ animationDelay: `${index * 100}ms` }}
+                    key={i}
+                    className={`flex items-start gap-4 p-4 rounded-2xl border ${f.borderColor} ${f.bgColor} hover:bg-white/5 transition-all duration-300`}
                   >
                     <div
-                      className={`flex items-start space-x-4 p-4 rounded-2xl border ${feature.borderColor} ${feature.bgColor} hover:bg-white/5 transition-all duration-300 hover:transform hover:scale-105`}
+                      className={`w-12 h-12 flex items-center justify-center bg-gradient-to-br ${f.color} rounded-xl`}
                     >
-                      <div
-                        className={`flex-shrink-0 w-12 h-12 bg-gradient-to-br ${feature.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg`}
-                      >
-                        <feature.icon className="text-white text-base" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-white font-semibold text-lg mb-1">
-                          {feature.title}
-                        </h3>
-                        <p className="text-slate-400 text-sm leading-relaxed">
-                          {feature.description}
-                        </p>
-                      </div>
+                      <f.icon className="text-white text-base" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-semibold">{f.title}</h3>
+                      <p className="text-slate-400 text-sm">{f.description}</p>
                     </div>
                   </div>
                 ))}
@@ -226,132 +188,56 @@ function NewsLetter() {
           </div>
 
           {/* Newsletter Form */}
-          <div className="sticky top-8">
-            <div className="bg-white/5 backdrop-blur-lg rounded-3xl p-8 border border-white/10 shadow-2xl hover:shadow-red-500/5 transition-all duration-500">
-              <div className="text-center mb-8">
-                <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg mx-auto mb-4 animate-float">
-                  <FiStar className="text-white text-xl" />
-                </div>
-                <h2 className="text-2xl font-bold text-white mb-2">
-                  Subscribe Now
-                </h2>
-                <p className="text-slate-400 text-base">
-                  Join Our Cinema Community
-                </p>
-              </div>
-
-              <p className="text-slate-300 text-center mb-6 text-sm leading-relaxed">
-                Enter your email to unlock premium benefits and be the first to
-                experience exclusive cinema content and early ticket access.
-              </p>
-
-              <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-4">
-                  <div className="relative group">
-                    <FiMail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 text-lg transition-all duration-300 group-focus-within:text-red-500 group-focus-within:scale-110" />
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Enter your email address..."
-                      className="w-full pl-12 pr-4 py-4 bg-black/40 backdrop-blur-sm border border-slate-600/30 rounded-2xl text-white placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-all duration-300 text-base hover:border-slate-500/50"
-                      disabled={loading}
-                    />
-                  </div>
-
-                  {message.text && (
-                    <div
-                      className={`p-3 rounded-xl border backdrop-blur-sm animate-fadeIn ${
-                        message.type === "success"
-                          ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                          : "bg-red-500/10 border-red-500/20 text-red-400"
-                      }`}
-                    >
-                      <div className="flex items-center space-x-2">
-                        {message.type === "success" ? (
-                          <FiCheck className="text-emerald-400 text-base flex-shrink-0" />
-                        ) : (
-                          <FiAlertCircle className="text-red-400 text-base flex-shrink-0" />
-                        )}
-                        <span className="font-medium text-sm">
-                          {message.text}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <button
-                  type="submit"
+          <div className="bg-white/5 backdrop-blur-lg rounded-3xl p-8 border border-white/10 shadow-2xl">
+            <h2 className="text-2xl font-bold text-center text-white mb-4">
+              Subscribe Now
+            </h2>
+            <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
+              <div className="relative">
+                <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email..."
+                  className="w-full pl-12 pr-4 py-4 bg-black/40 border border-slate-600/30 rounded-2xl text-white placeholder-slate-400 focus:outline-none focus:border-red-500"
                   disabled={loading || isSubscribed}
-                  className={`w-full group relative overflow-hidden py-4 rounded-2xl font-semibold transition-all duration-500 transform focus:outline-none focus:ring-2 focus:ring-red-500/50 shadow-xl 
-    ${
-      isSubscribed
-        ? "bg-gray-700 text-gray-300 cursor-not-allowed"
-        : "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white hover:scale-105 hover:shadow-red-500/20"
-    }`}
-                >
-                  <div className="relative z-10 flex items-center justify-center space-x-2">
-                    {loading ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span className="text-base">Securing Your Spot...</span>
-                      </>
-                    ) : isSubscribed ? (
-                      <span className="text-base">Subscribed ✅</span>
-                    ) : (
-                      <>
-                        <span className="text-base">Subscribe Now</span>
-                        <FiArrowRight className="text-base group-hover:translate-x-1 transition-transform duration-300" />
-                      </>
-                    )}
-                  </div>
-                </button>
-              </form>
-
-              <div className="mt-6 pt-6 border-t border-slate-600/30">
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <div className="flex flex-col items-center space-y-1">
-                    <FiShield className="text-emerald-400 text-base" />
-                    <span className="text-slate-400 text-xs">Secure</span>
-                  </div>
-                  <div className="flex flex-col items-center space-y-1">
-                    <FiStar className="text-amber-400 text-base" />
-                    <span className="text-slate-400 text-xs">No Spam</span>
-                  </div>
-                  <div className="flex flex-col items-center space-y-1">
-                    <FiHeart className="text-rose-400 text-base" />
-                    <span className="text-slate-400 text-xs">Easy Exit</span>
-                  </div>
-                </div>
+                />
               </div>
-            </div>
+
+              {message.text && (
+                <div
+                  className={`p-3 rounded-xl border text-sm ${
+                    message.type === "success"
+                      ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                      : "bg-red-500/10 border-red-500/20 text-red-400"
+                  }`}
+                >
+                  {message.text}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading || isSubscribed}
+                className={`w-full py-4 rounded-2xl font-semibold transition-all duration-300 ${
+                  isSubscribed
+                    ? "bg-gray-700 text-gray-300 cursor-not-allowed"
+                    : "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white"
+                }`}
+              >
+                {loading
+                  ? "Securing Your Spot..."
+                  : isSubscribed
+                  ? "Subscribed ✅"
+                  : "Subscribe Now"}
+              </button>
+            </form>
           </div>
         </div>
       </div>
 
-      {/* CSS Animations */}
       <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
         @keyframes gradient {
           0% {
             background-position: 0% 50%;
@@ -363,55 +249,9 @@ function NewsLetter() {
             background-position: 0% 50%;
           }
         }
-        @keyframes float {
-          0%,
-          100% {
-            transform: translateY(0);
-          }
-          50% {
-            transform: translateY(-8px);
-          }
-        }
-        @keyframes float-slow {
-          0%,
-          100% {
-            transform: translateY(0) translateX(0);
-          }
-          50% {
-            transform: translateY(-20px) translateX(10px);
-          }
-        }
-        @keyframes float-slower {
-          0%,
-          100% {
-            transform: translateY(0) translateX(0);
-          }
-          50% {
-            transform: translateY(15px) translateX(-15px);
-          }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.5s ease-out;
-        }
-        .animate-fade-in-up {
-          animation: fadeInUp 0.6s ease-out forwards;
-          opacity: 0;
-        }
         .animate-gradient {
           animation: gradient 3s ease infinite;
           background-size: 200% 200%;
-        }
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
-        .animate-float-slow {
-          animation: float-slow 8s ease-in-out infinite;
-        }
-        .animate-float-slower {
-          animation: float-slower 10s ease-in-out infinite;
-        }
-        .animate-pulse-slow {
-          animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
       `}</style>
     </div>

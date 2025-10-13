@@ -10,8 +10,7 @@ import MovieExperienceSection from "./components/Experience";
 import LoyaltyRewards from "./components/LoyaltyRewards";
 import NewsLetter from "./components/NewsLetter";
 import UpcomingEvent from "./components/UpcomingEvent";
-import AutoLocation from "./components/NearbyHome";
-
+import NearbyHome from "./components/NearbyHome";
 
 export default function home() {
   return (
@@ -23,7 +22,7 @@ export default function home() {
       <MovieExperienceSection />
       <LoyaltyRewards />
       <UpcomingEvent />
-      <AutoLocation/>
+      <NearbyHome />
       <NewsLetter />
       <FAQ />
     </main>
