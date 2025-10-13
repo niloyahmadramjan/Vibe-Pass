@@ -19,7 +19,8 @@ axiosSecure.interceptors.request.use(
 
     // If not found, fallback to NextAuth session token
     if (!token) {
-      const session = await getSession()
+     const session = await getSession()
+     console.log(session.accessToken) 
       if (session?.accessToken) {
         token = session.accessToken
       }
