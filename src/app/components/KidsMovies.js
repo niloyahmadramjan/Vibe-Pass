@@ -6,6 +6,7 @@ import { Navigation } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import BookingLocationModal from './BookingLocationModal' // ✅ modal import
+import axiosSecure from '../api/axiosHook/useAxiosSecure'
 
 // 🔹 Loading Spinner
 function Spinner() {
@@ -27,25 +28,26 @@ export default function KidsMovies() {
   const [selectionMode, setSelectionMode] = useState('auto')
   const [selectedCinema, setSelectedCinema] = useState(null)
 
-  useEffect(() => {
-    const fetchMovies = async () => {
-      setLoading(true)
-      try {
-        const res = await fetch(
 
-          `          http://localhost:5000/api/movies/category/genreAnimation`
-        )
-        const data = await res.json()
-        setMovies(data)
-        console.log(data.id)
+  useEffect(() => {
+    const fetchUpcoming = async () => {
+      try {
+        // 🔹 Use axiosSecure to call your backend API
+        const res = await axiosSecure.get("/api/movies/category/genreAnimation")
+
+        // 🔹 Store results (movies list) in state
+        setMovies(res.data || [])
       } catch (error) {
-        console.error('Error fetching kids movies:', error)
+        console.error("Error fetching upcoming movies:", error)
       } finally {
+        // 🔹 Stop loading spinner whether success or fail
         setLoading(false)
       }
     }
-    fetchMovies()
+
+    fetchUpcoming()
   }, [])
+  
   console.log(movies)
   if (loading) return <Spinner />
 
