@@ -293,7 +293,7 @@ export default function LoginPage() {
               Continue with Google
             </button>
             <button
-              onClick={() => signIn('github')}
+              onClick={() => signnI('github')}
               className="w-full flex items-center justify-center gap-3 bg-gray-800 hover:bg-gray-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 border border-gray-700 hover:border-gray-600 shadow-sm"
             >
               <Image

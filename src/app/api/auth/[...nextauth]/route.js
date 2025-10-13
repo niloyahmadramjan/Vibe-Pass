@@ -13,12 +13,17 @@ const handler = NextAuth({
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
     }),
   ],
+
+  session: {
+    strategy: 'jwt',
+  },
+
   callbacks: {
-    async signIn({ user }) {
-      // Send user data to backend for persistence
+    // 🟢 When a user logs in with Google or GitHub
+    async signIn({ user, account }) {
       try {
-        await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}api/auth/social-login`,
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/social-login`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -26,26 +31,39 @@ const handler = NextAuth({
               email: user.email,
               name: user.name,
               image: user.image,
-              provider: user.provider ?? 'social',
+              provider: account?.provider ?? 'social',
             }),
           }
         )
+
+        const data = await res.json()
+
+        // 🟢 save backend JWT (custom token) in user object
+        if (data?.token) {
+          user.backendToken = data.token
+        }
       } catch (error) {
-        console.error('Failed to sync user with backend:', error)
+        console.error('❌ Failed to sync user with backend:', error)
       }
+
       return true
     },
-    async jwt({ token, account, profile }) {
-      if (account) {
-        token.accessToken = account.access_token
+
+    // 🟢 Store backend token inside JWT
+    async jwt({ token, user }) {
+      if (user?.backendToken) {
+        token.accessToken = user.backendToken
       }
       return token
     },
+
+    // 🟢 Make backend token available in session
     async session({ session, token }) {
       session.accessToken = token.accessToken
       return session
     },
   },
+
   secret: process.env.NEXTAUTH_SECRET,
 })
 
