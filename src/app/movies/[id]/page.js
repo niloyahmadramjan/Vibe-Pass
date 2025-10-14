@@ -1,5 +1,6 @@
 'use client'
-import axiosSecure from '@/app/api/axiosHook/useAxiosSecure'
+import useAxios from '@/app/api/axiosHook/axiosInstance'
+// import useAxios from '@/app/api/axiosHook/useuseAxios'
 import TheatersNear from '@/app/components/NearbyTheaters'
 import LoadingSpinner from '@/app/hooks/LoadingSpiner'
 import AllTheatersLocation from '@/app/location/AllTheatersLocation'
@@ -30,7 +31,7 @@ export default function MovieDetailsPage() {
   useEffect(() => {
     const fetchHallData = async () => {
       try {
-        const res = await axiosSecure.get('/api/hall-distribution')
+        const res = await useAxios.get('/api/hall-distribution')
         setHallData(res.data)
       } catch (err) {
         setError(err)
@@ -45,7 +46,7 @@ export default function MovieDetailsPage() {
       if (!id) return
       try {
         setLoading(true)
-        const res = await axiosSecure.get(`/api/movies/${id}`)
+        const res = await useAxios.get(`/api/movies/${id}`)
         setMovie(res.data)
       } catch (err) {
         console.error("Error fetching movie details:", err)
@@ -103,7 +104,7 @@ export default function MovieDetailsPage() {
     console.log("id",id)
     try {
       console.log("🎥 Fetching trailer for TMDB ID:", id);
-      const res = await axiosSecure.get(`/api/movies/${id}/videos`);
+      const res = await useAxios.get(`/api/movies/${id}/videos`);
 
       if (res.status === 200) {
         const results = res.data.results;

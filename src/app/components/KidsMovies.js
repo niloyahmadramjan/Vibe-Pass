@@ -6,7 +6,8 @@ import { Navigation } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import BookingLocationModal from './BookingLocationModal' // ✅ modal import
-import axiosSecure from '../api/axiosHook/useAxiosSecure'
+import useAxios from '../api/axiosHook/axiosInstance'
+// import useAxios from '../api/axiosHook/useuseAxios'
 
 // 🔹 Loading Spinner
 function Spinner() {
@@ -32,8 +33,8 @@ export default function KidsMovies() {
   useEffect(() => {
     const fetchUpcoming = async () => {
       try {
-        // 🔹 Use axiosSecure to call your backend API
-        const res = await axiosSecure.get("/api/movies/category/genreAnimation")
+        // 🔹 Use useAxios to call your backend API
+        const res = await useAxios.get("/api/movies/category/genreAnimation")
 
         // 🔹 Store results (movies list) in state
         setMovies(res.data || [])
