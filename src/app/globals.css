@@ -281,7 +281,6 @@ button {
     transform: translateX(0);
   }
 }
-
 /* Badge Styles */
 .badge {
   background-color: var(--color-primary);
@@ -296,7 +295,6 @@ button {
   background: linear-gradient(135deg, var(--color-secondary) 0%, #FFA000 100%);
   color: var(--color-bg-dark);
 }
-
 
 @keyframes fadeIn {
   from {
