@@ -3,7 +3,15 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import { FiMenu, FiX, FiHome, FiInfo, FiCalendar, FiUser } from 'react-icons/fi'
+import {
+  FiMenu,
+  FiX,
+  FiHome,
+  FiInfo,
+  FiCalendar,
+  FiUser,
+  FiSettings,
+} from 'react-icons/fi'
 import { GiTheater } from 'react-icons/gi'
 import { RiMovie2Fill } from 'react-icons/ri'
 import Image from 'next/image'
@@ -83,6 +91,9 @@ export default function Navbar() {
     { href: '/about', label: 'About', icon: <FiInfo className="mr-1" /> },
   ]
 
+  // Check if user is admin
+  const isAdmin = session?.user?.role === 'admin' || user?.role === 'admin'
+
   return (
     <>
       <nav
@@ -117,7 +128,7 @@ export default function Navbar() {
                     ${
                       pathname === href
                         ? 'border-b-4 border-blue-400 !text-blue-400'
-                        : '!text-gray-300 hover:text-blue-400'
+                        : '!text-gray-300 hover:text-blue-400 hover:border-b-4 hover:border-blue-400'
                     }`}
                 >
                   {icon} {label}
@@ -136,24 +147,6 @@ export default function Navbar() {
                     onClick={() => setOpenDrop((prev) => !prev)}
                     className="flex items-center gap-2 focus:outline-none hover:bg-gray-800 px-3 py-2 rounded-lg transition-colors"
                   >
-                    {/* {session?.user?.image || user?.image ? (
-                      <Image
-                        src={session?.user?.image || user?.image}
-                        alt={session?.user?.name || user?.name || 'User'}
-                        width={40}
-                        height={40}
-                        className="rounded-full border-2 border-red-500"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center text-white font-bold border-2 border-red-500">
-                        {(
-                          session?.user?.name?.[0] ||
-                          user?.name?.[0] ||
-                          'U'
-                        ).toUpperCase()}
-                      </div>
-                    )} */}
-
                     <div className="flex flex-col items-start">
                       <span className="text-white font-semibold text-sm leading-tight max-w-[120px] truncate">
                         {session?.user?.name || user?.name}
@@ -215,35 +208,40 @@ export default function Navbar() {
                             <p className="text-red-400 text-xs">
                               Hi.MOVIECLUB U...
                             </p>
+                            {isAdmin && (
+                              <span className="inline-block mt-1 px-2 py-1 bg-purple-600 text-white text-xs rounded-full font-bold">
+                                ADMIN
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>
 
                       {/* Menu Items */}
                       <div className="py-2">
+                        {/* Admin Dashboard - Dropdown */}
+                        {isAdmin && (
+                          <Link
+                            href="/admin"
+                            className="flex items-center gap-3 px-4 py-3 hover:bg-purple-900/50 transition-colors text-white border-l-2 border-purple-500"
+                            onClick={() => setOpenDrop(false)}
+                          >
+                            <FiSettings className="w-5 h-5 text-purple-400" />
+                            <span className="font-medium">ADMIN DASHBOARD</span>
+                          </Link>
+                        )}
+
                         <Link
                           href="/profile"
                           className="flex items-center gap-3 px-4 py-3 hover:bg-gray-800 transition-colors text-white"
                           onClick={() => setOpenDrop(false)}
                         >
-                          <svg
-                            className="w-5 h-5 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                            />
-                          </svg>
+                          <FiUser className="w-5 h-5 text-gray-400" />
                           <span className="font-medium">MY PROFILE</span>
                         </Link>
 
                         <Link
-                          href="/my-tickets"
+                          href="/my-orders"
                           className="flex items-center gap-3 px-4 py-3 hover:bg-gray-800 transition-colors text-white"
                           onClick={() => setOpenDrop(false)}
                         >
@@ -263,8 +261,30 @@ export default function Navbar() {
                           <span className="font-medium">MY ORDERS</span>
                         </Link>
 
+                        {/* booking */}
                         <Link
-                          href="/rewards"
+                          href="/my-booking"
+                          className="flex items-center gap-3 px-4 py-3 hover:bg-gray-800 transition-colors text-white"
+                          onClick={() => setOpenDrop(false)}
+                        >
+                          <svg
+                            className="w-5 h-5 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M8 7V3m8 4V3m-9 8h10m-11 8h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2zm7-5l2 2 4-4"
+                            />
+                          </svg>
+                          <span className="font-medium">My Booking</span>
+                        </Link>
+
+                        <Link
+                          href="/my-rewards"
                           className="flex items-center gap-3 px-4 py-3 hover:bg-gray-800 transition-colors text-white"
                           onClick={() => setOpenDrop(false)}
                         >
@@ -285,7 +305,7 @@ export default function Navbar() {
                         </Link>
 
                         <Link
-                          href="/wallet"
+                          href="/my-wallet"
                           className="flex items-center gap-3 px-4 py-3 hover:bg-gray-800 transition-colors text-white"
                           onClick={() => setOpenDrop(false)}
                         >
@@ -340,26 +360,14 @@ export default function Navbar() {
                   href="/login"
                   className="flex items-center gap-2 rounded-lg font-medium bg-red-600 hover:bg-red-700 px-4 py-2 transition-colors duration-200 !text-white"
                 >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    />
-                  </svg>
+                  <FiUser className="w-5 h-5" />
                   Login
                 </Link>
               )}
             </div>
 
             {/* Mobile Menu Button */}
-            <div className="md:hidden  flex items-center">
+            <div className="md:hidden flex items-center">
               <button
                 onClick={() => setOpen(!open)}
                 className="p-2 rounded-md text-gray-300 hover:text-white hover:bg-gray-800 focus:outline-none transition-colors duration-200"
@@ -372,7 +380,7 @@ export default function Navbar() {
 
         {/* Mobile Slide Menu */}
         <div
-          className={`fixed top-0 right-0 h-full w-64 bg-gray-900 transform ${
+          className={`fixed top-0 right-0 h-full w-64 sm:w-72 bg-gray-900 transform ${
             open ? 'translate-x-0' : 'translate-x-full'
           } transition-transform duration-300 ease-in-out z-40 shadow-xl flex flex-col`}
         >
@@ -397,33 +405,100 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* Links */}
-          <div className="flex-1 flex flex-col space-y-4 p-4">
-            {navLinks.map(({ href, label, icon }) => (
-              <Link
-                key={href}
-                href={href}
-                className={`relative flex items-center font-bold transition-colors duration-200 ${
-                  pathname === href
-                    ? 'border-b-4 border-blue-400 !text-blue-400'
-                    : '!text-gray-300 hover:text-blue-400'
-                }`}
-              >
-                {icon} {label}
-              </Link>
-            ))}
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
+            {/* Main Navigation Links */}
+            <div className="space-y-4 mb-6">
+              {navLinks.map(({ href, label, icon }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`flex items-center font-bold transition-colors duration-200 py-2 px-3 rounded-lg ${
+                    pathname === href
+                      ? 'bg-blue-900/30 border-l-4 border-blue-400 !text-blue-400'
+                      : '!text-gray-300 hover:text-blue-400 hover:bg-gray-800 hover:border-l-4 hover:border-blue-400'
+                  }`}
+                  onClick={() => setOpen(false)}
+                >
+                  <span
+                    className={`mr-3 ${
+                      pathname === href ? 'text-blue-400' : 'text-gray-400'
+                    }`}
+                  >
+                    {icon}
+                  </span>
+                  {label}
+                </Link>
+              ))}
+
+              {/* Admin Dashboard Link - Mobile */}
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  className={`flex items-center font-bold transition-colors duration-200 py-2 px-3 rounded-lg ${
+                    pathname === '/admin'
+                      ? 'bg-purple-900/30 border-l-4 border-purple-400 !text-purple-400'
+                      : '!text-gray-300 hover:text-purple-400 hover:bg-gray-800 hover:border-l-4 hover:border-purple-400'
+                  }`}
+                  onClick={() => setOpen(false)}
+                >
+                  <span
+                    className={`mr-3 ${
+                      pathname === '/admin'
+                        ? 'text-purple-400'
+                        : 'text-gray-400'
+                    }`}
+                  >
+                    <FiSettings />
+                  </span>
+                  Dashboard
+                </Link>
+              )}
+            </div>
+
+            {/* User Menu Links - Only show when logged in */}
+            {(session || user) && (
+              <div className="border-t border-gray-700 pt-6 space-y-3">
+                <h3 className="text-gray-400 text-sm font-semibold uppercase tracking-wider mb-2 px-3">
+                  My Account
+                </h3>
+                {[
+                  { href: '/profile', label: 'MY PROFILE' },
+                  { href: '/my-orders', label: 'MY ORDERS' },
+                  { href: '/my-booking', label: 'MY BOOKING' },
+                  { href: '/my-rewards', label: 'MY REWARDS' },
+                  { href: '/my-wallet', label: 'MY WALLET' },
+                ].map(({ href, label }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={() => setOpen(false)}
+                    className="block px-3 py-3 rounded-lg text-white hover:bg-gray-800 transition-colors font-medium"
+                  >
+                    {label}
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Auth Section (mobile bottom) */}
-          <div className="mt-auto p-4 border-t border-gray-800">
+          <div className="p-4 border-t border-gray-800 bg-gray-950">
             {session || user ? (
-              <div className="flex items-center gap-3">
-                <span className="!text-white font-medium">
-                  {session?.user?.name || user?.name}
-                </span>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <span className="!text-white font-medium">
+                    {session?.user?.name || user?.name}
+                  </span>
+                  {isAdmin && (
+                    <span className="inline-block px-2 py-1 bg-purple-600 text-white text-xs rounded-full font-bold">
+                      ADMIN
+                    </span>
+                  )}
+                </div>
                 <button
                   onClick={handleLogout}
-                  className="ml-auto bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-white text-sm"
+                  className="w-full bg-red-600 hover:bg-red-700 px-3 py-2 rounded text-white text-sm font-bold transition-colors duration-200"
                 >
                   Logout
                 </button>
@@ -431,7 +506,8 @@ export default function Navbar() {
             ) : (
               <Link
                 href="/login"
-                className="w-full btn btn-primary flex items-center justify-center px-4 py-2 rounded-md font-bold bg-red-600 hover:bg-red-700 text-white"
+                className="w-full flex items-center justify-center px-4 py-2 rounded-md font-bold bg-red-600 hover:bg-red-700 text-white transition-colors duration-200"
+                onClick={() => setOpen(false)}
               >
                 <FiUser className="mr-2" /> Login
               </Link>

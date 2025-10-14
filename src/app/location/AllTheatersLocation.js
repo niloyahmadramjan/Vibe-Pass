@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { FaMapMarkerAlt, FaChevronDown, FaSearchLocation } from 'react-icons/fa'
-import SeatMap from '../components/SeatMap'
-import { locations } from '../lib/locations'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/navigation'
+import { locations } from '../lib/locations'
+import SeatMap from '../components/SeatMap'
 
-export default function AllTheatersLocation() {
+export default function AllTheatersLocation({ movieId }) {
   const [selectedDivision, setSelectedDivision] = useState('')
   const [selectedDistrict, setSelectedDistrict] = useState('')
   const [districts, setDistricts] = useState([])
@@ -51,57 +51,36 @@ export default function AllTheatersLocation() {
     }
   }, [selectedDistrict, selectedDivision])
 
-  // Map এ zoom
+  // Find Cinemas
   const handleFindCinemas = () => {
-    if (selectedLocation && mapRef.current) {
+    if (selectedLocation) {
       setIsLoading(true)
-
       setTimeout(() => {
-        mapRef.current?.scrollIntoView({ behavior: 'smooth' })
-      }, 100)
-
-      setTimeout(() => {
-        if (mapRef.current.flyTo) {
-          mapRef.current.flyTo(
-            [selectedLocation.latitude, selectedLocation.longitude],
-            10,
-            { duration: 2 }
-          )
-        }
-        setIsLoading(false)
-
         Swal.fire({
           icon: 'success',
           title: 'Cinemas Found!',
           text: `Now viewing cinemas in ${selectedLocation.district}, ${selectedLocation.region}`,
           confirmButtonText: 'OK',
-          confirmButtonColor: '#3085d6',
+          confirmButtonColor: '#E50914',
           background: '#1e1e1e',
           color: '#fff',
         })
-      }, 500)
+        setIsLoading(false)
+      }, 700)
     }
   }
 
   // Cinema select করলে update হবে
   const handleSelectCinema = (cinema) => {
     setSelectedCinema(cinema)
-
-    if (mapRef.current && selectedLocation) {
-      mapRef.current.flyTo(
-        [selectedLocation.latitude, selectedLocation.longitude],
-        14,
-        { duration: 1.5 }
-      )
-    }
   }
 
   // ✅ Book Now click করলে redirect হবে booking page এ
   const handleBookNow = () => {
-    if (!selectedCinema || !selectedLocation) return
+    if (!selectedCinema || !selectedLocation || !movieId) return
 
     router.push(
-      `/booking/1311031?cinema=${encodeURIComponent(
+      `/booking/${movieId}?cinema=${encodeURIComponent(
         selectedCinema
       )}&city=${encodeURIComponent(selectedLocation.city)}&district=${encodeURIComponent(
         selectedLocation.district
@@ -110,130 +89,103 @@ export default function AllTheatersLocation() {
   }
 
   return (
-    <div className=" py-8 px-4 sm:px-6  text-white">
-      <div className="max-w-6xl mx-auto">
-        {/* Division + District Select */}
-        <div className="rounded-2xl shadow-xl p-6 mb-8 border border-gray-700 bg-transparent">
-          <div className="grid grid-cols-1  gap-6 items-end">
-            {/* Division */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Division
-              </label>
-              <div className="relative">
-                <select
-                  value={selectedDivision}
-                  onChange={(e) => setSelectedDivision(e.target.value)}
-                  className="w-full px-4 py-3 pl-10 border border-gray-600 rounded-lg text-white bg-[#121212] appearance-none"
-                >
-                  <option value="">Choose a Division</option>
-                  {uniqueDivisions.map((div) => (
-                    <option key={div} value={div}>
-                      {div}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaSearchLocation className="h-5 w-5 text-gray-400" />
-                </div>
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <FaChevronDown className="h-4 w-4 text-gray-400" />
-                </div>
-              </div>
-            </div>
-
-            {/* District */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                District
-              </label>
-              <div className="relative">
-                <select
-                  value={selectedDistrict}
-                  onChange={(e) => setSelectedDistrict(e.target.value)}
-                  disabled={!selectedDivision}
-                  className="w-full px-4 py-3 pl-10 border border-gray-600 rounded-lg disabled:bg-gray-800 text-white bg-[#121212] appearance-none"
-                >
-                  <option value="">Choose a District</option>
-                  {districts.map((dist) => (
-                    <option key={dist} value={dist}>
-                      {dist}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaMapMarkerAlt className="h-5 w-5 text-gray-400" />
-                </div>
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <FaChevronDown className="h-4 w-4 text-gray-400" />
-                </div>
-              </div>
-            </div>
-
-            {/* Button */}
-            <div>
-              <button
-                onClick={handleFindCinemas}
-                disabled={!selectedLocation || isLoading}
-                className="w-full bg-[#E50914] disabled:bg-[#7a3d3f] text-white py-3 px-6 rounded-lg font-medium"
+    <div className="text-white space-y-5">
+      {/* Division + District Select */}
+      <div className="rounded-xl p-4 border border-gray-700 bg-[#111111]">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+          {/* Division */}
+          <div>
+            <label className="block text-xs font-medium text-gray-400 mb-1">
+              Division
+            </label>
+            <div className="relative">
+              <select
+                value={selectedDivision}
+                onChange={(e) => setSelectedDivision(e.target.value)}
+                className="w-full px-3 py-2 pl-8 border border-gray-600 rounded-md text-white bg-[#1a1a1a] text-sm appearance-none"
               >
-                {isLoading ? 'Loading...' : 'Set Your Location'}
-              </button>
+                <option value="">Select</option>
+                {uniqueDivisions.map((div) => (
+                  <option key={div} value={div}>
+                    {div}
+                  </option>
+                ))}
+              </select>
+              <FaSearchLocation className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
+              <FaChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs" />
             </div>
           </div>
-        </div>
 
-        {/* Cinemas */}
-        {selectedLocation && (
-          <div className="rounded-2xl shadow-md p-6 mb-8 border border-gray-700 bg-transparent">
-            <h2 className="text-2xl font-semibold text-white mb-6 pb-2 border-b border-gray-700 flex items-center gap-2">
-              <FaMapMarkerAlt className="text-red-500" />
-              Cinemas in {selectedLocation.district}, {selectedLocation.region}
-            </h2>
-            <div className="grid grid-cols-1 gap-4">
-              {selectedLocation.cinemas.map((cinema, index) => (
-                <div
-                  key={index}
-                  onClick={() => handleSelectCinema(cinema)}
-                  className={`rounded-lg p-4 border cursor-pointer transition-colors ${
-                    selectedCinema === cinema
-                      ? 'border-red-500 bg-gray-800'
-                      : 'border-gray-700 hover:bg-gray-800'
-                  }`}
-                >
-                  <div className="flex flex-col gap-3">
-                    <div className="flex items-center gap-2">
-                      <FaMapMarkerAlt className="text-red-500 text-lg" />
-                      <h3 className="font-medium text-white">{cinema}</h3>
-                    </div>
-                    <p className="text-sm text-gray-400">
-                      {selectedLocation.district}
-                    </p>
-                    {selectedCinema === cinema && (
-                      <button
-                        onClick={handleBookNow}
-                        className="bg-red-600 text-white py-2 rounded-md mt-2 hover:bg-red-700 transition"
-                      >
-                        Book Now
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
+          {/* District */}
+          <div>
+            <label className="block text-xs font-medium text-gray-400 mb-1">
+              District
+            </label>
+            <div className="relative">
+              <select
+                value={selectedDistrict}
+                onChange={(e) => setSelectedDistrict(e.target.value)}
+                disabled={!selectedDivision}
+                className="w-full px-3 py-2 pl-8 border border-gray-600 rounded-md text-white bg-[#1a1a1a] text-sm appearance-none disabled:bg-gray-800"
+              >
+                <option value="">Select</option>
+                {districts.map((dist) => (
+                  <option key={dist} value={dist}>
+                    {dist}
+                  </option>
+                ))}
+              </select>
+              <FaMapMarkerAlt className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
+              <FaChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs" />
             </div>
           </div>
-        )}
 
-        {/* Map */}
-        <div className="rounded-2xl shadow-xl overflow-hidden border border-gray-700 bg-dark h-72">
-          <SeatMap
-            locations={locations}
-            selectedLocation={selectedLocation}
-            selectedCinema={selectedCinema}
-            mapRef={mapRef}
-          />
+
         </div>
       </div>
+
+      {/* Cinemas */}
+      {selectedLocation && (
+        <div className="rounded-xl p-4 border border-gray-700 bg-[#111111]">
+          <h2 className="text-lg font-semibold mb-3 border-b border-gray-700 pb-1">
+             {selectedLocation.district}, {selectedLocation.region}
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {selectedLocation.cinemas.map((cinema, index) => (
+              <div
+                key={index}
+                onClick={() => handleSelectCinema(cinema)}
+                className={`rounded-md p-3 border text-sm cursor-pointer ${selectedCinema === cinema
+                  ? 'border-red-500 bg-gray-800'
+                  : 'border-gray-700 hover:bg-gray-800'
+                  }`}
+              >
+                <div className="flex justify-between items-center">
+                  <span className="truncate">{cinema}</span>
+                  {selectedCinema === cinema && (
+                    <button
+                      onClick={handleBookNow}
+                      className="text-xs bg-red-600 px-2 py-1 rounded-md hover:bg-red-700"
+                    >
+                      Book
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Map */}
+      {/* <div className="rounded-2xl shadow-xl overflow-hidden border border-gray-700 bg-dark h-72">
+        <SeatMap
+          locations={locations}
+          selectedLocation={selectedLocation}
+          selectedCinema={selectedCinema}
+          mapRef={mapRef}
+        />
+      </div> */}
     </div>
   )
 }

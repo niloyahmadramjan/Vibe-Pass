@@ -11,7 +11,7 @@ import LoadingSpinner from '@/app/hooks/LoadingSpiner'
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
 
 export default function PaymentPage() {
-  const { id } = useParams() // movie ticket id ধরবে
+  const { id } = useParams() // movie ticket id will get from use paramas
   const [session, setSession] = useState(null)
   const [error, setError] = useState(null)
 
@@ -28,7 +28,7 @@ export default function PaymentPage() {
     fetchData()
   }, [id])
 
-  console.log(session)
+  // console.log(session)
 
   if (error) return <p className="text-center text-red-500">{error}</p>
   if (!session) return <LoadingSpinner/>
@@ -41,3 +41,4 @@ export default function PaymentPage() {
     </Elements>
   )
 }
+

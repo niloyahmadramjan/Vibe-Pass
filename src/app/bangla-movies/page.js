@@ -1,33 +1,52 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import BookingLocationModal from '../components/BookingLocationModal'
 import LoadingSpinner from '../hooks/LoadingSpiner'
+import axiosSecure from '../api/axiosHook/useAxiosSecure'
 
 export default function BanglaMoviesPage() {
   const [movies, setMovies] = useState([])
   const [loading, setLoading] = useState(true)
-  const router = useRouter()
+
+  // 🔹 Modal States
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedMovie, setSelectedMovie] = useState(null)
+  const [selectionMode, setSelectionMode] = useState('auto')
+  const [selectedCinema, setSelectedCinema] = useState(null)
+  const IMG_URL = 'https://image.tmdb.org/t/p/w500'
 
   useEffect(() => {
     async function fetchBanglaMovies() {
       try {
-        const res = await fetch(
-          `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&with_original_language=bn&sort_by=popularity.desc`
-        )
-        const data = await res.json()
-        setMovies(data.results || [])
+        setLoading(true);
+
+        const res = await axiosSecure.get("/api/movies/category/banglaFilm");
+
+        if (res.status === 200) {
+          setMovies(res.data); // results from your API
+        } else {
+          throw new Error("Failed to load Bangla movies");
+        }
       } catch (error) {
-        console.error('Failed to load Bangla movies:', error)
+        console.error("Failed to load Bangla movies:", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
-    fetchBanglaMovies()
-  }, [])
 
-  if (loading) {
-    return <LoadingSpinner/>
+    fetchBanglaMovies();
+  }, []);
+
+
+  if (loading) return <LoadingSpinner />
+
+  // 🔹 Handle Book Now
+  const handleBookNow = (movie) => {
+    setSelectedMovie(movie)
+    setSelectedCinema(null) // reset
+    setSelectionMode('auto') // default auto
+    setIsModalOpen(true)
   }
 
   return (
@@ -44,25 +63,22 @@ export default function BanglaMoviesPage() {
             <div
               key={movie.id}
               className="group bg-gray-900 rounded-2xl overflow-hidden shadow-lg hover:scale-105 transform transition duration-300 cursor-pointer flex flex-col"
-              onClick={() => router.push(`/movies/${movie.id}`)}
             >
               <div className="relative w-full h-[300px]">
                 <Image
                   src={
-                    movie.poster_path
-                      ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-                      : '/no-poster.png'
+                    typeof movie.poster_path === "string" && movie.poster_path.startsWith("http")
+                      ? movie.poster_path // full URL (like i.ibb.co)
+                      : IMG_URL + movie.poster_path // TMDB partial path
                   }
-                  alt={movie.title}
+                  alt={movie.title || "Movie Poster"}
                   fill
                   className="object-cover group-hover:opacity-90 transition"
                 />
               </div>
 
               <div className="p-4 flex flex-col flex-grow">
-                <h2 className="text-lg font-semibold truncate">
-                  {movie.title}
-                </h2>
+                <h2 className="text-lg font-semibold truncate">{movie.title}</h2>
                 <p className="text-sm text-gray-400 mt-1">
                   {movie.release_date || 'N/A'}
                 </p>
@@ -80,20 +96,29 @@ export default function BanglaMoviesPage() {
                   </span>
                 </div>
 
+                {/* 🔹 Book Now Button */}
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    router.push(`/movies/${movie.id}`)
-                  }}
+                  onClick={() => handleBookNow(movie)}
                   className="mt-4 w-full px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition"
                 >
-                  View Details
+                  Book Now
                 </button>
               </div>
             </div>
           ))}
         </div>
       )}
+
+      {/* 🔹 Booking Modal */}
+      <BookingLocationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        movie={selectedMovie}
+        selectionMode={selectionMode}
+        setSelectionMode={setSelectionMode}
+        selectedCinema={selectedCinema}
+        setSelectedCinema={setSelectedCinema}
+      />
     </div>
   )
 }

@@ -11,11 +11,11 @@ export const socket = io(SOCKET_URL, {
 
 // Connection status logging (optional)
 socket.on("connect", () => {
-  console.log("✅ Connected to server:", socket.id)
+  // console.log("✅ Connected to server:", socket.id)
 })
 
 socket.on("disconnect", () => {
-  console.log("❌ Disconnected from server")
+  // console.log("❌ Disconnected from server")
 })
 
 export default socket
