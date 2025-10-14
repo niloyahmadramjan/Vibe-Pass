@@ -21,7 +21,7 @@ export default function TicketDetailsPage() {
         );
         if (!response.ok) throw new Error("Payment fetch failed");
         const data = await response.json();
-        console.log("✅ Payment Data:", data);
+        // console.log("✅ Payment Data:", data);
         setTicket(data);
       } catch (err) {
         console.error("❌ Error fetching payment:", err);

@@ -10,17 +10,23 @@ import { useEffect, useState } from 'react'
 export default function MovieDetailsPage() {
   const params = useParams()
   const id = params.id
+  // console.log(id)
   const [movie, setMovie] = useState(null)
-  const [showTrailer, setShowTrailer] = useState(false)
+
   const [hallData, setHallData] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [nearbyTheaters, setNearbyTheaters] = useState([])
   const [selectedCinema, setSelectedCinema] = useState(null)
   const [selectionMode, setSelectionMode] = useState('auto')
+  
+  const [showTrailer, setShowTrailer] = useState(false);
+  const [trailerUrl, setTrailerUrl] = useState("");
   const router = useRouter()
-
+  const IMG_URL = "https://image.tmdb.org/t/p/w500";
   // Fetch Hall Data
+
+
   useEffect(() => {
     const fetchHallData = async () => {
       try {
@@ -36,20 +42,19 @@ export default function MovieDetailsPage() {
   // Fetch TMDB Movie Details
   useEffect(() => {
     async function fetchMovie() {
+      if (!id) return
       try {
         setLoading(true)
-        const res = await fetch(
-          `https://api.themoviedb.org/3/movie/${id}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&append_to_response=videos,credits`
-        )
-        const data = await res.json()
-        setMovie(data)
+        const res = await axiosSecure.get(`/api/movies/${id}`)
+        setMovie(res.data)
       } catch (err) {
-        console.error('Error fetching movie details:', err)
+        console.error("Error fetching movie details:", err)
       } finally {
         setLoading(false)
       }
     }
-    if (id) fetchMovie()
+
+    fetchMovie()
   }, [id])
 
   // Auto Detect nearby theater
@@ -92,11 +97,39 @@ export default function MovieDetailsPage() {
     (vid) => vid.type === 'Trailer' && vid.site === 'YouTube'
   )
 
+
+
+  const fetchTrailer = async (id) => {
+    console.log("id",id)
+    try {
+      console.log("🎥 Fetching trailer for TMDB ID:", id);
+      const res = await axiosSecure.get(`/api/movies/${id}/videos`);
+
+      if (res.status === 200) {
+        const results = res.data.results;
+        const trailer = results.find(
+          (v) => v.type === "Trailer" && v.site === "YouTube"
+        );
+
+        if (trailer) {
+          setTrailerUrl(`https://www.youtube.com/embed/${trailer.key}?autoplay=1`);
+          setShowTrailer(true);
+        } else {
+          alert("Trailer not available!");
+        }
+      } else {
+        console.error("Failed to fetch trailer: Status", res.status);
+      }
+    } catch (error) {
+      console.error("🎬 Failed to fetch trailer:", error);
+    }
+  };
+
   if (loading) return <LoadingSpinner />
   if (!movie)
     return (
       <div className="p-6 text-center text-red-500 bg-gray-900 min-h-screen">
-        ❌ Movie not found!
+         Movie not found!
       </div>
     )
 
@@ -106,8 +139,13 @@ export default function MovieDetailsPage() {
       <div className="relative w-full h-96 sm:h-80 md:h-96 lg:h-[500px] xl:h-[600px] overflow-hidden">
         <Image
           fill
-          src={`https://image.tmdb.org/t/p/original${movie.backdrop_path || movie.poster_path
-            }`}
+          src={
+            typeof movie.poster_path === "string" && movie.poster_path.startsWith("http")
+              ? movie.poster_path // full URL (like i.ibb.co)
+              : IMG_URL + movie.poster_path // TMDB partial path
+          }
+         
+          
           alt={movie.title}
           className="object-cover w-full h-full"
           priority
@@ -223,9 +261,9 @@ export default function MovieDetailsPage() {
 
             {/* Action Buttons - Responsive */}
             <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4 pt-3 sm:pt-4">
-              {trailer && (
+         
                 <button
-                  onClick={() => setShowTrailer(true)}
+                onClick={() => fetchTrailer(movie.id )}
                   className="px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 rounded-lg bg-red-600 hover:bg-red-700 transition-all duration-300 hover:scale-105 flex items-center gap-2 shadow-lg text-sm sm:text-base whitespace-nowrap"
                 >
                   <svg
@@ -237,7 +275,7 @@ export default function MovieDetailsPage() {
                   </svg>
                   Watch Trailer
                 </button>
-              )}
+          
 
               <button className="px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 rounded-lg bg-gray-700 hover:bg-gray-600 transition-all duration-300 hover:scale-105 flex items-center gap-2 shadow-lg text-sm sm:text-base whitespace-nowrap">
                 <svg
@@ -263,47 +301,33 @@ export default function MovieDetailsPage() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
         {/* Trailer Modal */}
-        {showTrailer && trailer && (
-          <div className="fixed inset-0 bg-black/95 flex items-center justify-center z-50 p-3 sm:p-4">
-            <div className="relative bg-[#1E1E1E] rounded-xl sm:rounded-2xl p-4 sm:p-6 w-full max-w-2xl lg:max-w-4xl border border-gray-700">
-              <div className="flex justify-between items-center mb-3 sm:mb-4">
-                <h3 className="text-lg sm:text-xl font-bold text-white truncate pr-2">
-                  {movie.title} - Trailer
-                </h3>
-                <button
-                  onClick={() => setShowTrailer(false)}
-                  className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg transition-all duration-200 flex items-center gap-1 sm:gap-2 text-sm sm:text-base whitespace-nowrap flex-shrink-0"
-                >
-                  <svg
-                    className="w-3 h-3 sm:w-4 sm:h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                  Close
-                </button>
-              </div>
-              <div className="relative aspect-video rounded-lg overflow-hidden">
-                <iframe
-                  src={`https://www.youtube.com/embed/${trailer.key}?autoplay=1`}
-                  title={`${movie.title} Trailer`}
-                  width="100%"
-                  height="100%"
-                  allow="autoplay; encrypted-media"
-                  allowFullScreen
-                  className="absolute inset-0 w-full h-full"
-                />
-              </div>
+        {showTrailer && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+            <div className="relative w-full max-w-3xl bg-black rounded-xl p-4 border border-gray-700">
+              <button
+                onClick={() => {
+                  setShowTrailer(false);
+                  setTrailerUrl("");
+                }}
+                className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg transition"
+              >
+                ✖ Close
+              </button>
+
+              <iframe
+                src={trailerUrl}
+                width="100%"
+                height="500"
+                title={`${movie.title} Trailer`}
+                allow="autoplay; encrypted-media"
+                allowFullScreen
+                className="rounded-lg"
+              ></iframe>
             </div>
           </div>
         )}
+
+
 
         {/* Content Grid */}
         <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
@@ -392,106 +416,122 @@ export default function MovieDetailsPage() {
 
 
 
-
-          {/* Sidebar - Booking Section */}
-          <div className="space-y-6">
-            {/* Cinema Selection */}
-            <div className="bg-[#1E1E1E] rounded-xl lg:rounded-2xl p-4 sm:p-6 border border-gray-700">
-              <div className="flex items-center gap-3 mb-4 sm:mb-6">
-                <div className="w-1.5 sm:w-2 h-6 sm:h-8 bg-green-500 rounded-full flex-shrink-0"></div>
-                <h2 className="text-xl sm:text-2xl font-bold text-white">
-                  Book Tickets
-                </h2>
-              </div>
-
-              {/* Selection Mode Toggle */}
-              <div className="flex gap-2 sm:gap-2 mb-4 sm:mb-6 p-1 bg-gray-800 rounded-lg mx-2">
-                <button
-                  onClick={() => setSelectionMode('auto')}
-                  className={`flex-1 py-2 px-2 sm:px-3 rounded-md font-semibold transition-all text-xs sm:text-sm ${selectionMode === 'auto'
-                    ? 'bg-red-600 text-white shadow-lg'
-                    : 'text-gray-400 hover:text-white'
-                    }`}
-                >
-                  Auto
-                </button>
-                <button
-                  onClick={() => setSelectionMode('manual')}
-                  className={`flex-1 py-2 px-2 sm:px-3 rounded-md font-semibold transition-all text-xs sm:text-sm ${selectionMode === 'manual'
-                    ? 'bg-red-600 text-white shadow-lg'
-                    : 'text-gray-400 hover:text-white'
-                    }`}
-                >
-                  Manual
-                </button>
-              </div>
-
-              {/* Auto Detect */}
-              {selectionMode === 'auto' && (
-                <div className="mb-4">
-                  <TheatersNear
-                    selectedCinema={selectedCinema}
-                    setSelectedCinema={setSelectedCinema}
-                  />
-                </div>
-              )}
-
-              {/* Manual Select */}
-              {selectionMode === 'manual' && (
-                <div className="mb-4">
-                  <AllTheatersLocation
-                    movieId={movie?.id}
-                    onLocationSelect={(loc) => {
-                      if (loc?.cinemas?.length > 0) {
-                        handleCinemaSelect({
-                          name: loc.cinemas[0],
-                          city: loc.region,
-                          district: loc.district,
-                        })
-                      }
-                    }}
-                  />
-
-                </div>
-              )}
-
-              {/* Book Now Button */}
-              {selectedCinema && (
-                <button
-                  onClick={() =>
-                    router.push(
-                      `/booking/${movie.id}?cinema=${encodeURIComponent(
-                        selectedCinema.name
-                      )}&city=${selectedCinema.city}&district=${selectedCinema.district
-                      }`
-                    )
-                  }
-                  className="w-full py-3 sm:py-4 rounded-lg bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 shadow-lg font-semibold text-sm sm:text-base whitespace-nowrap"
-                >
-                  <svg
-                    className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                    />
-                  </svg>
-                  Book at{' '}
-                  {selectedCinema.name.length > 20
-                    ? `${selectedCinema.name.substring(0, 20)}...`
-                    : selectedCinema.name}
-                </button>
-              )}
+          {/* Sidebar - Booking Section or Release Info */}
+          {movie?.category === "upcoming" ? (
+            //  Show this if the movie is upcoming
+            <div className="bg-[#1E1E1E] rounded-xl lg:rounded-2xl p-4 justify-center items-center flex flex-col sm:p-6 border border-gray-700 text-center h-70 ">
+              <h2 className="text-2xl font-bold text-white mb-2"> Coming Soon</h2>
+              <p className="text-gray-400">
+                Release Date:{" "}
+                <span className="text-green-500 font-semibold">
+                  {new Date(movie?.release_date).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </span>
+              </p>
             </div>
-          </div>
+          ) : (
+            // ✅ Show booking section for all other categories
+            <div className="space-y-6">
+              <div className="bg-[#1E1E1E] rounded-xl lg:rounded-2xl p-4 sm:p-6 border border-gray-700">
+                <div className="flex items-center gap-3 mb-4 sm:mb-6">
+                  <div className="w-1.5 sm:w-2 h-6 sm:h-8 bg-green-500 rounded-full flex-shrink-0"></div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-white">
+                    Book Tickets
+                  </h2>
+                </div>
+
+                {/* Selection Mode Toggle */}
+                <div className="flex gap-2 sm:gap-2 mb-4 sm:mb-6 p-1 bg-gray-800 rounded-lg mx-2">
+                  <button
+                    onClick={() => setSelectionMode("auto")}
+                    className={`flex-1 py-2 px-2 sm:px-3 rounded-md font-semibold transition-all text-xs sm:text-sm ${selectionMode === "auto"
+                        ? "bg-red-600 text-white shadow-lg"
+                        : "text-gray-400 hover:text-white"
+                      }`}
+                  >
+                    Auto
+                  </button>
+                  <button
+                    onClick={() => setSelectionMode("manual")}
+                    className={`flex-1 py-2 px-2 sm:px-3 rounded-md font-semibold transition-all text-xs sm:text-sm ${selectionMode === "manual"
+                        ? "bg-red-600 text-white shadow-lg"
+                        : "text-gray-400 hover:text-white"
+                      }`}
+                  >
+                    Manual
+                  </button>
+                </div>
+
+                {/* Auto Detection */}
+                {selectionMode === "auto" && (
+                  <div className="mb-4">
+                    <TheatersNear
+                      selectedCinema={selectedCinema}
+                      setSelectedCinema={setSelectedCinema}
+                    />
+                  </div>
+                )}
+
+                {/* Manual Theater Selection */}
+                {selectionMode === "manual" && (
+                  <div className="mb-4">
+                    <AllTheatersLocation
+                      movieId={movie?.id}
+                      onLocationSelect={(loc) => {
+                        if (loc?.cinemas?.length > 0) {
+                          handleCinemaSelect({
+                            name: loc.cinemas[0],
+                            city: loc.region,
+                            district: loc.district,
+                          });
+                        }
+                      }}
+                    />
+                  </div>
+                )}
+
+                {/* Book Now Button */}
+                {selectedCinema && (
+                  <button
+                    onClick={() =>
+                      router.push(
+                        `/booking/${movie.id}?cinema=${encodeURIComponent(
+                          selectedCinema.name
+                        )}&city=${selectedCinema.city}&district=${selectedCinema.district
+                        }`
+                      )
+                    }
+                    className="w-full py-3 sm:py-4 rounded-lg bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 shadow-lg font-semibold text-sm sm:text-base whitespace-nowrap"
+                  >
+                    <svg
+                      className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                      />
+                    </svg>
+                    Book at{" "}
+                    {selectedCinema.name.length > 20
+                      ? `${selectedCinema.name.substring(0, 20)}...`
+                      : selectedCinema.name}
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
 
 
-
+         
+        
 
         </div>
       </div>

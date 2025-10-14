@@ -150,7 +150,7 @@ function MyOrder() {
     ...order,
     // Map backend fields to frontend fields
     movieTitle: order.sessionTitle || "Unknown Movie",
-    totalAmount: order.amount ? order.amount / 100 : 0, // Convert from cents if needed
+    totalAmount: order.amount, // Convert from cents if needed
     showDate: order.showTime || order.createdAt,
     showTime: order.showTime || "N/A",
     selectedSeats: order.selectedSeats || ["N/A"],

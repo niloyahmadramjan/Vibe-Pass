@@ -2,6 +2,7 @@
 'use client'
 
 import { useState } from 'react'
+import ContactSupportSection from './ContactModal'
 
 const QnA = () => {
   const [activeIndex, setActiveIndex] = useState(null)
@@ -168,19 +169,17 @@ const QnA = () => {
             <button
               key={category.id}
               onClick={() => setSelectedCategory(category.id)}
-              className={`px-4 py-2 rounded-full border transition-all duration-300 ${
-                selectedCategory === category.id
-                  ? 'bg-[#D32F2F] border-[#D32F2F] text-white shadow-lg shadow-red-500/25'
-                  : 'border-[#333] text-[#B0B0B0] hover:border-[#D32F2F] hover:text-white'
-              }`}
+              className={`px-4 py-2 rounded-full border transition-all duration-300 ${selectedCategory === category.id
+                ? 'bg-[#D32F2F] border-[#D32F2F] text-white shadow-lg shadow-red-500/25'
+                : 'border-[#333] text-[#B0B0B0] hover:border-[#D32F2F] hover:text-white'
+                }`}
             >
               <span className="font-medium">{category.name}</span>
               <span
-                className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${
-                  selectedCategory === category.id
-                    ? 'bg-white text-[#D32F2F]'
-                    : 'bg-[#333] text-[#B0B0B0]'
-                }`}
+                className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${selectedCategory === category.id
+                  ? 'bg-white text-[#D32F2F]'
+                  : 'bg-[#333] text-[#B0B0B0]'
+                  }`}
               >
                 {category.count}
               </span>
@@ -220,11 +219,10 @@ const QnA = () => {
             {filteredFaqs.map((faq, index) => (
               <div
                 key={faq.id}
-                className={`bg-[#1E1E1E] border border-[#333] rounded-2xl overflow-hidden transition-all duration-300 hover:border-[#D32F2F]/50 ${
-                  activeIndex === index
-                    ? 'ring-2 ring-[#D32F2F]/20 border-[#D32F2F]'
-                    : ''
-                }`}
+                className={`bg-[#1E1E1E] border border-[#333] rounded-2xl overflow-hidden transition-all duration-300 hover:border-[#D32F2F]/50 ${activeIndex === index
+                  ? 'ring-2 ring-[#D32F2F]/20 border-[#D32F2F]'
+                  : ''
+                  }`}
               >
                 <button
                   className="w-full px-6 py-5 text-left flex items-center justify-between focus:outline-none"
@@ -250,9 +248,8 @@ const QnA = () => {
                     </div>
                   </div>
                   <div
-                    className={`transform transition-transform duration-300 ${
-                      activeIndex === index ? 'rotate-180' : ''
-                    }`}
+                    className={`transform transition-transform duration-300 ${activeIndex === index ? 'rotate-180' : ''
+                      }`}
                   >
                     <svg
                       className="w-6 h-6 text-[#D32F2F]"
@@ -270,9 +267,8 @@ const QnA = () => {
                   </div>
                 </button>
                 <div
-                  className={`px-6 pb-5 transition-all duration-300 ${
-                    activeIndex === index ? 'block' : 'hidden'
-                  }`}
+                  className={`px-6 pb-5 transition-all duration-300 ${activeIndex === index ? 'block' : 'hidden'
+                    }`}
                 >
                   <div className="pl-6 border-l-2 border-[#D32F2F]">
                     <p className="text-[#B0B0B0] leading-relaxed">
@@ -291,9 +287,7 @@ const QnA = () => {
             Still have questions? We're here to help!
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <button className="btn-primary bg-gradient-to-r from-[#D32F2F] to-[#B71C1C] text-white px-8 py-3 rounded-lg font-semibold hover:from-[#F44336] hover:to-[#D32F2F] transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl shadow-red-500/25">
-              Contact Support
-            </button>
+            <ContactSupportSection />
             <button className="btn-secondary border-2 border-[#D32F2F] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#D32F2F] transition-all duration-300">
               Live Chat
             </button>

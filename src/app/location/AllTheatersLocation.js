@@ -178,14 +178,14 @@ export default function AllTheatersLocation({ movieId }) {
       )}
 
       {/* Map */}
-      <div className="rounded-2xl shadow-xl overflow-hidden border border-gray-700 bg-dark h-72">
+      {/* <div className="rounded-2xl shadow-xl overflow-hidden border border-gray-700 bg-dark h-72">
         <SeatMap
           locations={locations}
           selectedLocation={selectedLocation}
           selectedCinema={selectedCinema}
           mapRef={mapRef}
         />
-      </div>
+      </div> */}
     </div>
   )
 }

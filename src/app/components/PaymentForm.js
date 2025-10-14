@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import {
   useStripe,
   useElements,
-  CardNumberElement,
+  CardNumberElement,  
   CardExpiryElement,
   CardCvcElement,
 } from "@stripe/react-stripe-js";
@@ -16,7 +16,7 @@ export default function PaymentForm({ session }) {
   const stripe = useStripe();
   const elements = useElements();
   const router = useRouter();
-  // console.log( "session",session)
+  // console.log("session", session._id)
 
   const [clientSecret, setClientSecret] = useState("");
   const [processing, setProcessing] = useState(false);
@@ -43,8 +43,9 @@ export default function PaymentForm({ session }) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        amount: session.totalAmount * 100,
+        amount: session.totalAmount ,
         bookingId: session._id,
+        
       }),
     })
       .then((res) => res.json())

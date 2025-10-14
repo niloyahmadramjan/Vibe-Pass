@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import toast from "react-hot-toast";
 import axiosSecure from "@/app/api/axiosHook/useAxiosSecure";
 import { motion, AnimatePresence } from "framer-motion";
@@ -11,13 +11,15 @@ import StatCard from "../components/StartCard";
 import UniversalTable from "../components/UniversalTable";
 import AdminLoading from "../components/AdminLoading";
 import Swal from "sweetalert2";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function CouponsPage() {
   const [coupons, setCoupons] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [editCoupon, setEditCoupon] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'table'
+  const [viewMode, setViewMode] = useState('grid');
+  const queryClient = useQueryClient();
 
   const [couponData, setCouponData] = useState({
     code: "",
@@ -26,25 +28,60 @@ export default function CouponsPage() {
     minAmount: "",
     expiryDate: "",
     usageLimit: "",
-    description: "", 
-
+    description: "",
   });
 
-  useEffect(() => {
-    fetchCoupons();
-  }, []);
-
-  const fetchCoupons = async () => {
-    try {
-      setLoading(true);
+  // ✅ Fetch Coupons (useQuery)
+  const { data: couponList = [], isLoading } = useQuery({
+    queryKey: ["coupons"],
+    queryFn: async () => {
       const res = await axiosSecure.get("/api/coupons");
       setCoupons(res.data);
-    } catch (err) {
-      toast.error("Failed to load coupons");
-      console.error(err);
-    } finally {
       setLoading(false);
-    }
+      return res.data;
+    },
+    onError: () => {
+      toast.error("Failed to load coupons");
+    },
+  });
+
+  // ✅ Add / Update Coupon 
+  const saveCouponMutation = useMutation({
+    mutationFn: async () => {
+      if (editCoupon) {
+        await axiosSecure.put(`/api/coupons/${editCoupon._id}`, couponData);
+      } else {
+        await axiosSecure.post("/api/coupons/add", couponData);
+      }
+    },
+    onSuccess: () => {
+      toast.success(editCoupon ? "🎉 Coupon updated successfully!" : "🎉 Coupon created successfully!");
+      queryClient.invalidateQueries(["coupons"]); 
+      closeModal();
+    },
+    onError: () => {
+      toast.error("❌ Error saving coupon");
+    },
+  });
+
+  // Delete Coupon 
+  const deleteCouponMutation = useMutation({
+    mutationFn: async (id) => {
+      await axiosSecure.delete(`/api/coupons/${id}`);
+    },
+    onSuccess: () => {
+      toast.success(  "Coupon delete successfully!");
+
+      queryClient.invalidateQueries(["coupons"]); 
+    },
+    onError: () => {
+      Swal.fire("Error!", "Something went wrong.", "error");
+    },
+  });
+
+  const fetchCoupons = async () => {
+ 
+    queryClient.invalidateQueries(["coupons"]);
   };
 
   const openModal = (coupon = null) => {
@@ -84,20 +121,7 @@ export default function CouponsPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      if (editCoupon) {
-        await axiosSecure.put(`/api/coupons/${editCoupon._id}`, couponData);
-        toast.success("🎉 Coupon updated successfully!");
-      } else {
-        await axiosSecure.post("/api/coupons/add", couponData);
-        toast.success("🎉 Coupon created successfully!");
-      }
-      fetchCoupons();
-      closeModal();
-    } catch (err) {
-      toast.error("❌ Error saving coupon");
-      console.error(err);
-    }
+    saveCouponMutation.mutate();
   };
 
   const handleDelete = async (id) => {
@@ -111,17 +135,7 @@ export default function CouponsPage() {
       confirmButtonText: "Yes, delete it!",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        try {
-          await axiosSecure.delete(`/api/coupons/${id}`);
-          // toast.success(" Coupon deleted successfully");
-          fetchCoupons();
-
-          Swal.fire("Deleted!", "Coupon has been removed.", "success");
-        } catch (err) {
-          console.error(err);
-          // toast.error("❌ Failed to delete coupon");
-          Swal.fire("Error!", "Something went wrong.", "error");
-        }
+        deleteCouponMutation.mutate(id);
       }
     });
   };
@@ -131,7 +145,6 @@ export default function CouponsPage() {
     toast.success(`📋 Copied: ${code}`);
   };
 
-  // Stats Calculation
   const stats = {
     totalCoupons: coupons.length,
     activeCoupons: coupons.filter(c => new Date(c.expiryDate) >= new Date()).length,
@@ -139,7 +152,7 @@ export default function CouponsPage() {
     totalDiscount: coupons.reduce((sum, c) => sum + (c.discountValue || 0), 0)
   };
 
-  if (loading) return <AdminLoading/>
+  if (isLoading || loading) return <AdminLoading />;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-6">

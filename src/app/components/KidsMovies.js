@@ -6,6 +6,7 @@ import { Navigation } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import BookingLocationModal from './BookingLocationModal' // ✅ modal import
+import axiosSecure from '../api/axiosHook/useAxiosSecure'
 
 // 🔹 Loading Spinner
 function Spinner() {
@@ -19,6 +20,7 @@ function Spinner() {
 export default function KidsMovies() {
   const [movies, setMovies] = useState([])
   const [loading, setLoading] = useState(true)
+  const IMG_URL = 'https://image.tmdb.org/t/p/w500'
 
   // 🔹 Modal States
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -26,24 +28,27 @@ export default function KidsMovies() {
   const [selectionMode, setSelectionMode] = useState('auto')
   const [selectedCinema, setSelectedCinema] = useState(null)
 
+
   useEffect(() => {
-    const fetchMovies = async () => {
-      setLoading(true)
+    const fetchUpcoming = async () => {
       try {
-        const res = await fetch(
-          `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&language=en-US&sort_by=popularity.desc&with_genres=16,10751&page=1`
-        )
-        const data = await res.json()
-        setMovies(data.results || [])
+        // 🔹 Use axiosSecure to call your backend API
+        const res = await axiosSecure.get("/api/movies/category/genreAnimation")
+
+        // 🔹 Store results (movies list) in state
+        setMovies(res.data || [])
       } catch (error) {
-        console.error('Error fetching kids movies:', error)
+        console.error("Error fetching upcoming movies:", error)
       } finally {
+        // 🔹 Stop loading spinner whether success or fail
         setLoading(false)
       }
     }
-    fetchMovies()
-  }, [])
 
+    fetchUpcoming()
+  }, [])
+  
+  console.log(movies)
   if (loading) return <Spinner />
 
   // 🔹 Handle Book Now
@@ -86,8 +91,12 @@ export default function KidsMovies() {
             >
               {/* Poster */}
               <Image
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                alt={movie.title}
+                src={
+                  typeof movie.poster_path === "string" && movie.poster_path.startsWith("http")
+                    ? movie.poster_path // full URL (like i.ibb.co)
+                    : IMG_URL + movie.poster_path // TMDB partial path
+                }
+                alt={movie.title || "Movie Poster"}
                 fill
                 className="object-cover"
               />
