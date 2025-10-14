@@ -155,10 +155,10 @@ const EventCard = ({ event, onSelect, index }) => (
         {event.title}
       </h3>
 
-      <p className="text-[#B0B0B0] mb-4 line-clamp-2">{event.description}</p>
+    
 
       <div className="space-y-2 text-[#B0B0B0]">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 pt-2">
           <FiCalendar className="text-[#D32F2F]" />
           <span>{new Date(event.date).toLocaleDateString()}</span>
         </div>
@@ -166,12 +166,7 @@ const EventCard = ({ event, onSelect, index }) => (
           <FiClock className="text-green-400" />
           <span>{event.time || "All Day"}</span>
         </div>
-        <div className="flex items-center gap-3">
-          <FiMapPin className="text-red-400" />
-          <span className="line-clamp-1">
-            Cinema: {event.location || "N/A"}
-          </span>
-        </div>
+       
       </div>
 
       <div className="flex gap-2 mt-6">
@@ -244,7 +239,7 @@ const EventModal = ({ event, onClose }) => (
           alt={event.title || "Event image"}
           width={800}
           height={400}
-          className="w-full h-56 md:h-64 lg:h-72 object-cover rounded-xl group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-56 md:h-64 lg:h-102 object-cover rounded-xl group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#1E1E1E] via-transparent to-transparent" />
         <button

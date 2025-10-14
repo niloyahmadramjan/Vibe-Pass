@@ -155,7 +155,7 @@ export default function LoyaltyRewards() {
                 <h3 className="text-3xl font-bold">
                   <CountUp
                     end={stat.end}
-                    duration={2.5}
+                    duration={50.5}
                     separator=","
                     suffix={stat.suffix}
                   />

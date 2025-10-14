@@ -22,7 +22,7 @@ export default function home() {
       <MovieExperienceSection />
       <LoyaltyRewards />
       <UpcomingEvent />
-      <NearbyHome />
+      {/* <NearbyHome /> */}
       <NewsLetter />
       <FAQ />
     </main>
