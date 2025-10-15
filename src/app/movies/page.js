@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import LoadingSpinner from '../hooks/LoadingSpiner'
 import BookingLocationModal from '../components/BookingLocationModal'
-import axiosSecure from '../api/axiosHook/useAxiosSecure'
+import axiosPublic from '../api/axiosHook/useAxiosPublic'
 
 export default function MoviesPage() {
   const [movies, setMovies] = useState([])
@@ -26,7 +26,7 @@ export default function MoviesPage() {
     const fetchAllMovies = async () => {
       try {
         setLoading(true)
-        const res = await axiosSecure.get(`/api/movies`)
+        const res = await axiosPublic.get(`/api/movies`)
 
         const allMoviesData = res.data || []
         setAllMovies(allMoviesData)

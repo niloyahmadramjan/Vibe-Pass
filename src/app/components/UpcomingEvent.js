@@ -15,6 +15,7 @@ import {
 } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import axiosPublic from "../api/axiosHook/useAxiosPublic";
 
 function UpcomingEvent() {
   const [events, setEvents] = useState([]);
@@ -24,21 +25,21 @@ function UpcomingEvent() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const eventsPerPage = 3;
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/events");
-        if (!response.ok) throw new Error("Failed to fetch events");
-        const data = await response.json();
-        setEvents(data.data || []);
-      } catch (err) {
-        setError(err.message || "Failed to fetch events");
-      } finally {
-        setLoading(false);
+
+    useEffect(() => {
+      const fetchEvents = async () => {
+        try {
+          const response = await axiosPublic.get('/api/events')
+          setEvents(response.data.data || [])
+        } catch (err) {
+          setError(err.message || 'Failed to fetch events')
+        } finally {
+          setLoading(false)
+        }
       }
-    };
-    fetchEvents();
-  }, []);
+
+      fetchEvents()
+    }, [])
 
   const filteredEvents = events;
   const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
