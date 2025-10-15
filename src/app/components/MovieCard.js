@@ -8,8 +8,7 @@ import 'swiper/css/navigation'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import BookingLocationModal from './BookingLocationModal' // ✅ modal import
-import useAxios from '../api/axiosHook/axiosInstance'
-// import useAxios from '../api/axiosHook/useuseAxios'
+import axiosPublic from '../api/axiosHook/useAxiosPublic'
 
 // 🔹 Loading Spinner
 function Spinner() {
@@ -53,7 +52,7 @@ export default function MovieCard() {
       try {
         const results = await Promise.all(
           categories.map(async (cat) => {
-            const res = await useAxios.get(`/api/movies/category/${cat.key}`)
+            const res = await axiosPublic.get(`/api/movies/category/${cat.key}`)
             return { key: cat.key, movies: res.data || [] }
 
           })

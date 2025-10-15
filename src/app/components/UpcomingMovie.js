@@ -9,8 +9,7 @@ import { Navigation } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import Link from 'next/link'
-import useAxios from '../api/axiosHook/axiosInstance'
-// import useAxios from '../api/axiosHook/useuseAxios'
+import axiosPublic from '../api/axiosHook/useAxiosPublic'
 
 // Simple Loading Spinner Component
 function Spinner() {
@@ -37,8 +36,8 @@ export default function UpcomingMovie() {
   useEffect(() => {
     const fetchUpcoming = async () => {
       try {
-        // 🔹 Use useAxios to call your backend API
-        const res = await useAxios.get("/api/movies/category/upcoming")
+        // 🔹 Use axiosPublic to call your backend API
+        const res = await axiosPublic.get("/api/movies/category/upcoming")
 
         // 🔹 Store results (movies list) in state
         setUpcoming(res.data || [])
