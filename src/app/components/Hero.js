@@ -6,7 +6,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, Pagination } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/pagination'
-import axiosSecure from '../api/axiosHook/useAxiosSecure'
+import axiosPublic from '../api/axiosHook/useAxiosPublic'
 
 export default function HeroSection() {
   const [movies, setMovies] = useState([])
@@ -20,10 +20,10 @@ export default function HeroSection() {
   useEffect(() => {
     async function fetchMovies() {
       try {
-        // 🔹 Use axiosSecure to call your backend API
+        // 🔹 Use axiosPublic to call your backend API
         const [hollywoodRes, bollywoodRes] = await Promise.all([
-          axiosSecure.get("/api/movies/category/trending"),
-          axiosSecure.get("/api/movies/category/genreAction"),
+          axiosPublic.get("/api/movies/category/trending"),
+          axiosPublic.get("/api/movies/category/genreAction"),
         ])
 
         const hollywoodData = hollywoodRes.data
@@ -55,7 +55,7 @@ export default function HeroSection() {
       console.log("🎥 Fetching trailer for TMDB ID:", tmdbId);
 
       // ✅ Call your backend API
-      const res = await axiosSecure.get(`/api/movies/${tmdbId}/videos`);
+      const res = await axiosPublic.get(`/api/movies/${tmdbId}/videos`);
 
       if (res.status === 200) {
         const results = res.data.results;

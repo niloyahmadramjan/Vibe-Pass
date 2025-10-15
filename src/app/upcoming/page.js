@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import LoadingSpinner from '../hooks/LoadingSpiner'
-import axiosSecure from '../api/axiosHook/useAxiosSecure'
+import axiosPublic from '../api/axiosHook/useAxiosPublic'
 
 function UpcomingMoviesContent() {
   const [movies, setMovies] = useState([])
@@ -23,7 +23,7 @@ function UpcomingMoviesContent() {
     const fetchMovies = async () => {
       try {
         setLoading(true);
-        const res = await axiosSecure.get(`/api/movies/category/upcoming?page=${page}`);
+        const res = await axiosPublic.get(`/api/movies/category/upcoming?page=${page}`);
         setMovies(res.data || []);
         setTotalPages(res.data.total_pages || 1);
       } catch (error) {
@@ -42,7 +42,7 @@ function UpcomingMoviesContent() {
       console.log("🎥 Fetching trailer for TMDB ID:", tmdbId);
 
       // call from backend
-      const res = await axiosSecure.get(`/api/movies/${tmdbId}/videos`);
+      const res = await axiosPublic.get(`/api/movies/${tmdbId}/videos`);
       const results = res.data.results || [];
 
       const trailer = results.find(

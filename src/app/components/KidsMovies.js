@@ -5,8 +5,8 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
-import BookingLocationModal from './BookingLocationModal' // ✅ modal import
-import axiosSecure from '../api/axiosHook/useAxiosSecure'
+import BookingLocationModal from './BookingLocationModal' 
+import axiosPublic from '../api/axiosHook/useAxiosPublic'
 
 // 🔹 Loading Spinner
 function Spinner() {
@@ -32,8 +32,8 @@ export default function KidsMovies() {
   useEffect(() => {
     const fetchUpcoming = async () => {
       try {
-        // 🔹 Use axiosSecure to call your backend API
-        const res = await axiosSecure.get("/api/movies/category/genreAnimation")
+        // 🔹 Use axiosPublic to call your backend API
+        const res = await axiosPublic.get("/api/movies/category/genreAnimation")
 
         // 🔹 Store results (movies list) in state
         setMovies(res.data || [])

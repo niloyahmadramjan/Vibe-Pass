@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import BookingLocationModal from '../components/BookingLocationModal'
 import LoadingSpinner from '../hooks/LoadingSpiner'
-import axiosSecure from '../api/axiosHook/useAxiosSecure'
+import axiosPublic from '../api/axiosHook/useAxiosPublic'
 
 export default function BanglaMoviesPage() {
   const [movies, setMovies] = useState([])
@@ -21,7 +21,7 @@ export default function BanglaMoviesPage() {
       try {
         setLoading(true);
 
-        const res = await axiosSecure.get("/api/movies/category/banglaFilm");
+        const res = await axiosPublic.get("/api/movies/category/banglaFilm");
 
         if (res.status === 200) {
           setMovies(res.data); // results from your API
