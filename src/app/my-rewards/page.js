@@ -419,198 +419,214 @@ export default function RewardsPage() {
             )}
           </div>
         </div>
-        {/* Redeem Points Section - Selection Style */}
+
         <div className="relative mb-16">
           {/* Background Elements */}
-          <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 via-cyan-500/5 to-emerald-500/5 rounded-3xl blur-xl"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-[#9292FF]/10 via-cyan-500/5 to-emerald-500/5 rounded-3xl blur-xl"></div>
 
-          <div className="relative bg-gray-900/80 backdrop-blur-2xl rounded-3xl p-8 border border-green-500/20 shadow-2xl">
+          <div className="relative bg-gray-900/80 backdrop-blur-2xl rounded-3xl p-4 md:p-8 border border-[#9292FF]/30 shadow-2xl">
             {/* Section Header */}
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-4 mb-6">
+            <div className="text-center mb-8 md:mb-12">
+              <div className="inline-flex flex-col md:flex-row items-center gap-3 md:gap-4 mb-4 md:mb-6">
                 <div className="relative">
-                  <div className="absolute inset-0 bg-green-500 rounded-full blur-lg opacity-50"></div>
-                  <FiDollarSign className="relative text-4xl text-green-400 z-10" />
+                  <div className="absolute inset-0 bg-[#9292FF] rounded-full blur-lg opacity-50"></div>
+                  <FiDollarSign className="relative text-3xl md:text-4xl text-[#9292FF] z-10" />
                 </div>
-                <h2 className="text-4xl font-black bg-gradient-to-r from-green-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
+                <h2 className="text-2xl md:text-4xl font-black bg-gradient-to-r  from-purple-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
                   Select Points to Redeem
                 </h2>
               </div>
-              <p className="text-gray-300 text-xl max-w-2xl mx-auto leading-relaxed">
+              <p className="text-gray-300 text-base md:text-xl max-w-2xl mx-auto leading-relaxed px-4">
                 Choose your redemption amount and convert points to TK instantly
               </p>
             </div>
 
-            {/* Selection Grid */}
-            <div className="space-y-4 max-w-4xl mx-auto">
-              {redemptionOptions.map((option, index) => (
-                <div
-                  key={option.points}
-                  className={`group relative transition-all duration-300 ${
-                    rewardData.points >= option.points
-                      ? "hover:scale-[1.02] cursor-pointer"
-                      : "opacity-60"
-                  }`}
-                >
-                  {/* Selection Item */}
+            {/* Scrollable Container */}
+            <div className="overflow-x-auto pb-4">
+              <div className="min-w-[600px] space-y-4 max-w-4xl mx-auto">
+                {redemptionOptions.map((option, index) => (
                   <div
-                    onClick={() =>
-                      rewardData.points >= option.points &&
-                      handleRedeem(option.points, option.tk)
-                    }
-                    className={`relative p-6 rounded-2xl border-2 transition-all duration-300 ${
+                    key={option.points}
+                    className={`group relative transition-all duration-300 ${
                       rewardData.points >= option.points
-                        ? "bg-gradient-to-r from-gray-800 to-gray-900 border-green-500/30 hover:border-green-400/60 hover:bg-gradient-to-r hover:from-green-500/10 hover:to-cyan-500/10"
-                        : "bg-gray-800/50 border-gray-600/30 cursor-not-allowed"
+                        ? "hover:scale-[1.02] cursor-pointer"
+                        : "opacity-60"
                     }`}
                   >
-                    {/* Left Side - Points and Info */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-6 flex-1">
-                        {/* Selection Indicator */}
-                        <div
-                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
-                            rewardData.points >= option.points
-                              ? "border-green-400 bg-green-400/20 group-hover:bg-green-400/30"
-                              : "border-gray-500 bg-gray-600/20"
-                          }`}
-                        >
-                          {rewardData.points >= option.points && (
-                            <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                          )}
-                        </div>
-
-                        {/* Points Amount */}
-                        <div className="flex items-center gap-4">
+                    {/* Selection Item */}
+                    <div
+                      onClick={() =>
+                        rewardData.points >= option.points &&
+                        handleRedeem(option.points, option.tk)
+                      }
+                      className={`relative p-4 md:p-6 rounded-2xl border-2 transition-all duration-300 ${
+                        rewardData.points >= option.points
+                          ? "bg-gradient-to-r from-gray-800 to-gray-900 border-[#9292FF]/40 hover:border-[#9292FF]/60 hover:bg-gradient-to-r hover:from-[#9292FF]/10 hover:to-cyan-500/10"
+                          : "bg-gray-800/50 border-gray-600/30 cursor-not-allowed"
+                      }`}
+                    >
+                      {/* Left Side - Points and Info */}
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
+                        <div className="flex items-center gap-4 md:gap-6 flex-1">
+                          {/* Selection Indicator */}
                           <div
-                            className={`text-3xl font-black ${
+                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                               rewardData.points >= option.points
-                                ? "text-white"
-                                : "text-gray-500"
+                                ? "border-[#9292FF] bg-[#9292FF]/20 group-hover:bg-[#9292FF]/30"
+                                : "border-gray-500 bg-gray-600/20"
                             }`}
                           >
-                            {option.points}
+                            {rewardData.points >= option.points && (
+                              <div className="w-3 h-3 bg-[#9292FF] rounded-full animate-pulse"></div>
+                            )}
                           </div>
-                          <div className="text-gray-400 text-lg">points</div>
+
+                          {/* Points and TK Value */}
+                          <div className="flex items-center gap-3 md:gap-6 flex-wrap">
+                            {/* Points Amount */}
+                            <div className="flex items-center gap-2 md:gap-4">
+                              <div
+                                className={`text-2xl md:text-3xl font-black ${
+                                  rewardData.points >= option.points
+                                    ? "text-white"
+                                    : "text-gray-500"
+                                }`}
+                              >
+                                {option.points}
+                              </div>
+                              <div className="text-gray-400 text-base md:text-lg">
+                                points
+                              </div>
+                            </div>
+
+                            {/* Arrow Separator */}
+                            <div className="text-gray-500 text-lg md:text-xl hidden sm:block">
+                              →
+                            </div>
+
+                            {/* TK Value */}
+                            <div className="flex items-center gap-2 md:gap-3">
+                              <FiDollarSign
+                                className={`text-lg md:text-xl ${
+                                  rewardData.points >= option.points
+                                    ? "text-yellow-400"
+                                    : "text-gray-500"
+                                }`}
+                              />
+                              <span
+                                className={`text-xl md:text-2xl font-black ${
+                                  rewardData.points >= option.points
+                                    ? "text-yellow-300"
+                                    : "text-gray-500"
+                                }`}
+                              >
+                                {option.tk} TK
+                              </span>
+                            </div>
+
+                            {/* Bonus Label */}
+                            {option.label && (
+                              <div
+                                className={`px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-semibold border ${
+                                  rewardData.points >= option.points
+                                    ? "bg-[#9292FF]/20 text-[#9292FF] border-[#9292FF]/30"
+                                    : "bg-gray-600/20 text-gray-400 border-gray-500/30"
+                                }`}
+                              >
+                                {option.label}
+                              </div>
+                            )}
+                          </div>
                         </div>
 
-                        {/* Arrow Separator */}
-                        <div className="text-gray-500 text-xl">→</div>
-
-                        {/* TK Value */}
-                        <div className="flex items-center gap-3">
-                          <FiDollarSign
-                            className={`text-xl ${
-                              rewardData.points >= option.points
-                                ? "text-yellow-400"
-                                : "text-gray-500"
-                            }`}
-                          />
-                          <span
-                            className={`text-2xl font-black ${
-                              rewardData.points >= option.points
-                                ? "text-yellow-300"
-                                : "text-gray-500"
-                            }`}
-                          >
-                            {option.tk} TK
-                          </span>
-                        </div>
-
-                        {/* Bonus Label */}
-                        {option.label && (
-                          <div
-                            className={`px-3 py-1 rounded-full text-sm font-semibold border ${
-                              rewardData.points >= option.points
-                                ? "bg-purple-500/20 text-purple-300 border-purple-500/30"
-                                : "bg-gray-600/20 text-gray-400 border-gray-500/30"
-                            }`}
-                          >
-                            {option.label}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Right Side - Status and Action */}
-                      <div className="flex items-center gap-6">
-                        {/* Progress Indicator */}
-                        <div className="flex items-center gap-3">
-                          <div className="w-24 bg-gray-700 rounded-full h-2">
-                            <div
-                              className={`h-2 rounded-full transition-all duration-1000 ${
+                        {/* Right Side - Status and Action */}
+                        <div className="flex items-center justify-between md:justify-end gap-4 md:gap-6">
+                          {/* Progress Indicator */}
+                          <div className="flex items-center gap-3">
+                            <div className="w-16 md:w-24 bg-gray-700 rounded-full h-2">
+                              <div
+                                className={`h-2 rounded-full transition-all duration-1000 ${
+                                  rewardData.points >= option.points
+                                    ? "bg-gradient-to-r from-[#9292FF] to-cyan-500"
+                                    : "bg-gradient-to-r from-yellow-500 to-orange-500"
+                                }`}
+                                style={{
+                                  width: `${Math.min(
+                                    (rewardData.points / option.points) * 100,
+                                    100
+                                  )}%`,
+                                }}
+                              ></div>
+                            </div>
+                            <span
+                              className={`text-xs md:text-sm font-medium w-14 md:w-16 ${
                                 rewardData.points >= option.points
-                                  ? "bg-gradient-to-r from-green-500 to-cyan-500"
-                                  : "bg-gradient-to-r from-yellow-500 to-orange-500"
+                                  ? "text-[#9292FF]"
+                                  : "text-orange-400"
                               }`}
-                              style={{
-                                width: `${Math.min(
-                                  (rewardData.points / option.points) * 100,
-                                  100
-                                )}%`,
-                              }}
-                            ></div>
+                            >
+                              {rewardData.points >= option.points
+                                ? "Ready"
+                                : `${option.points - rewardData.points} needed`}
+                            </span>
                           </div>
-                          <span
-                            className={`text-sm font-medium w-16 ${
+
+                          {/* Action Button */}
+                          <button
+                            disabled={rewardData.points < option.points}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRedeem(option.points, option.tk);
+                            }}
+                            className={`px-4 md:px-8 py-2 md:py-3 rounded-xl font-bold transition-all duration-300 relative overflow-hidden min-w-[100px] ${
                               rewardData.points >= option.points
-                                ? "text-green-400"
-                                : "text-orange-400"
+                                ? "bg-[#5b5bac] text-white hover:shadow-lg hover:scale-105"
+                                : "bg-gray-700 text-gray-400 cursor-not-allowed"
                             }`}
                           >
-                            {rewardData.points >= option.points
-                              ? "Ready"
-                              : `${option.points - rewardData.points} needed`}
-                          </span>
+                            {rewardData.points >= option.points ? (
+                              <span className="flex items-center justify-center gap-1 md:gap-2 text-sm md:text-base">
+                                <FiGift className="text-base md:text-lg" />
+                                Redeem
+                              </span>
+                            ) : (
+                              <span className="flex items-center justify-center gap-1 md:gap-2 text-sm md:text-base">
+                                <FiLock className="text-base md:text-lg" />
+                                Locked
+                              </span>
+                            )}
+                          </button>
                         </div>
+                      </div>
 
-                        {/* Action Button */}
-                        <button
-                          disabled={rewardData.points < option.points}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRedeem(option.points, option.tk);
-                          }}
-                          className={`px-8 py-3 rounded-xl font-bold transition-all duration-300 relative overflow-hidden ${
+                      {/* Bonus Description */}
+                      {option.bonus && (
+                        <div
+                          className={`mt-3 ml-0 md:ml-12 text-xs md:text-sm ${
                             rewardData.points >= option.points
-                              ? "bg-gradient-to-r from-green-500 to-cyan-500 text-white hover:shadow-lg hover:scale-105"
-                              : "bg-gray-700 text-gray-400 cursor-not-allowed"
+                              ? "text-cyan-300"
+                              : "text-gray-500"
                           }`}
                         >
-                          {rewardData.points >= option.points ? (
-                            <span className="flex items-center gap-2">
-                              <FiGift className="text-lg" />
-                              Redeem
-                            </span>
-                          ) : (
-                            <span className="flex items-center gap-2">
-                              <FiLock className="text-lg" />
-                              Locked
-                            </span>
-                          )}
-                        </button>
-                      </div>
+                          🎁 {option.bonus}
+                        </div>
+                      )}
                     </div>
 
-                    {/* Bonus Description */}
-                    {option.bonus && (
-                      <div
-                        className={`mt-3 ml-12 text-sm ${
-                          rewardData.points >= option.points
-                            ? "text-cyan-300"
-                            : "text-gray-500"
-                        }`}
-                      >
-                        🎁 {option.bonus}
-                      </div>
+                    {/* Hover Effect */}
+                    {rewardData.points >= option.points && (
+                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#9292FF]/5 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
                     )}
                   </div>
+                ))}
+              </div>
+            </div>
 
-                  {/* Hover Effect */}
-                  {rewardData.points >= option.points && (
-                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-green-500/5 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
-                  )}
-                </div>
-              ))}
+            {/* Scroll Indicator for Mobile */}
+            <div className="flex justify-center mt-4 md:hidden">
+              <div className="flex items-center gap-1 text-xs text-gray-500">
+                <span>← Scroll →</span>
+              </div>
             </div>
           </div>
         </div>
