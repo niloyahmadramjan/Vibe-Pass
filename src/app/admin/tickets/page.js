@@ -9,7 +9,7 @@ import AdminLoading from '../components/AdminLoading';
 import axiosSecure from '@/app/api/axiosHook/useAxiosSecure';
 import { FaTicketAlt } from 'react-icons/fa';
 import { useQuery } from '@tanstack/react-query';
-import TicketPDF from '../components/TicketPDF';
+
 
 export default function TicketManagement() {
     const [searchTerm, setSearchTerm] = useState('');
@@ -94,11 +94,7 @@ export default function TicketManagement() {
     };
 
     // Download ticket as PDF
-    const handleDownloadTicket = (ticket) => {
-        TicketPDF.generatePDF(ticket);
-        toast.success(`Downloading ticket for ${ticket.userName}`);
-    };
-
+ 
     // Format time
     const formatTime = (time) => {
         if (!time) return 'N/A';
@@ -108,6 +104,52 @@ export default function TicketManagement() {
         const formattedHour = hour % 12 || 12;
         return `${formattedHour}:${minutes} ${ampm}`;
     };
+
+
+
+
+    const TicketPDF = async () => {
+        try {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/generate-ticket-pdf`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        movieTitle: booking.movieTitle,
+                        theaterName: booking.theaterName,
+                        showDate: booking.showDate,
+                        showTime: booking.showTime,
+                        selectedSeats: booking.selectedSeats,
+                        totalAmount: booking.totalAmount,
+                        transactionId: ticket.transactionId,
+                        screen: booking.screen,
+                        status: ticket.status,
+                        userName: booking.userName,
+                        userEmail: booking.userEmail,
+                    }),
+                }
+            );
+
+            if (!response.ok) throw new Error("Failed to download PDF");
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `ticket-${ticket.transactionId}.pdf`;
+            link.click();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Download failed:", error);
+        } finally {
+          ;
+        }
+    };
+
+
+
+
 
     if (isLoading) {
         return <AdminLoading />;
@@ -308,7 +350,7 @@ export default function TicketManagement() {
                                             </button>
                                             {ticket.paymentStatus === 'paid' && (
                                                 <button
-                                                    onClick={() => handleDownloadTicket(ticket)}
+                                                    onClick={ TicketPDF}
                                                     className="p-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors text-white"
                                                     title="Download Ticket"
                                                 >
@@ -503,3 +545,15 @@ export default function TicketManagement() {
         </div>
     );
 }
+
+
+
+
+
+
+
+
+
+
+
+

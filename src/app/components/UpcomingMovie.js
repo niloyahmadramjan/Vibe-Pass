@@ -9,7 +9,7 @@ import { Navigation } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import Link from 'next/link'
-import axiosSecure from '../api/axiosHook/useAxiosSecure'
+import axiosPublic from '../api/axiosHook/useAxiosPublic'
 
 // Simple Loading Spinner Component
 function Spinner() {
@@ -36,8 +36,8 @@ export default function UpcomingMovie() {
   useEffect(() => {
     const fetchUpcoming = async () => {
       try {
-        // 🔹 Use axiosSecure to call your backend API
-        const res = await axiosSecure.get("/api/movies/category/upcoming")
+        // 🔹 Use axiosPublic to call your backend API
+        const res = await axiosPublic.get("/api/movies/category/upcoming")
 
         // 🔹 Store results (movies list) in state
         setUpcoming(res.data || [])
