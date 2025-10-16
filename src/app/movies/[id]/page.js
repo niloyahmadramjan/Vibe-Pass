@@ -284,7 +284,7 @@ export default function MovieDetailsPage() {
               </button>
 
 
-              <button className="px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 rounded-lg bg-gray-700 hover:bg-gray-600 transition-all duration-300 hover:scale-105 flex items-center gap-2 shadow-lg text-sm sm:text-base whitespace-nowrap">
+              {/* <button className="px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 rounded-lg bg-gray-700 hover:bg-gray-600 transition-all duration-300 hover:scale-105 flex items-center gap-2 shadow-lg text-sm sm:text-base whitespace-nowrap">
                 <svg
                   className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
                   fill="none"
@@ -299,7 +299,7 @@ export default function MovieDetailsPage() {
                   />
                 </svg>
                 Watchlist
-              </button>
+              </button> */}
             </div>
           </div>
         </div>

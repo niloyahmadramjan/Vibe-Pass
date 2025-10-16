@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { FaFacebook, FaInstagram, FaYoutube, FaTwitter } from "react-icons/fa";
+import { FaFacebook, FaInstagram, FaYoutube, } from "react-icons/fa";
+import { BsTwitterX } from "react-icons/bs";
 
 export default function Footer() {
   return (
@@ -65,14 +66,14 @@ export default function Footer() {
                   Blog
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="/contact"
                   className="!text-white hover:!text-[var(--color-primary-hover)] font-bold"
                 >
                   Contact
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </div>
 
@@ -81,16 +82,16 @@ export default function Footer() {
             <h3 className="text-lg md:text-xl font-semibold mb-4">Support</h3>
             <ul className="space-y-2 text-sm md:text-base">
               <li>
-                <Link
+                {/* <Link
                   href="/help-center"
                   className="!text-white hover:!text-[var(--color-primary-hover)] font-bold"
                 >
                   Help Center
-                </Link>
+                </Link> */}
               </li>
               <li>
                 <Link
-                  href="/terms"
+                  href="/termsAndConditions"
                   className="!text-white hover:!text-[var(--color-primary-hover)] font-bold"
                 >
                   Terms & Conditions
@@ -98,7 +99,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/privacy"
+                  href="/PrivacyPolicy"
                   className="!text-white hover:!text-[var(--color-primary-hover)] font-bold"
                 >
                   Privacy Policy
@@ -137,7 +138,7 @@ export default function Footer() {
                 target="_blank"
                 className="!text-white hover:!text-[#1DA1F2]"
               >
-                <FaTwitter size={25} />
+                <BsTwitterX size={25} />
               </a>
             </div>
           </div>
@@ -147,24 +148,24 @@ export default function Footer() {
         <div className="py-4 px-12 bg-[#282828] text-[#CCCCCC] text-sm hidden md:flex items-center justify-between flex-wrap">
           <div className="flex justify-around gap-6">
             <Link
-              href="/terms"
+              href="/termsAndConditions"
               className="!text-white hover:!text-[var(--color-primary-hover)] font-semibold"
             >
               Terms & Conditions
             </Link>
             <Link
-              href="/copyright"
+              href="/CopyrightNotice"
               className="!text-white hover:!text-[var(--color-primary-hover)] font-semibold"
             >
               Copyright Notice
             </Link>
             <Link
-              href="/privacy"
+              href="/PrivacyPolicy"
               className="!text-white hover:!text-[var(--color-primary-hover)] font-semibold"
             >
               Privacy Policy
             </Link>
-            <Link
+            {/* <Link
               href="/disclaimer"
               className="!text-white hover:!text-[var(--color-primary-hover)] font-semibold"
             >
@@ -181,7 +182,7 @@ export default function Footer() {
               className="!text-white hover:!text-[var(--color-primary-hover)] font-semibold"
             >
               ABC Policy
-            </Link>
+            </Link> */}
           </div>
           <p className="mt-2 md:mt-0 font-semibold">
             © 2025 Ticket Booking Platform. All rights reserved.

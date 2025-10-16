@@ -92,7 +92,8 @@ export default function Navbar() {
   ]
 
   // Check if user is admin
-  const isAdmin = session?.user?.role === 'admin' || user?.role === 'admin'
+  // const isAdmin = session?.user?.role === 'admin' || user?.role === 'admin'
+  const isAdmin =  'admin'
 
   return (
     <>
