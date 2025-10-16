@@ -16,8 +16,7 @@ import { GiTheater } from 'react-icons/gi'
 import { RiMovie2Fill } from 'react-icons/ri'
 import Image from 'next/image'
 
-// NextAuth + custom auth
-import { useSession, signOut } from 'next-auth/react'
+// Custom auth only
 import { useAuth } from '@/app/context/AuthContext'
 import toast from 'react-hot-toast'
 import { FaFilm } from 'react-icons/fa'
@@ -28,8 +27,7 @@ export default function Navbar() {
   const pathname = usePathname()
   const router = useRouter()
 
-  const { data: session, status } = useSession()
-  const { user, logout } = useAuth()
+  const { user, logout, loading, setLoading } = useAuth()
 
   const [openDrop, setOpenDrop] = useState(false)
   const [groupHover, setGroupHover] = useState(false)
@@ -56,9 +54,6 @@ export default function Navbar() {
   }, [])
 
   const handleLogout = async () => {
-    if (session) {
-      await signOut({ redirect: false })
-    }
     if (user) {
       await logout({ redirect: false })
       toast.success('Logged out successfully!')
@@ -92,7 +87,8 @@ export default function Navbar() {
   ]
 
   // Check if user is admin
-  const isAdmin = session?.user?.role === 'admin' || user?.role === 'admin'
+  const isAdmin = user?.role === 'admin'
+  console.log(user)
 
   return (
     <>
@@ -138,9 +134,9 @@ export default function Navbar() {
 
             {/* Right - Auth (desktop) */}
             <div className="hidden lg:flex items-center">
-              {status === 'loading' ? (
+              {loading ? (
                 <div className="animate-spin h-6 w-6 rounded-full border-2 border-red-500 border-t-transparent"></div>
-              ) : session || user ? (
+              ) : user ? (
                 <div className="flex items-center gap-3 relative group">
                   {/* User Info with Dropdown Trigger */}
                   <button
@@ -149,7 +145,7 @@ export default function Navbar() {
                   >
                     <div className="flex flex-col items-start">
                       <span className="text-white font-semibold text-sm leading-tight max-w-[120px] truncate">
-                        {session?.user?.name || user?.name}
+                        {user?.name}
                       </span>
                       <span className="text-red-400 text-xs font-medium">
                         HI.MOVIECLUB U...
@@ -184,26 +180,22 @@ export default function Navbar() {
                       {/* Header Section */}
                       <div className="bg-gray-800 px-4 py-3 border-b border-gray-700">
                         <div className="flex items-center gap-3">
-                          {session?.user?.image || user?.image ? (
+                          {user?.image ? (
                             <Image
-                              src={session?.user?.image || user?.image}
-                              alt={session?.user?.name || user?.name || 'User'}
+                              src={user?.image}
+                              alt={user?.name || 'User'}
                               width={40}
                               height={40}
                               className="rounded-full border-2 border-red-500"
                             />
                           ) : (
                             <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center text-white font-bold border-2 border-red-500">
-                              {(
-                                session?.user?.name?.[0] ||
-                                user?.name?.[0] ||
-                                'U'
-                              ).toUpperCase()}
+                              {(user?.name?.[0] || 'U').toUpperCase()}
                             </div>
                           )}
                           <div>
                             <p className="text-white font-semibold text-sm">
-                              {session?.user?.name || user?.name}
+                              {user?.name}
                             </p>
                             <p className="text-red-400 text-xs">
                               Hi.MOVIECLUB U...
@@ -457,7 +449,7 @@ export default function Navbar() {
             </div>
 
             {/* User Menu Links - Only show when logged in */}
-            {(session || user) && (
+            {user && (
               <div className="border-t border-gray-700 pt-6 space-y-3">
                 <h3 className="text-gray-400 text-sm font-semibold uppercase tracking-wider mb-2 px-3">
                   My Account
@@ -484,12 +476,10 @@ export default function Navbar() {
 
           {/* Auth Section (mobile bottom) */}
           <div className="p-4 border-t border-gray-800 bg-gray-950">
-            {session || user ? (
+            {user ? (
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <span className="!text-white font-medium">
-                    {session?.user?.name || user?.name}
-                  </span>
+                  <span className="!text-white font-medium">{user?.name}</span>
                   {isAdmin && (
                     <span className="inline-block px-2 py-1 bg-purple-600 text-white text-xs rounded-full font-bold">
                       ADMIN
