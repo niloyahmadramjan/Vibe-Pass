@@ -63,7 +63,7 @@ export default function RegisterPage() {
     },
     onSuccess: () => {
       Swal.fire({
-        title: 'OTP Sent! 📧',
+        title: 'OTP Sent! ',
         text: 'Check your email for the verification code',
         icon: 'success',
         timer: 3000,
@@ -95,7 +95,7 @@ export default function RegisterPage() {
     },
     onSuccess: () => {
       Swal.fire({
-        title: 'Success! ✅',
+        title: 'Success! ',
         text: 'Email verified successfully',
         icon: 'success',
         timer: 2000,
@@ -129,7 +129,7 @@ export default function RegisterPage() {
       login(data) // store token + user in context
       Swal.fire({
         icon: 'success',
-        title: '🎉 Welcome to VibePass!',
+        title: 'Welcome to VibePass!',
         text: 'Your account has been created successfully',
         timer: 2000,
         showConfirmButton: false,
