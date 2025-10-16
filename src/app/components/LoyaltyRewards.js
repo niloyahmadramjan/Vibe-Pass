@@ -142,7 +142,7 @@ export default function LoyaltyRewards() {
           </div>
 
           {/* ===== STATS ===== */}
-          <div className="grid grid-cols-2 md:grid-cols-4 md:gap-5 gap-0 mt-16">
+          <div className="grid grid-cols-2 md:grid-cols-4 md:gap-5 gap-3 mt-16">
             {programStats.map((stat, i) => (
               <motion.div
                 key={i}

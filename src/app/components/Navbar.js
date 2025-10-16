@@ -11,6 +11,10 @@ import {
   FiCalendar,
   FiUser,
   FiSettings,
+  FiCreditCard,
+  FiGift,
+  FiFilm,
+  FiShoppingBag,
 } from "react-icons/fi";
 import { GiTheater } from "react-icons/gi";
 import { RiMovie2Fill } from "react-icons/ri";
@@ -20,7 +24,7 @@ import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import { useAuth } from "@/app/context/AuthContext";
 import toast from "react-hot-toast";
-import { FaFilm } from "react-icons/fa";
+import { FaFilm, FaHistory } from "react-icons/fa";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -237,7 +241,7 @@ export default function Navbar() {
                           onClick={() => setOpenDrop(false)}
                         >
                           <FiUser className="w-5 h-5 text-gray-400" />
-                          <span className="font-medium">MY PROFILE</span>
+                          <span className="font-medium">My Profile</span>
                         </Link>
 
                         <Link
@@ -258,7 +262,7 @@ export default function Navbar() {
                               d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"
                             />
                           </svg>
-                          <span className="font-medium">MY ORDERS</span>
+                          <span className="font-medium">My Orders</span>
                         </Link>
 
                         {/* booking */}
@@ -301,7 +305,7 @@ export default function Navbar() {
                               d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"
                             />
                           </svg>
-                          <span className="font-medium">MY REWARDS</span>
+                          <span className="font-medium">My Rewards</span>
                         </Link>
 
                         <Link
@@ -463,19 +467,36 @@ export default function Navbar() {
                   My Account
                 </h3>
                 {[
-                  { href: "/profile", label: "MY PROFILE" },
-                  { href: "/my-orders", label: "MY ORDERS" },
-                  { href: "/my-booking", label: "MY BOOKING" },
-                  { href: "/my-rewards", label: "MY REWARDS" },
-                  { href: "/my-wallet", label: "MY WALLET" },
-                ].map(({ href, label }) => (
+                  { href: "/profile", label: "My Profile", icon: <FiUser /> },
+                  {
+                    href: "/my-orders",
+                    label: "My Orders",
+                    icon: <FiShoppingBag />,
+                  },
+                  {
+                    href: "/my-booking",
+                    label: "My Booking",
+                    icon: <FiFilm />,
+                  },
+                  {
+                    href: "/my-rewards",
+                    label: "My Rewards",
+                    icon: <FiGift />,
+                  },
+                  {
+                    href: "/payment-history",
+                    label: "Payment History",
+                    icon: <FaHistory />,
+                  },
+                ].map(({ href, label, icon }) => (
                   <Link
                     key={href}
                     href={href}
                     onClick={() => setOpen(false)}
-                    className="block px-3 py-3 rounded-lg text-white hover:bg-gray-800 transition-colors font-medium"
+                    className="flex items-center gap-3 px-3 py-3 rounded-lg !text-white hover:bg-gray-800 transition-colors font-semibold"
                   >
-                    {label}
+                    <span className="text-gray-400">{icon}</span>
+                    <span>{label}</span>
                   </Link>
                 ))}
               </div>

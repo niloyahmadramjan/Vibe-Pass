@@ -133,13 +133,6 @@ const QnA = () => {
 
   return (
     <section className="py-16  relative overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-10 left-10 w-20 h-20 border-2 border-[#D32F2F] rounded-lg"></div>
-        <div className="absolute bottom-10 right-10 w-16 h-16 border-2 border-[#FFD700] rounded-full"></div>
-        <div className="absolute top-1/2 left-1/4 w-12 h-12 border-2 border-[#2196F3] rotate-45"></div>
-      </div>
-
       <div className="container mx-auto px-4 max-w-6xl relative z-10">
         {/* Header */}
         <div className="text-center mb-12 fade-in">
