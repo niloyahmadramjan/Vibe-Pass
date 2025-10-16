@@ -79,11 +79,7 @@ export default function Navbar() {
       label: 'Upcoming',
       icon: <FiCalendar className="mr-1" />,
     },
-    {
-      href: '/bangla-movies',
-      label: 'BanglaFlix',
-      icon: <FaFilm className="mr-1" />,
-    },
+   
     {
       href: '/location',
       label: 'Theaters',

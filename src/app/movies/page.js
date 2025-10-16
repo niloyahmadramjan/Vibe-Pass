@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import LoadingSpinner from '../hooks/LoadingSpiner'
 import BookingLocationModal from '../components/BookingLocationModal'
 import axiosPublic from '../api/axiosHook/useAxiosPublic'
+import { Star } from 'lucide-react'
 
 export default function MoviesPage() {
   const [movies, setMovies] = useState([])
@@ -174,106 +175,115 @@ export default function MoviesPage() {
       ) : (
         <>
           {/* Movie Grid */}
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {movies.map((movie, index) => (
-              <div
-                key={movie.id}
-                className="group bg-gray-800/50 backdrop-blur-sm rounded-2xl overflow-hidden shadow-2xl hover:shadow-red-500/20 border border-gray-700/50 hover:border-red-500/30 transition-all duration-500 hover:-translate-y-2 flex flex-col"
-              >
-                {/* Poster Image with Hover Effect */}
-                <div 
-                  className="relative w-full h-80 overflow-hidden cursor-pointer"
-                  onClick={() => handleViewDetails(movie)}
-                >
-                  <Image
-                    src={
-                      typeof movie.poster_path === "string" && movie.poster_path.startsWith("http")
-                        ? movie.poster_path
-                        : IMG_URL + movie.poster_path
-                    }
-                    alt={movie.title || "Movie Poster"}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-500"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                    priority={index < 4}
-                  />
-                  
-                  {/* Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/20 to-transparent"></div>
-                  
-                  {/* Rating Badge */}
-                  <div className="absolute top-3 right-3 bg-black/80 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1 border border-yellow-500/30">
-                    <span className="text-yellow-400 text-sm font-bold">⭐</span>
-                    <span className="text-white font-bold text-sm">
-                      {movie.vote_average?.toFixed(1)}
-                    </span>
-                  </div>
+        {/* Movie Grid */}
+<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+  {movies.map((movie, index) => (
+    <div
+      key={movie.id}
+      className="group bg-gray-800/40 backdrop-blur-md rounded-xl overflow-hidden 
+                 shadow-lg hover:shadow-red-500/20 border border-gray-700/30 
+                 hover:border-red-500/40 transition-all duration-500 
+                 hover:-translate-y-2 flex flex-col"
+    >
+      {/* Poster Image */}
+      <div 
+        className="relative w-full h-72 overflow-hidden cursor-pointer"
+        onClick={() => handleViewDetails(movie)}
+      >
+        <Image
+          src={
+            typeof movie.poster_path === "string" && movie.poster_path.startsWith("http")
+              ? movie.poster_path
+              : IMG_URL + movie.poster_path
+          }
+          alt={movie.title || "Movie Poster"}
+          fill
+          className="object-cover group-hover:scale-110 transition-transform duration-500"
+        />
+        
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/20 to-transparent"></div>
 
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <div className="text-center transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                      <div className="text-3xl mb-2">👁️</div>
-                      <p className="text-lg font-semibold">View Details</p>
-                    </div>
-                  </div>
-                </div>
+        <div className="absolute top-3 right-3 bg-black/80 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1 border border-yellow-500/30">
+         <span className="text-yellow-400 text-sm font-bold flex items-center gap-1">
+  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+</span>
 
-                {/* Movie Details */}
-                <div className="p-6 flex flex-col flex-1">
-                  <div className="flex-1">
-                    <h2 
-                      className="text-xl font-bold text-white mb-2 line-clamp-2 group-hover:text-red-400 transition-colors cursor-pointer"
-                      onClick={() => handleViewDetails(movie)}
-                    >
-                      {movie.title}
-                    </h2>
-                    
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-gray-400 text-sm bg-gray-700/50 px-2 py-1 rounded">
-                        {movie.release_date || 'Coming Soon'}
-                      </span>
-                      <span className="text-gray-400 text-sm">
-                        {movie.vote_count} votes
-                      </span>
-                    </div>
+          <span className="text-white font-bold text-sm">
+            {movie.vote_average?.toFixed(1)}
+          </span>
+        </div>
 
-                
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => fetchTrailer(movie)}
-                      disabled={trailerLoading === movie.id}
-                      className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg hover:shadow-blue-500/25 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 group/btn disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {trailerLoading === movie.id ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          <span>Loading...</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>Trailer</span>
-                          <span className="group-hover/btn:scale-110 transition-transform">🎬</span>
-                        </>
-                      )}
-                    </button>
-
-                    <button
-                      onClick={() => handleBookNow(movie)}
-                      className="flex-1 px-4 py-3 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold rounded-xl shadow-lg hover:shadow-red-500/25 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 group/btn"
-                    >
-                      <span>Book</span>
-                      <span className="group-hover/btn:translate-x-1 transition-transform">🎟️</span>
-                    </button>
-                  </div>
-
-
-                </div>
-              </div>
-            ))}
+        {/* Hover Overlay */}
+        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+          <div className="text-center transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+            <div className="text-2xl mb-1">👁️</div>
+            <p className="text-sm font-medium">View Details</p>
           </div>
+        </div>
+      </div>
+
+      {/* Movie Info */}
+      <div className="p-5 flex flex-col flex-1">
+        <div className="flex-1 mb-4">
+          <h2 
+            className="text-lg font-semibold text-white mb-1 line-clamp-2 
+                       group-hover:text-red-400 transition-colors cursor-pointer"
+            onClick={() => handleViewDetails(movie)}
+          >
+            {movie.title}
+          </h2>
+
+          <div className="flex items-center justify-between text-xs text-gray-400">
+            <span className="bg-gray-700/50 px-2 py-0.5 rounded">
+              {movie.release_date || 'Coming Soon'}
+            </span>
+            <span>{movie.vote_count} votes</span>
+          </div>
+        </div>
+
+        {/* Buttons */}
+       {/* Buttons Row */}
+<div className="flex items-center gap-3 mt-3">
+  {/* 🎬 Trailer Button */}
+  <button
+    onClick={() => fetchTrailer(movie)}
+    disabled={trailerLoading === movie.id}
+    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 
+               bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium 
+               rounded-md shadow-sm transition duration-300 
+               disabled:opacity-50 disabled:cursor-not-allowed"
+  >
+    {trailerLoading === movie.id ? (
+      <>
+        <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+        <span>Loading...</span>
+      </>
+    ) : (
+      <>
+        <span className="text-base">▶</span>
+        <span>Trailer</span>
+      </>
+    )}
+  </button>
+
+  {/* 🎟️ Book Now Button */}
+  <button
+    onClick={() => handleBookNow(movie)}
+    className="flex-1 px-3 py-2 bg-gradient-to-r from-red-600 to-orange-600 
+               hover:from-red-700 hover:to-orange-700 text-white text-sm 
+               font-semibold rounded-md shadow-md hover:shadow-red-500/25 
+               transition-all duration-300 transform hover:scale-105 
+               flex items-center justify-center gap-2"
+  >
+     <span>Book Now</span>
+  </button>
+</div>
+
+      </div>
+    </div>
+  ))}
+</div>
+
 
           {/* Pagination */}
           {totalPages > 1 && (
@@ -365,13 +375,13 @@ export default function MoviesPage() {
         </>
       )}
 
-      {/* Trailer Modal - Same as HeroSection */}
+      {/* Trailer Modal - Same as UpcomingMoviesPage */}
       {trailerKey && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
           <div className="relative w-full max-w-3xl p-4 bg-black rounded-xl">
             <button
               onClick={() => setTrailerKey(false)}
-              className="absolute -top-12 right-0 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition z-10"
+              className="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition"
             >
               ✖ Close
             </button>
