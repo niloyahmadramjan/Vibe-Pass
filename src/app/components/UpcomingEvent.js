@@ -25,21 +25,20 @@ function UpcomingEvent() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const eventsPerPage = 3;
 
-
-    useEffect(() => {
-      const fetchEvents = async () => {
-        try {
-          const response = await axiosPublic.get('/api/events')
-          setEvents(response.data.data || [])
-        } catch (err) {
-          setError(err.message || 'Failed to fetch events')
-        } finally {
-          setLoading(false)
-        }
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await axiosPublic.get("/api/events");
+        setEvents(response.data.data || []);
+      } catch (err) {
+        setError(err.message || "Failed to fetch events");
+      } finally {
+        setLoading(false);
       }
+    };
 
-      fetchEvents()
-    }, [])
+    fetchEvents();
+  }, []);
 
   const filteredEvents = events;
   const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
@@ -52,7 +51,7 @@ function UpcomingEvent() {
   if (error) return <EventSectionError error={error} />;
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -156,8 +155,6 @@ const EventCard = ({ event, onSelect, index }) => (
         {event.title}
       </h3>
 
-    
-
       <div className="space-y-2 text-[#B0B0B0]">
         <div className="flex items-center gap-3 pt-2">
           <FiCalendar className="text-[#D32F2F]" />
@@ -167,7 +164,6 @@ const EventCard = ({ event, onSelect, index }) => (
           <FiClock className="text-green-400" />
           <span>{event.time || "All Day"}</span>
         </div>
-       
       </div>
 
       <div className="flex gap-2 mt-6">

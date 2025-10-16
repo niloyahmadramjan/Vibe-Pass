@@ -14,7 +14,9 @@ import {
   FiFilm,
   FiPlay,
   FiArrowRight,
+  FiSend,
 } from "react-icons/fi";
+import { MdOutlinePrivacyTip } from "react-icons/md";
 import Swal from "sweetalert2";
 import axiosSecure from "../api/axiosHook/useAxiosSecure";
 
@@ -136,12 +138,6 @@ function NewsLetter() {
 
   return (
     <div className="min-h-screen py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Animated background */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-red-500/5 rounded-full blur-3xl animate-float-slow"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl animate-float-slower"></div>
-      </div>
-
       <div className="max-w-6xl mx-auto relative z-10">
         <div className="text-center mb-16">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl mb-6 shadow-2xl shadow-red-500/20 hover:scale-105 transition-all">
@@ -163,7 +159,7 @@ function NewsLetter() {
           {/* Features */}
           <div className="space-y-6">
             <div className="bg-white/5 backdrop-blur-lg rounded-3xl p-8 border border-white/10 shadow-2xl">
-              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+              <h2 className="text-2xl font-bold text-white mb-6 flex items-center justify-center gap-3">
                 <FiStar className="text-red-500" /> Premium Benefits
               </h2>
               <div className="space-y-4">
@@ -184,15 +180,17 @@ function NewsLetter() {
                   </div>
                 ))}
               </div>
+              
             </div>
           </div>
 
           {/* Newsletter Form */}
-          <div className="bg-white/5 backdrop-blur-lg rounded-3xl p-8 border border-white/10 shadow-2xl">
-            <h2 className="text-2xl font-bold text-center text-white mb-4">
+          <div className="bg-white/5 backdrop-blur-lg rounded-3xl p-8 border border-white/10 shadow-2xl  ">
+            <h2 className="text-2xl font-bold text-center text-white mb-4 flex items-center justify-center gap-2 pb-2 pt-2">
+              <FiSend className="text-red-500 text-xl" />
               Subscribe Now
             </h2>
-            <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
+            <form ref={formRef} onSubmit={handleSubmit} className="space-y-7 ">
               <div className="relative">
                 <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
@@ -233,6 +231,10 @@ function NewsLetter() {
                   : "Subscribe Now"}
               </button>
             </form>
+            <p className="text-sm text-slate-400 text-center pt-8 flex gap-1 items-center justify-center lg:pb-42">
+              <MdOutlinePrivacyTip className="text-emerald-400 text-lg" />
+              Your email is safe with us — we respect your privacy.
+            </p>
           </div>
         </div>
       </div>

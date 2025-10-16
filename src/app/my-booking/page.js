@@ -24,6 +24,8 @@ function MyBooking() {
   const [deleteLoading, setDeleteLoading] = useState(null);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  // Add this to your component's state
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
 
   useEffect(() => {
     if (!userEmail) {
@@ -127,7 +129,7 @@ function MyBooking() {
     switch (paymentStatus) {
       case "paid":
         return `${baseClasses} bg-blue-500/20 text-blue-400 border border-blue-500/30`;
-      case "pending":
+      case "unpaid":
         return `${baseClasses} bg-yellow-500/20 text-yellow-400 border border-yellow-500/30`;
       case "failed":
         return `${baseClasses} bg-red-500/20 text-red-400 border border-red-500/30`;
@@ -183,19 +185,10 @@ function MyBooking() {
                     Theater
                   </th>
                   <th className="py-4 px-6 text-left text-sm font-semibold text-gray-300 uppercase tracking-wider">
-                    Show Time
-                  </th>
-                  <th className="py-4 px-6 text-left text-sm font-semibold text-gray-300 uppercase tracking-wider">
-                    Seats
-                  </th>
-                  <th className="py-4 px-6 text-left text-sm font-semibold text-gray-300 uppercase tracking-wider">
                     Amount
                   </th>
                   <th className="py-4 px-6 text-left text-sm font-semibold text-gray-300 uppercase tracking-wider">
                     Status
-                  </th>
-                  <th className="py-4 px-6 text-left text-sm font-semibold text-gray-300 uppercase tracking-wider">
-                    Payment
                   </th>
                   <th className="py-4 px-6 text-center text-sm font-semibold text-gray-300 uppercase tracking-wider">
                     Actions
@@ -224,46 +217,262 @@ function MyBooking() {
                     </td>
                     <td className="py-4 px-6 text-gray-300">{b.theaterName}</td>
                     <td className="py-4 px-6">
-                      <div className="text-white font-medium">{b.showTime}</div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="flex flex-wrap gap-1">
-                        {b.selectedSeats.map((seat, index) => (
-                          <span
-                            key={index}
-                            className="px-2 py-1 bg-gray-700 rounded text-xs text-gray-300 border border-gray-600"
-                          >
-                            {seat}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-                    <td className="py-4 px-6">
                       <div className="text-green-400 font-semibold">
                         ৳{b.totalAmount}
                       </div>
                     </td>
                     <td className="py-4 px-6">
-                      <div className="flex items-center space-x-2">
-                        {b.status === "confirmed" && (
-                          <FiCheckCircle className="text-green-400" />
-                        )}
-                        {b.status === "pending" && (
-                          <FiClock className="text-yellow-400" />
-                        )}
-                        {b.status === "cancelled" && (
-                          <FiXCircle className="text-red-400" />
-                        )}
-                        <span className={getStatusBadge(b.status)}>
-                          {b.status}
+                      <div className="flex flex-wrap items-center gap-2">
+                        {/* Payment Badge */}
+                        <span className={getPaymentBadge(b.paymentStatus)}>
+                          {b.paymentStatus}
                         </span>
+
+                        {/* Pay Now Button */}
+                        {b.paymentStatus === "unpaid" && (
+                          <button
+                            onClick={() => setSelectedBooking(b)}
+                            className="px-3 py-1 rounded-full text-sm font-medium capitalize bg-red-600 text-white hover:bg-red-700 transition-colors"
+                          >
+                            Pay Now
+                          </button>
+                        )}
                       </div>
                     </td>
-                    <td className="py-4 px-6">
-                      <span className={getPaymentBadge(b.paymentStatus)}>
-                        {b.paymentStatus}
-                      </span>
-                    </td>
+                    {/* Payment Options Modal */}
+                    {selectedBooking &&
+                      selectedBooking.paymentStatus === "unpaid" && (
+                        <div className="fixed inset-0 flex items-center justify-center p-4 z-50 bg-black/60 backdrop-blur-sm">
+                          <div className="bg-white rounded-2xl max-w-md w-full border border-gray-100 shadow-2xl p-6 animate-in fade-in duration-200">
+                            {/* Progress Steps */}
+                            <div className="flex items-center justify-center mb-6">
+                              <div className="flex items-center">
+                                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
+                                  <span className="text-white text-sm font-semibold">
+                                    1
+                                  </span>
+                                </div>
+                                <div className="w-12 h-1 bg-blue-600 mx-2"></div>
+                                <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                                  <span className="text-gray-600 text-sm font-semibold">
+                                    2
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Header */}
+                            <div className="text-center mb-6">
+                              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <svg
+                                  className="w-7 h-7 text-white"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+                                  />
+                                </svg>
+                              </div>
+                              <h3 className="text-gray-900 text-xl font-bold">
+                                Select Payment Method
+                              </h3>
+                              <p className="text-gray-500 text-sm mt-2">
+                                Choose how you'd like to complete your payment
+                              </p>
+                            </div>
+
+                            {/* Payment Options */}
+                            <div className="space-y-3 mb-6">
+                              {/* International Payment Option */}
+                              <div
+                                className={`border-2 rounded-xl p-4 cursor-pointer transition-all duration-200 ${
+                                  selectedPaymentMethod === "stripe"
+                                    ? "border-blue-500 bg-blue-50/50 shadow-md"
+                                    : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
+                                }`}
+                                onClick={() =>
+                                  setSelectedPaymentMethod("stripe")
+                                }
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center space-x-3">
+                                    <div
+                                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                                        selectedPaymentMethod === "stripe"
+                                          ? "border-blue-500 bg-blue-500"
+                                          : "border-gray-300"
+                                      }`}
+                                    >
+                                      {selectedPaymentMethod === "stripe" && (
+                                        <div className="w-2 h-2 rounded-full bg-white"></div>
+                                      )}
+                                    </div>
+                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                      <svg
+                                        className="w-5 h-5 text-white"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                                        />
+                                      </svg>
+                                    </div>
+                                    <div>
+                                      <div className="font-semibold text-gray-900">
+                                        International Cards
+                                      </div>
+                                      <div className="text-sm text-gray-600">
+                                        Visa, MasterCard, Amex
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="flex space-x-1">
+                                    <div className="w-6 h-4 bg-blue-600 rounded-sm"></div>
+                                    <div className="w-6 h-4 bg-red-500 rounded-sm"></div>
+                                    <div className="w-6 h-4 bg-amber-400 rounded-sm"></div>
+                                  </div>
+                                </div>
+
+                                {/* Additional Info */}
+                                {selectedPaymentMethod === "stripe" && (
+                                  <div className="mt-3 pl-8">
+                                    <div className="text-xs text-gray-500 bg-white p-2 rounded-lg border">
+                                      Secure payment processed by Stripe.
+                                      Supports all major international cards.
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Bangladesh Payment Option */}
+                              <div
+                                className={`border-2 rounded-xl p-4 cursor-pointer transition-all duration-200 ${
+                                  selectedPaymentMethod === "sslcommerz"
+                                    ? "border-emerald-500 bg-emerald-50/50 shadow-md"
+                                    : "border-gray-200 hover:border-emerald-300 hover:bg-gray-50"
+                                }`}
+                                onClick={() =>
+                                  setSelectedPaymentMethod("sslcommerz")
+                                }
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center space-x-3">
+                                    <div
+                                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                                        selectedPaymentMethod === "sslcommerz"
+                                          ? "border-emerald-500 bg-emerald-500"
+                                          : "border-gray-300"
+                                      }`}
+                                    >
+                                      {selectedPaymentMethod ===
+                                        "sslcommerz" && (
+                                        <div className="w-2 h-2 rounded-full bg-white"></div>
+                                      )}
+                                    </div>
+                                    <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center">
+                                      <svg
+                                        className="w-5 h-5 text-white"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+                                        />
+                                      </svg>
+                                    </div>
+                                    <div>
+                                      <div className="font-semibold text-gray-900">
+                                        Local Payment
+                                      </div>
+                                      <div className="text-sm text-gray-600">
+                                        bKash, Nagad, Rocket, Local Cards
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="text-xs font-semibold text-emerald-700 bg-emerald-100 px-2 py-1 rounded-full">
+                                    BD
+                                  </div>
+                                </div>
+
+                                {/* Additional Info */}
+                                {selectedPaymentMethod === "sslcommerz" && (
+                                  <div className="mt-3 pl-8">
+                                    <div className="text-xs text-gray-500 bg-white p-2 rounded-lg border">
+                                      Processed by SSLCommerz. Supports all
+                                      popular Bangladeshi payment methods.
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex space-x-3">
+                              <button
+                                onClick={() => setSelectedBooking(null)}
+                                className="flex-1 py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-200 font-semibold"
+                              >
+                                Cancel
+                              </button>
+
+                              <button
+                                onClick={() => {
+                                  if (selectedPaymentMethod === "stripe") {
+                                    window.location.href = `/payment/stripe/${selectedBooking._id}`;
+                                  } else if (
+                                    selectedPaymentMethod === "sslcommerz"
+                                  ) {
+                                    window.location.href = `/payment/sslcommerz/${selectedBooking._id}`;
+                                  }
+                                }}
+                                disabled={!selectedPaymentMethod}
+                                className={`flex-1 py-3 rounded-xl font-semibold transition-all duration-200 ${
+                                  selectedPaymentMethod
+                                    ? "bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105"
+                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                }`}
+                              >
+                                Continue to Pay
+                              </button>
+                            </div>
+
+                            {/* Security Badge */}
+                            <div className="mt-4 text-center">
+                              <div className="flex items-center justify-center space-x-2 text-xs text-gray-500">
+                                <svg
+                                  className="w-4 h-4 text-green-500"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                                  />
+                                </svg>
+                                <span>Secure & Encrypted Payment</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
                     <td className="py-4 px-6">
                       <div className="flex justify-center space-x-2">
                         {/* View Details Button */}
@@ -308,10 +517,6 @@ function MyBooking() {
         {/* Summary */}
         <div className="mt-6 flex justify-between items-center text-sm text-gray-400">
           <div>Total Bookings: {bookings.length}</div>
-          <div>
-            Confirmed: {bookings.filter((b) => b.status === "confirmed").length}{" "}
-            • Pending: {bookings.filter((b) => b.status === "pending").length}
-          </div>
         </div>
       </div>
 
