@@ -257,7 +257,7 @@ export default function RewardsPage() {
               Loyalty Rewards Program
             </span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
             Earn & Redeem Rewards
           </h1>
           <p className="text-gray-300 text-lg max-w-2xl mx-auto leading-relaxed">
@@ -430,9 +430,9 @@ export default function RewardsPage() {
               <div className="inline-flex flex-col md:flex-row items-center gap-3 md:gap-4 mb-4 md:mb-6">
                 <div className="relative">
                   <div className="absolute inset-0 bg-[#9292FF] rounded-full blur-lg opacity-50"></div>
-                  <FiDollarSign className="relative text-3xl md:text-4xl text-[#9292FF] z-10" />
+                  <FiDollarSign className="relative text-3xl md:text-4xl text-[#e22727] z-10" />
                 </div>
-                <h2 className="text-2xl md:text-4xl font-black bg-gradient-to-r  from-purple-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                <h2 className="text-2xl md:text-4xl font-black bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
                   Select Points to Redeem
                 </h2>
               </div>

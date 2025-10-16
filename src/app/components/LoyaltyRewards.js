@@ -106,7 +106,7 @@ export default function LoyaltyRewards() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="bg-[#121212]/80 backdrop-blur-md border border-white/10 rounded-3xl p-10 shadow-2xl shadow-red-600/10"
+          className=" backdrop-blur-md  rounded-3xl shadow-2xl shadow-red-600/10"
         >
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-10">
             <div className="flex items-center gap-6">
@@ -142,7 +142,7 @@ export default function LoyaltyRewards() {
           </div>
 
           {/* ===== STATS ===== */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-16">
+          <div className="grid grid-cols-2 md:grid-cols-4 md:gap-5 gap-0 mt-16">
             {programStats.map((stat, i) => (
               <motion.div
                 key={i}
@@ -196,7 +196,7 @@ export default function LoyaltyRewards() {
         </motion.div>
 
         {/* ===== FOOTER ===== */}
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
@@ -211,7 +211,7 @@ export default function LoyaltyRewards() {
           <p className="text-gray-500 mt-2">
             Instant points • No hidden fees • Redeem anytime
           </p>
-        </motion.div>
+        </motion.div> */}
       </div>
     </div>
   );
