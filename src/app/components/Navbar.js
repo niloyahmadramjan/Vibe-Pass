@@ -22,7 +22,6 @@ import { useAuth } from '@/app/context/AuthContext'
 import toast from 'react-hot-toast'
 import { FaFilm } from 'react-icons/fa'
 
-
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -116,7 +115,7 @@ export default function Navbar() {
             </div>
 
             {/* Middle - Links (desktop) */}
-            <div className="hidden lg:flex space-x-8 justify-center items-center">
+            <div className="hidden xl:flex space-x-8 justify-center items-center">
               {navLinks.map(({ href, label, icon }) => (
                 <Link
                   key={href}
@@ -134,7 +133,7 @@ export default function Navbar() {
             </div>
 
             {/* Right - Auth (desktop) */}
-            <div className="hidden lg:flex items-center">
+            <div className="hidden xl:flex items-center">
               {status === 'loading' ? (
                 <div className="animate-spin h-6 w-6 rounded-full border-2 border-red-500 border-t-transparent"></div>
               ) : session || user ? (
@@ -364,8 +363,8 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Mobile Menu Button */}
-            <div className="md:hidden flex items-center">
+            {/* Mobile Menu Button - Show on screens smaller than 1280px (xl breakpoint) */}
+            <div className="xl:hidden flex items-center">
               <button
                 onClick={() => setOpen(!open)}
                 className="p-2 rounded-md text-gray-300 hover:text-white hover:bg-gray-800 focus:outline-none transition-colors duration-200"
