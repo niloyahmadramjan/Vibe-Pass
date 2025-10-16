@@ -1,4 +1,3 @@
-
 'use client';
 import { useState } from 'react';
 import {
@@ -19,7 +18,7 @@ export default function TicketManagement() {
     const [selectedTicket, setSelectedTicket] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const ticketsPerPage = 10;
-    console.log(statusFilter)
+
     // Fetch tickets using React Query
     const { data: tickets = [], isLoading, error, refetch } = useQuery({
         queryKey: ['tickets'],
@@ -36,7 +35,7 @@ export default function TicketManagement() {
             }
         }
     });
-    console.log(tickets)
+
     // Filter tickets
     const filteredTickets = tickets.filter(ticket => {
         const matchesSearch =
@@ -94,21 +93,7 @@ export default function TicketManagement() {
     };
 
     // Download ticket as PDF
- 
-    // Format time
-    const formatTime = (time) => {
-        if (!time) return 'N/A';
-        const [hours, minutes] = time.split(':');
-        const hour = parseInt(hours);
-        const ampm = hour >= 12 ? 'PM' : 'AM';
-        const formattedHour = hour % 12 || 12;
-        return `${formattedHour}:${minutes} ${ampm}`;
-    };
-
-
-
-
-    const TicketPDF = async () => {
+    const handleDownloadTicket = async (ticket) => {
         try {
             const response = await fetch(
                 `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/generate-ticket-pdf`,
@@ -116,17 +101,18 @@ export default function TicketManagement() {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        movieTitle: booking.movieTitle,
-                        theaterName: booking.theaterName,
-                        showDate: booking.showDate,
-                        showTime: booking.showTime,
-                        selectedSeats: booking.selectedSeats,
-                        totalAmount: booking.totalAmount,
+                        movieTitle: ticket.movieTitle,
+                        theaterName: ticket.theaterName,
+                        showDate: ticket.showDate,
+                        showTime: ticket.showTime,
+                        selectedSeats: ticket.selectedSeats,
+                        totalAmount: ticket.totalAmount,
                         transactionId: ticket.transactionId,
-                        screen: booking.screen,
-                        status: ticket.status,
-                        userName: booking.userName,
-                        userEmail: booking.userEmail,
+                        screen: ticket.screen,
+                        status: ticket.paymentStatus,
+                        userName: ticket.userName,
+                        userEmail: ticket.userEmail,
+                        bookingId: ticket.bookingId,
                     }),
                 }
             );
@@ -137,19 +123,44 @@ export default function TicketManagement() {
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.href = url;
-            link.download = `ticket-${ticket.transactionId}.pdf`;
+            link.download = `ticket-${ticket.bookingId || ticket.transactionId}.pdf`;
             link.click();
             window.URL.revokeObjectURL(url);
+
+            toast.success('Ticket downloaded successfully!');
         } catch (error) {
             console.error("Download failed:", error);
-        } finally {
-          ;
+            toast.error('Failed to download ticket');
         }
     };
 
+    // Format time
+    const formatTime = (time) => {
+        if (!time) return 'N/A';
+        const [hours, minutes] = time.split(':');
+        const hour = parseInt(hours);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        const formattedHour = hour % 12 || 12;
+        return `${formattedHour}:${minutes} ${ampm}`;
+    };
 
+    // Improved pagination - show limited page numbers
+    const getVisiblePages = () => {
+        const visiblePages = 5; // Show max 5 page numbers
+        let startPage = Math.max(1, currentPage - Math.floor(visiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + visiblePages - 1);
 
+        // Adjust if we're near the end
+        if (endPage - startPage + 1 < visiblePages) {
+            startPage = Math.max(1, endPage - visiblePages + 1);
+        }
 
+        const pages = [];
+        for (let i = startPage; i <= endPage; i++) {
+            pages.push(i);
+        }
+        return pages;
+    };
 
     if (isLoading) {
         return <AdminLoading />;
@@ -234,7 +245,7 @@ export default function TicketManagement() {
 
             {/* Filters */}
             <div className="bg-gradient-to-br from-gray-900 to-gray-900/55 rounded-2xl border border-gray-700 p-6 shadow-2xl mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Search */}
                     <div className="relative">
                         <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -257,7 +268,6 @@ export default function TicketManagement() {
                         <option value="paid">Paid</option>
                         <option value="unpaid">Unpaid</option>
                         <option value="cancelled">Cancelled</option>
-
                     </select>
 
                     {/* Date Filter */}
@@ -269,18 +279,7 @@ export default function TicketManagement() {
                     />
 
                     {/* Reset Filters */}
-                    <button
-                        onClick={() => {
-                            setSearchTerm('');
-                            setStatusFilter('all');
-                            setSelectedDate('');
-                            setCurrentPage(1);
-                        }}
-                        className="px-4 py-3 bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-xl text-white transition-colors flex items-center justify-center gap-2"
-                    >
-                        <FiRefreshCw />
-                        Reset Filters
-                    </button>
+                   
                 </div>
             </div>
 
@@ -350,7 +349,7 @@ export default function TicketManagement() {
                                             </button>
                                             {ticket.paymentStatus === 'paid' && (
                                                 <button
-                                                    onClick={ TicketPDF}
+                                                    onClick={() => handleDownloadTicket(ticket)}
                                                     className="p-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors text-white"
                                                     title="Download Ticket"
                                                 >
@@ -375,36 +374,71 @@ export default function TicketManagement() {
                 )}
             </div>
 
-            {/* Pagination */}
+            {/* Improved Pagination */}
             {totalPages > 1 && (
-                <div className="flex justify-center items-center gap-4">
+                <div className="flex justify-center items-center gap-2 flex-wrap">
                     <button
                         onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                         disabled={currentPage === 1}
-                        className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:text-gray-500 rounded-xl text-white transition-colors"
+                        className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:text-gray-500 rounded-xl text-white transition-colors flex items-center gap-2"
                     >
                         Previous
                     </button>
 
-                    <div className="flex gap-2">
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                    {/* Show first page if not in visible range */}
+                    {currentPage > 3 && (
+                        <>
                             <button
-                                key={page}
-                                onClick={() => setCurrentPage(page)}
-                                className={`px-4 py-2 rounded-xl transition-colors ${currentPage === page
+                                onClick={() => setCurrentPage(1)}
+                                className={`px-4 py-2 rounded-xl transition-colors ${1 === currentPage
                                     ? 'bg-purple-600 text-white'
                                     : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                                     }`}
                             >
-                                {page}
+                                1
                             </button>
-                        ))}
-                    </div>
+                            {currentPage > 4 && (
+                                <span className="px-2 text-gray-400">...</span>
+                            )}
+                        </>
+                    )}
+
+                    {/* Visible page numbers */}
+                    {getVisiblePages().map(page => (
+                        <button
+                            key={page}
+                            onClick={() => setCurrentPage(page)}
+                            className={`px-4 py-2 rounded-xl transition-colors ${page === currentPage
+                                ? 'bg-purple-600 text-white'
+                                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                }`}
+                        >
+                            {page}
+                        </button>
+                    ))}
+
+                    {/* Show last page if not in visible range */}
+                    {currentPage < totalPages - 2 && (
+                        <>
+                            {currentPage < totalPages - 3 && (
+                                <span className="px-2 text-gray-400">...</span>
+                            )}
+                            <button
+                                onClick={() => setCurrentPage(totalPages)}
+                                className={`px-4 py-2 rounded-xl transition-colors ${totalPages === currentPage
+                                    ? 'bg-purple-600 text-white'
+                                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                    }`}
+                            >
+                                {totalPages}
+                            </button>
+                        </>
+                    )}
 
                     <button
                         onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                         disabled={currentPage === totalPages}
-                        className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:text-gray-500 rounded-xl text-white transition-colors"
+                        className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:text-gray-500 rounded-xl text-white transition-colors flex items-center gap-2"
                     >
                         Next
                     </button>
@@ -545,15 +579,3 @@ export default function TicketManagement() {
         </div>
     );
 }
-
-
-
-
-
-
-
-
-
-
-
-

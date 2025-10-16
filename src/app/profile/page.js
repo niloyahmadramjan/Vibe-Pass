@@ -44,7 +44,7 @@ const ProfilePage = () => {
         setUserData(response.data)
       } catch (err) {
         console.error('Failed to fetch user data:', err)
-        toast.error('Failed to load user data ❌')
+        toast.error('Failed to load user data ')
       } finally {
         setLoading(false)
       }
@@ -83,10 +83,10 @@ const ProfilePage = () => {
       )
 
       setUserData((prev) => ({ ...prev, image: response.data.imageUrl }))
-      toast.success('Profile image updated successfully ✅')
+      toast.success('Profile image updated successfully ')
     } catch (err) {
       console.error('Image upload failed:', err)
-      toast.error('Failed to update profile image ❌')
+      toast.error('Failed to update profile image ')
     } finally {
       setLoading(false)
     }
@@ -106,7 +106,7 @@ const ProfilePage = () => {
       setShowModal(null)
     } catch (err) {
       console.error('Mobile update failed:', err)
-      toast.error('Failed to update mobile ❌')
+      toast.error('Failed to update mobile ')
     } finally {
       setLoading(false)
     }

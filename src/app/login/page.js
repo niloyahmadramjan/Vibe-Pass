@@ -8,8 +8,8 @@ import { useRouter } from 'next/navigation'
 import Swal from 'sweetalert2'
 import LoadingSpinner from '../hooks/LoadingSpiner'
 import { useAuth } from '../context/AuthContext'
-import axiosSecure from '../api/axiosHook/useAxiosSecure'
 import { FaArrowLeft } from 'react-icons/fa'
+import axiosPublic from '../api/axiosHook/useAxiosPublic'
 
 const mockSlides = [
   {
@@ -63,7 +63,7 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const res = await axiosSecure.post('api/auth/login', {
+      const res = await axiosPublic.post('api/auth/login', {
         email,
         password,
       })
@@ -74,7 +74,7 @@ export default function LoginPage() {
       // Enhanced SweetAlert success popup
       Swal.fire({
         icon: 'success',
-        title: 'Welcome Back! 🎬',
+        title: 'Welcome Back! ',
         text: 'Login successful! Redirecting to your dashboard...',
         timer: 2000,
         showConfirmButton: false,
@@ -120,7 +120,7 @@ export default function LoginPage() {
     if (status === 'authenticated' && session?.user) {
       Swal.fire({
         icon: 'success',
-        title: 'Welcome! 🎉',
+        title: 'Welcome! ',
         text: `Successfully logged in as ${
           session.user.name || session.user.email
         }`,

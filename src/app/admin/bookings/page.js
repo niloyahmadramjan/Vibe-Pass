@@ -359,17 +359,7 @@ export default function BookingsPage() {
                   <option value="month">Last Month</option>
                 </select>
 
-                {/* Items Per Page */}
-                <select
-                  value={itemsPerPage}
-                  onChange={(e) => setItemsPerPage(Number(e.target.value))}
-                  className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="5">5 per page</option>
-                  <option value="10">10 per page</option>
-                  <option value="20">20 per page</option>
-                  <option value="50">50 per page</option>
-                </select>
+                {/* Items Per Page */}      
               </div>
 
               <div className="flex items-center gap-3">

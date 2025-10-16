@@ -6,6 +6,7 @@ import AllTheatersLocation from '@/app/location/AllTheatersLocation'
 import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 
 export default function MovieDetailsPage() {
   const params = useParams()
@@ -121,13 +122,13 @@ export default function MovieDetailsPage() {
           setTrailerUrl(`https://www.youtube.com/embed/${trailer.key}?autoplay=1`);
           setShowTrailer(true);
         } else {
-          alert("Trailer not available!");
+          toast.error("Trailer not available!")
         }
       } else {
         console.error("Failed to fetch trailer: Status", res.status);
       }
     } catch (error) {
-      console.error("🎬 Failed to fetch trailer:", error);
+      console.error(" Failed to fetch trailer:", error);
     }
   };
   
@@ -143,8 +144,16 @@ export default function MovieDetailsPage() {
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white">
       {/* Enhanced Banner */}
-      <div className="relative w-full h-96 sm:h-80 md:h-96 lg:h-[500px] xl:h-[600px] overflow-hidden">
-        <Image
+      <div className="w-full h-[40vh] lg:h-[100vh] bg-cover bg-center relative flex items-center"
+      
+        style={{
+          backgroundImage: movie.poster_path
+            ? movie.poster_path.startsWith("http")
+              ? `url(${movie.poster_path})` // full URL (like i.ibb.co)
+              : `url(https://image.tmdb.org/t/p/original${movie.poster_path})` // TMDB path
+            : "url(/fallback-banner.jpg)", // optional fallback
+        }}>
+        {/* <Image
           fill
           src={
             typeof movie.poster_path === "string" && movie.poster_path.startsWith("http")
@@ -157,7 +166,12 @@ export default function MovieDetailsPage() {
           className="object-cover w-full h-full"
           priority
           sizes="(max-width: 640px) 100vw, (max-width: 768px) 100vw, (max-width: 1024px) 100vw, 100vw"
-        />
+        /> */}
+
+
+          
+             
+        
 
         {/* Enhanced Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/70 to-transparent" />
