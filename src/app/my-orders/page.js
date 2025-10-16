@@ -8,7 +8,6 @@ import {
   FiClock,
   FiEye,
   FiCalendar,
-  FiMapPin,
   FiDollarSign,
   FiUser,
   FiFilm,
@@ -24,8 +23,9 @@ function MyOrder() {
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-    const [bookings, setBookings] = useState([]);
-// payment data
+  const [bookings, setBookings] = useState([]);
+
+  // payment data
   useEffect(() => {
     if (!userEmail) {
       setLoading(false);
@@ -37,13 +37,11 @@ function MyOrder() {
         const { data } = await axiosSecure.get(
           `/api/payments/user?userEmail=${userEmail}`
         );
-        console.log("📦 Orders data:", data); // Debug log
+        console.log("📦 Orders data:", data);
         setOrders(data);
       } catch (err) {
         console.error("❌ Error fetching orders:", err);
         Swal.fire("Error!", "Failed to load orders.", "error");
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -62,6 +60,7 @@ function MyOrder() {
         const { data } = await axiosSecure.get(
           `api/ticket/my-bookings?userEmail=${userEmail}`
         );
+        console.log("🎫 Bookings data:", data);
         setBookings(data);
       } catch (err) {
         console.error("❌ Error fetching booking:", err);
@@ -114,7 +113,6 @@ function MyOrder() {
     }
   };
 
-
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     try {
@@ -128,42 +126,79 @@ function MyOrder() {
     }
   };
 
-  const formatTime = (timeString) => {
-    if (!timeString) return "N/A";
-    try {
-      // Handle both full datetime and time-only strings
-      const date = timeString.includes("T")
-        ? new Date(timeString)
-        : new Date(`2000-01-01T${timeString}`);
-      return date.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-      });
-    } catch {
-      return "Invalid Time";
-    }
+  const findMatchingBooking = (order) => {
+    console.log("🔍 Finding match for order:", order._id, order);
+
+    // Try multiple matching strategies
+    const matchingBooking = bookings.find((booking) => {
+      // Strategy 1: Match by transaction ID if available
+      if (
+        order.transactionId &&
+        booking.transactionId === order.transactionId
+      ) {
+        console.log("✅ Matched by transaction ID");
+        return true;
+      }
+
+      // Strategy 2: Match by similar timestamps (within 5 minutes)
+      const orderTime = new Date(order.createdAt).getTime();
+      const bookingTime = new Date(booking.createdAt).getTime();
+
+      // Strategy 3: Match by movie title and user email with similar time
+      if (
+        booking.userEmail === order.userEmail &&
+        booking.movieTitle === order.sessionTitle
+      ) {
+        console.log("✅ Matched by movie title + email + time");
+        return true;
+      }
+
+      // Strategy 4: Match by amount and movie title
+      if (
+        booking.userEmail === order.userEmail &&
+        booking.movieTitle === order.sessionTitle &&
+        booking.totalAmount === order.amount
+      ) {
+        console.log("✅ Matched by amount + movie title");
+        return true;
+      }
+
+      return false;
+    });
+
+    console.log("✅ Matching booking result:", matchingBooking);
+    return matchingBooking;
   };
 
   // Transform API data to match frontend expectations
-  const transformOrderData = (order) => ({
-    ...order,
-    // Map backend fields to frontend fields
-    movieTitle: order.sessionTitle || "Unknown Movie",
-    totalAmount: order.amount, // Convert from cents if needed
-    showDate: order.showTime || order.createdAt,
-    showTime: order.showTime || "N/A",
-    selectedSeats: order.selectedSeats || ["N/A"],
-    theaterName: order.theaterName || "Unknown Theater",
-    screen: order.screen || "N/A",
-    userName: order.userName || "Customer",
-    userEmail: order.userEmail,
-    status: order.status || "confirmed",
-    paymentStatus: order.status || "paid",
-    transactionId: order.transactionId || order.providerPaymentId,
-  });
+  const transformOrderData = (order) => {
+    const matchingBooking = findMatchingBooking(order);
 
-  if (loading) return <LoadingSpinner />;
+    const transformed = {
+      ...order,
+      movieTitle: order.sessionTitle || "Unknown Movie",
+      totalAmount: order.amount,
+      showDate: order.showTime || order.createdAt,
+      showTime: order.showTime || "N/A",
+      selectedSeats: order.selectedSeats || ["N/A"],
+      screen: order.screen || "N/A",
+      userName: order.userName || "Customer",
+      userEmail: order.userEmail,
+      status: order.status || "confirmed",
+      paymentStatus: order.status || "paid",
+      transactionId: order.transactionId || order.providerPaymentId,
+      // Add theaterName from matching booking or use fallback
+      theaterName: matchingBooking?.theaterName || "Cinema Theater",
+    };
+
+    console.log("🔄 Transformed order:", transformed);
+    return transformed;
+  };
+
+  // Show loading only when both requests are complete
+  const isLoading = loading && (orders.length === 0 || bookings.length === 0);
+
+  if (isLoading) return <LoadingSpinner />;
 
   const transformedOrders = orders.map(transformOrderData);
 
@@ -251,9 +286,6 @@ function MyOrder() {
                         <div className="text-white font-medium">
                           {formatDate(order.showDate)}
                         </div>
-                        <div className="text-gray-400 text-sm">
-                          {formatTime(order.showTime)}
-                        </div>
                       </div>
                     </td>
                     <td className="py-4 px-6">
@@ -310,13 +342,6 @@ function MyOrder() {
                 }
               </span>
             </span>
-            <span className="flex items-center space-x-1">
-              <FiClock className="text-yellow-400" />
-              <span>
-                Pending:{" "}
-                {transformedOrders.filter((o) => o.status === "pending").length}
-              </span>
-            </span>
           </div>
         </div>
       </div>
@@ -369,13 +394,10 @@ function MyOrder() {
                     <div>
                       <p className="text-gray-400 text-sm">Show Date & Time</p>
                       <p className="text-white font-medium">
-                        {formatDate(selectedOrder.showDate)} at{" "}
-                        {formatTime(selectedOrder.showTime)}
+                        {formatDate(selectedOrder.showDate)}
                       </p>
                     </div>
                   </div>
-
-                 
                   <div className="flex items-center space-x-3">
                     <FiUser className="text-purple-400 text-lg" />
                     <div>
@@ -419,8 +441,6 @@ function MyOrder() {
                         {getStatusIcon(selectedOrder.status)}
                         <span className="ml-1">{selectedOrder.status}</span>
                       </span>
-                    </div>
-                    <div>
                     </div>
                   </div>
                 </div>

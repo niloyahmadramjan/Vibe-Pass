@@ -128,15 +128,30 @@ const QnA = () => {
   }
 
   return (
-    <>
-      {/* Main FAQ Section */}
-      <section className="py-16 relative overflow-hidden">
+<>
+    <section className="py-16  relative overflow-hidden">
+      <div className="container mx-auto px-4 max-w-6xl relative z-10">
+        {/* Header */}
+        <div className="text-center mb-12 fade-in">
+          <div className="inline-flex items-center gap-2 mb-4">
+            <div className="w-3 h-3 bg-[#D32F2F] rounded-full"></div>
+            <span className="text-[#FFD700] font-semibold text-sm uppercase tracking-wider">
+              FAQ
+            </span>
+            <div className="w-3 h-3 bg-[#D32F2F] rounded-full"></div>
+          </div>
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            Frequently Asked
+            <span className="text-gradient bg-gradient-to-r from-[#D32F2F] to-[#FF5252] bg-clip-text text-transparent">
+              {' '}
+              Questions
+            </span>
+          </h2>
+          <p className="text-[#B0B0B0] text-lg max-w-7xl mx-auto">
+            Find quick answers to common questions about booking, payments, and
+            your movie experience.
+          </p>
 
-        {/* Background decorative elements */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-10 left-10 w-20 h-20 border-2 border-[#D32F2F] rounded-lg"></div>
-          <div className="absolute bottom-10 right-10 w-16 h-16 border-2 border-[#FFD700] rounded-full"></div>
-          <div className="absolute top-1/2 left-1/4 w-12 h-12 border-2 border-[#2196F3] rotate-45"></div>
         </div>
 
         <div className="container mx-auto px-4 max-w-6xl relative z-10">
@@ -296,7 +311,9 @@ const QnA = () => {
             }
           }
         `}</style>
+      </div>
       </section>
+     
 
       {/* Chat Modal Component - Opens on right side */}
       <UserChatModal
