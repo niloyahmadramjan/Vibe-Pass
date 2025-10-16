@@ -5,13 +5,33 @@ import Image from "next/image";
 import { useAuth } from "../context/AuthContext";
 import Link from "next/link";
 import { useRef, useState } from "react";
+import { useSession } from "next-auth/react";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export default function AdminNavbar({ toggleSidebar }) {
-  const { user } = useAuth();
+    const router = useRouter()
+  
+   const { data: session, status } = useSession()
+  const { user, logout } = useAuth()
+
     const [userDropdownOpen, setUserDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
   
-  // console.log(user)
+  // console.log(user
+
+
+
+  const handleLogout = async () => {
+    if (session) {
+      await signOut({ redirect: false })
+    }
+    if (user) {
+      await logout({ redirect: false })
+      toast.success('Logged out successfully!')
+    }
+    router.refresh()
+  }
 
   return (
     <nav className="w-full bg-[#0c0c0f] text-white shadow px-4 lg:px-6  flex items-center justify-between border-b border-[#1e1f26]">
@@ -63,25 +83,19 @@ export default function AdminNavbar({ toggleSidebar }) {
                   <div className="absolute left-0 mt-2 w-48 bg-[#1b1e2b] rounded-lg shadow-lg overflow-hidden border border-[#1e1f26] z-50">
                     <Link
                       href="/profile"
-                      className="block px-4 py-3 text-[#a1a1aa] hover:bg-[#2a2c36] hover:text-white"
+                      className="block px-4 py-3 !text-white !hover:bg-[#2a2c36] !hover:text-white"
                       onClick={() => setUserDropdownOpen(false)}
                     >
                       Profile
                     </Link>
-                    <Link
-                      href="/change-password"
-                      className="block px-4 py-3 text-[#a1a1aa] hover:bg-[#2a2c36] hover:text-white"
-                      onClick={() => setUserDropdownOpen(false)}
-                    >
-                      Change Password
-                    </Link>
-                    <Link
-                      href="/logout"
-                      className="block px-4 py-3 text-[#a1a1aa] hover:bg-[#2a2c36] hover:text-white"
-                      onClick={() => setUserDropdownOpen(false)}
+                   
+                    <button
+                      onClick={handleLogout}
+                      className="block px-4 py-3 !text-white hover:bg-[#2a2c36] hover:text-white"
+                      
                     >
                       Logout
-                    </Link>
+                    </button>
                   </div>
                 )}
               </div>

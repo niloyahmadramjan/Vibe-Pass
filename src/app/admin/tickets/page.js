@@ -1,7 +1,8 @@
 
 'use client';
 import { useState } from 'react';
-import { FiUser, FiFilm, FiCalendar, FiClock,FiDollarSign, FiSearch, FiRefreshCw,FiCheckCircle, FiXCircle, FiEye, FiDownload, FiShoppingCart
+import {
+    FiUser, FiFilm, FiCalendar, FiClock, FiDollarSign, FiSearch, FiRefreshCw, FiCheckCircle, FiXCircle, FiEye, FiDownload, FiShoppingCart
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import AdminLoading from '../components/AdminLoading';
