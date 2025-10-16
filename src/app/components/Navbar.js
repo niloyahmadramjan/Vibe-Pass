@@ -26,6 +26,7 @@ import { useAuth } from "@/app/context/AuthContext";
 import toast from "react-hot-toast";
 import { FaFilm, FaHistory } from "react-icons/fa";
 
+
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -144,7 +145,7 @@ export default function Navbar() {
             <div className="hidden lg:flex items-center">
               {status === "loading" ? (
                 <div className="animate-spin h-6 w-6 rounded-full border-2 border-red-500 border-t-transparent"></div>
-              ) : session || user ? (
+              ) : user ? (
                 <div className="flex items-center gap-3 relative group">
                   {/* User Info with Dropdown Trigger */}
                   <button
@@ -153,7 +154,7 @@ export default function Navbar() {
                   >
                     <div className="flex flex-col items-start">
                       <span className="text-white font-semibold text-sm leading-tight max-w-[120px] truncate">
-                        {session?.user?.name || user?.name}
+                        {user?.name}
                       </span>
                       <span className="text-red-400 text-xs font-medium">
                         HI.MOVIECLUB U...
@@ -176,6 +177,7 @@ export default function Navbar() {
                       />
                     </svg>
                   </button>
+                 
 
                   {/* Dropdown Menu */}
                   {(openDrop || groupHover) && (
@@ -188,7 +190,7 @@ export default function Navbar() {
                       {/* Header Section */}
                       <div className="bg-gray-800 px-4 py-3 border-b border-gray-700">
                         <div className="flex items-center gap-3">
-                          {session?.user?.image || user?.image ? (
+                          {user?.image ? (
                             <Image
                               src={session?.user?.image || user?.image}
                               alt={session?.user?.name || user?.name || "User"}
@@ -207,7 +209,7 @@ export default function Navbar() {
                           )}
                           <div>
                             <p className="text-white font-semibold text-sm">
-                              {session?.user?.name || user?.name}
+                              {user?.name}
                             </p>
                             <p className="text-red-400 text-xs">
                               Hi.MOVIECLUB U...
@@ -231,7 +233,7 @@ export default function Navbar() {
                             onClick={() => setOpenDrop(false)}
                           >
                             <FiSettings className="w-5 h-5 text-purple-400" />
-                            <span className="font-medium">ADMIN DASHBOARD</span>
+                            <span className="font-medium">Admin Dashboard</span>
                           </Link>
                         )}
 
@@ -461,7 +463,7 @@ export default function Navbar() {
             </div>
 
             {/* User Menu Links - Only show when logged in */}
-            {(session || user) && (
+            {user && (
               <div className="border-t border-gray-700 pt-6 space-y-3">
                 <h3 className="text-gray-400 text-sm font-semibold uppercase tracking-wider mb-2 px-3">
                   My Account
@@ -505,12 +507,10 @@ export default function Navbar() {
 
           {/* Auth Section (mobile bottom) */}
           <div className="p-4 border-t border-gray-800 bg-gray-950">
-            {session || user ? (
+            {user ? (
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <span className="!text-white font-medium">
-                    {session?.user?.name || user?.name}
-                  </span>
+                  <span className="!text-white font-medium">{user?.name}</span>
                   {isAdmin && (
                     <span className="inline-block px-2 py-1 bg-purple-600 text-white text-xs rounded-full font-bold">
                       ADMIN
