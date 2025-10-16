@@ -144,7 +144,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="py-4 px-12 bg-[#282828] text-[#CCCCCC] text-sm hidden md:flex items-center justify-between flex-wrap">
+        <div className="py-4 px-6 bg-[#141313] text-[#CCCCCC] text-sm hidden md:flex items-center justify-between flex-wrap">
           <div className="flex justify-around gap-6">
             <Link
               href="/terms"
