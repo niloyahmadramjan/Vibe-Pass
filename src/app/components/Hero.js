@@ -125,7 +125,7 @@ export default function HeroSection() {
                         onClick={() => router.push(`/movies/${movie.id}`)}
                         className=" px-2 lg:px-5 py-1 lg:py-3  rounded-lg bg-red-600 hover:bg-red-700 transition"
                       >
-                        Book Now
+                        Details
                       </button>
                     </div>
                   </div>
