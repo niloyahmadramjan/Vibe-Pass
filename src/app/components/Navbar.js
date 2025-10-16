@@ -21,6 +21,7 @@ import { useAuth } from '@/app/context/AuthContext'
 import toast from 'react-hot-toast'
 import { FaFilm } from 'react-icons/fa'
 
+
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -168,6 +169,7 @@ export default function Navbar() {
                       />
                     </svg>
                   </button>
+                 
 
                   {/* Dropdown Menu */}
                   {(openDrop || groupHover) && (
