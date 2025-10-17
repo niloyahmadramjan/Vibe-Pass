@@ -16,7 +16,6 @@ export default function LocationPage() {
 
   const uniqueDivisions = [...new Set(locations.map((loc) => loc.region))]
 
-  // যখন Division select হবে তখন districts আপডেট হবে
   useEffect(() => {
     if (selectedDivision) {
       const filteredDistricts = locations
@@ -33,7 +32,7 @@ export default function LocationPage() {
     }
   }, [selectedDivision])
 
-  // District change হলে location আপডেট হবে এবং স্বয়ংক্রিয়ভাবে Cinemas দেখাবে
+ 
   useEffect(() => {
     if (selectedDistrict && selectedDivision) {
       const loc = locations.find(
@@ -53,7 +52,7 @@ export default function LocationPage() {
     }
   }, [selectedDistrict, selectedDivision])
 
-  // Cinema select করলে zoom করবে
+  
   const handleSelectCinema = (cinema) => {
     setSelectedCinema(cinema)
     if (mapRef.current && selectedLocation) {

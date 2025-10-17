@@ -1,15 +1,15 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import QRCode from 'react-qr-code'
-import LoadingSpinner from '../hooks/LoadingSpiner'
-import Image from 'next/image'
-import { useAuth } from '../context/AuthContext'
-import axiosSecure from '../api/axiosHook/useAxiosSecure'
-import Swal from 'sweetalert2'
-import toast, { Toaster } from 'react-hot-toast'
-import axios from 'axios'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from "react";
+import QRCode from "react-qr-code";
+import LoadingSpinner from "../hooks/LoadingSpiner";
+import Image from "next/image";
+import { useAuth } from "../context/AuthContext";
+import axiosSecure from "../api/axiosHook/useAxiosSecure";
+import Swal from "sweetalert2";
+import toast, { Toaster } from "react-hot-toast";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 /**
  * ProfilePage Component
@@ -18,174 +18,174 @@ import { useRouter } from 'next/navigation'
  */
 const ProfilePage = () => {
   // State to control which modal is currently open
-  const [showModal, setShowModal] = useState(null)
+  const [showModal, setShowModal] = useState(null);
   // State for loading indicators during async operations
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   // State for user data from backend
-  const [userData, setUserData] = useState(null)
-  const { user, loading: authLoading } = useAuth()
-  const router = useRouter()
+  const [userData, setUserData] = useState(null);
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
 
   // ========================= AUTHENTICATION PROTECTION =========================
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push('/login')
+      router.push("/login");
     }
-  }, [user, authLoading, router])
+  }, [user, authLoading, router]);
 
   // ========================= EFFECT TO FETCH USER DATA =========================
 
   useEffect(() => {
-    if (!user) return // Don't fetch if no user
+    if (!user) return; // Don't fetch if no user
 
     const fetchUserData = async () => {
       try {
-        const response = await axiosSecure.get('/api/user/info')
-        setUserData(response.data)
+        const response = await axiosSecure.get("/api/user/info");
+        setUserData(response.data);
       } catch (err) {
-        console.error('Failed to fetch user data:', err)
-        toast.error('Failed to load user data ')
+        console.error("Failed to fetch user data:", err);
+        toast.error("Failed to load user data ❌");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchUserData()
-  }, [user, router])
+    fetchUserData();
+  }, [user, router]);
 
   // ========================= HANDLER FUNCTIONS (API Calls) =========================
 
   // Add this to your handler functions section
 
   const handleUpdateImage = async (imageFile) => {
-    setLoading(true)
+    setLoading(true);
     try {
       // 1. Upload to imgbb
-      const imgbbForm = new FormData()
-      imgbbForm.append('image', imageFile)
+      const imgbbForm = new FormData();
+      imgbbForm.append("image", imageFile);
 
       const imgbbRes = await axios.post(
         `https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`,
         imgbbForm
-      )
+      );
 
-      const imageUrl = imgbbRes.data.data.url
+      const imageUrl = imgbbRes.data.data.url;
 
       // 2. Send the URL to your backend
       const response = await axiosSecure.put(
-        '/api/user/image',
+        "/api/user/image",
         { imageUrl }, // just send URL
         {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         }
-      )
+      );
 
-      setUserData((prev) => ({ ...prev, image: response.data.imageUrl }))
-      toast.success('Profile image updated successfully ')
+      setUserData((prev) => ({ ...prev, image: response.data.imageUrl }));
+      toast.success("Profile image updated successfully ✅");
     } catch (err) {
-      console.error('Image upload failed:', err)
-      toast.error('Failed to update profile image ')
+      console.error("Image upload failed:", err);
+      toast.error("Failed to update profile image ❌");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   /**
    * Updates the user's mobile number.
    * @param {string} newNumber - The new mobile number to set.
    */
   const handleUpdateMobile = async (newNumber) => {
-    setLoading(true)
+    setLoading(true);
     try {
-      await axiosSecure.put('/api/user/number', { number: newNumber })
+      await axiosSecure.put("/api/user/number", { number: newNumber });
       // Update local user data
-      setUserData((prev) => ({ ...prev, phone: newNumber }))
-      toast.success('Mobile updated successfully ')
-      setShowModal(null)
+      setUserData((prev) => ({ ...prev, phone: newNumber }));
+      toast.success("Mobile updated successfully ");
+      setShowModal(null);
     } catch (err) {
-      console.error('Mobile update failed:', err)
-      toast.error('Failed to update mobile ')
+      console.error("Mobile update failed:", err);
+      toast.error("Failed to update mobile ❌");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   /**
    * Requests a new email verification link.
    */
   const handleVerifyEmail = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      await axiosSecure.post('/api/user/verify-email')
-      toast.success('Verification email sent ')
-      setShowModal(null)
+      await axiosSecure.post("/api/user/verify-email");
+      toast.success("Verification email sent ");
+      setShowModal(null);
     } catch (err) {
-      console.error('Email verification request failed:', err)
-      toast.error('Failed to send verification email ')
+      console.error("Email verification request failed:", err);
+      toast.error("Failed to send verification email ");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   /**
    * Updates general user profile information.
    * @param {object} profileData - The data object containing profile fields to update.
    */
   const handleEditProfile = async (profileData) => {
-    setLoading(true)
+    setLoading(true);
     try {
-      await axiosSecure.put('/api/user/profile', profileData)
+      await axiosSecure.put("/api/user/profile", profileData);
       // Update local user data
-      setUserData((prev) => ({ ...prev, ...profileData }))
-      toast.success('Profile updated successfully ')
-      setShowModal(null)
+      setUserData((prev) => ({ ...prev, ...profileData }));
+      toast.success("Profile updated successfully ");
+      setShowModal(null);
     } catch (err) {
-      console.error('Profile update failed:', err)
-      toast.error('Failed to update profile ')
+      console.error("Profile update failed:", err);
+      toast.error("Failed to update profile ");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   /**
    * Updates user communication preferences.
    * @param {object} preferences - The data object containing preference fields (updates, surveys).
    */
   const handleEditPreferences = async (preferences) => {
-    setLoading(true)
+    setLoading(true);
     try {
-      await axiosSecure.put('/api/user/preferences', preferences)
+      await axiosSecure.put("/api/user/preferences", preferences);
       // Update local user data
-      setUserData((prev) => ({ ...prev, ...preferences }))
-      toast.success('Preferences updated ')
-      setShowModal(null)
+      setUserData((prev) => ({ ...prev, ...preferences }));
+      toast.success("Preferences updated ");
+      setShowModal(null);
     } catch (err) {
-      console.error('Preferences update failed:', err)
-      toast.error('Failed to update preferences ')
+      console.error("Preferences update failed:", err);
+      toast.error("Failed to update preferences ");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   /**
    * Changes the user's PIN.
    * @param {object} pinData - Object containing oldPin and newPin.
    */
   const handleChangePin = async (pinData) => {
-    setLoading(true)
+    setLoading(true);
     try {
-      await axiosSecure.put('/api/user/pin', pinData)
-      toast.success('Password changed successfully')
-      setShowModal(null)
+      await axiosSecure.put("/api/user/pin", pinData);
+      toast.success("Password changed successfully");
+      setShowModal(null);
     } catch (err) {
-      console.error('password change failed:', err)
-      toast.error('Failed to change password ')
+      console.error("password change failed:", err);
+      toast.error("Failed to change password ");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   /**
    * Initiates the account deletion process after user confirmation.
@@ -193,48 +193,48 @@ const ProfilePage = () => {
    */
   const handleDeleteAccount = async () => {
     Swal.fire({
-      title: 'Are you sure?',
-      text: 'This action cannot be undone! Your account will be permanently deleted.',
-      icon: 'warning',
+      title: "Are you sure?",
+      text: "This action cannot be undone! Your account will be permanently deleted.",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#e3342f',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Yes, delete it!',
+      confirmButtonColor: "#e3342f",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Yes, delete it!",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        setLoading(true)
+        setLoading(true);
         try {
-          await axiosSecure.delete('/api/user/account')
-          Swal.fire('Deleted!', 'Your account has been deleted.', 'success')
+          await axiosSecure.delete("/api/user/account");
+          Swal.fire("Deleted!", "Your account has been deleted.", "success");
           // Note: Successful deletion should typically redirect the user to a public page or trigger a global logout
-          setShowModal(null)
+          setShowModal(null);
         } catch (err) {
-          console.error('Account deletion failed:', err)
-          Swal.fire('Error!', 'Failed to delete account.', 'error')
+          console.error("Account deletion failed:", err);
+          Swal.fire("Error!", "Failed to delete account.", "error");
         } finally {
-          setLoading(false)
+          setLoading(false);
         }
       }
-    })
-  }
+    });
+  };
 
   /**
    * Sends a support message from the user.
    * @param {string} message - The support message content.
    */
   const handleContactSupport = async (message) => {
-    setLoading(true)
+    setLoading(true);
     try {
-      await axiosSecure.post('/api/user/support', { message })
-      toast.success('Support request sent ')
-      setShowModal(null)
+      await axiosSecure.post("/api/user/support", { message });
+      toast.success("Support request sent ");
+      setShowModal(null);
     } catch (err) {
-      console.error('Support request failed:', err)
-      toast.error('Failed to contact support ')
+      console.error("Support request failed:", err);
+      toast.error("Failed to contact support ");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // ========================= UTILITY FUNCTIONS =========================
 
@@ -243,12 +243,12 @@ const ProfilePage = () => {
    * @param {string} modalType - The string identifier for the modal to open.
    */
   const openModal = (modalType) => {
-    setShowModal(modalType)
-  }
+    setShowModal(modalType);
+  };
 
   // ========================= LOADING STATE =========================
   if (authLoading || !user || !userData) {
-    return <LoadingSpinner />
+    return <LoadingSpinner />;
   }
 
   // ========================= RENDER =========================
@@ -262,7 +262,7 @@ const ProfilePage = () => {
             <div className="relative group">
               <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-2 border-[var(--color-primary)]">
                 <Image
-                  src={userData?.image || '/default-avatar.png'}
+                  src={userData?.image || "/default-avatar.png"}
                   alt="Profile"
                   className="object-cover w-full h-full"
                   placeholder="empty"
@@ -272,7 +272,7 @@ const ProfilePage = () => {
               </div>
               {/* Image Upload Button */}
               <button
-                onClick={() => openModal('updateImage')}
+                onClick={() => openModal("updateImage")}
                 className="absolute bottom-2 right-0 bg-[var(--color-primary)] text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg"
                 title="Change profile picture"
               >
@@ -333,11 +333,11 @@ const ProfilePage = () => {
                   </span>
                   <div className="flex justify-between items-center">
                     <p className="text-[var(--color-text-light)] font-medium">
-                      {userData?.phone || 'Not set'}
+                      {userData?.phone || "Not set"}
                     </p>
                     {/* FIXED: Open modal instead of calling API handler */}
                     <button
-                      onClick={() => openModal('updateMobile')}
+                      onClick={() => openModal("updateMobile")}
                       className="text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] text-sm font-medium"
                     >
                       Update
@@ -374,7 +374,7 @@ const ProfilePage = () => {
                     ) : (
                       // FIXED: Open modal/call verification if not verified
                       <button
-                        onClick={() => openModal('verifyEmail')}
+                        onClick={() => openModal("verifyEmail")}
                         className="text-yellow-400 hover:text-yellow-500 text-sm font-medium"
                       >
                         Verify Now
@@ -394,7 +394,7 @@ const ProfilePage = () => {
                 <h2 className="text-xl font-bold">PROFILE INFO</h2>
                 {/* FIXED: Open modal instead of calling API handler */}
                 <button
-                  onClick={() => openModal('editProfile')}
+                  onClick={() => openModal("editProfile")}
                   className="border border-white px-4 py-1 rounded-lg text-sm hover:bg-white hover:text-black transition"
                 >
                   EDIT
@@ -406,7 +406,7 @@ const ProfilePage = () => {
                 {/* Name */}
                 <div>
                   <p className="uppercase text-gray-400 font-semibold">Name</p>
-                  <p className="mt-1">{userData?.name || 'Not set'}</p>
+                  <p className="mt-1">{userData?.name || "Not set"}</p>
                 </div>
 
                 {/* Date of Birth */}
@@ -414,13 +414,21 @@ const ProfilePage = () => {
                   <p className="uppercase text-gray-400 font-semibold">
                     Date of Birth
                   </p>
-                  <p className="mt-1">{userData?.dob || 'Not set'}</p>
+                  <p className="mt-1">
+                    {userData?.dob
+                      ? new Date(userData.dob).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })
+                      : "Not set"}
+                  </p>
                 </div>
 
                 {/* State */}
                 <div>
                   <p className="uppercase text-gray-400 font-semibold">State</p>
-                  <p className="mt-1">{userData?.state || 'Not set'}</p>
+                  <p className="mt-1">{userData?.state || "Not set"}</p>
                 </div>
 
                 {/* District */}
@@ -428,7 +436,7 @@ const ProfilePage = () => {
                   <p className="uppercase text-gray-400 font-semibold">
                     District
                   </p>
-                  <p className="mt-1">{userData?.district || 'Not set'}</p>
+                  <p className="mt-1">{userData?.district || "Not set"}</p>
                 </div>
 
                 {/* Gender */}
@@ -436,7 +444,7 @@ const ProfilePage = () => {
                   <p className="uppercase text-gray-400 font-semibold">
                     Gender
                   </p>
-                  <p className="mt-1">{userData?.gender || 'Not set'}</p>
+                  <p className="mt-1">{userData?.gender || "Not set"}</p>
                 </div>
               </div>
             </div>
@@ -450,7 +458,7 @@ const ProfilePage = () => {
 
                 {/* FIXED: Open modal instead of calling API handler */}
                 <button
-                  onClick={() => openModal('editPreferences')}
+                  onClick={() => openModal("editPreferences")}
                   className="border border-white px-4 py-1 rounded-lg text-sm hover:bg-white hover:text-black transition"
                 >
                   EDIT
@@ -497,7 +505,7 @@ const ProfilePage = () => {
                   </span>
                   {/* FIXED: Open modal instead of calling API handler */}
                   <button
-                    onClick={() => openModal('changePin')}
+                    onClick={() => openModal("changePin")}
                     className="text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] text-sm font-medium"
                   >
                     CHANGE PASSWORD
@@ -521,7 +529,7 @@ const ProfilePage = () => {
                 <div className="col-span-full pt-4">
                   {/* FIXED: Open modal instead of calling API handler */}
                   <button
-                    onClick={() => openModal('contactSupport')}
+                    onClick={() => openModal("contactSupport")}
                     className="text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] text-sm font-medium"
                   >
                     NEED HELP? CONTACT US
@@ -540,17 +548,17 @@ const ProfilePage = () => {
           <div className="bg-[var(--color-bg-dark)] text-[var(--color-text-light)] rounded-lg p-6 w-full max-w-sm shadow-xl">
             {/* Title formatting to clean up camelCase into a readable title */}
             <h3 className="text-lg font-semibold mb-4 capitalize">
-              {showModal.replace(/([A-Z])/g, ' $1')}
+              {showModal.replace(/([A-Z])/g, " $1")}
             </h3>
 
             {/* Render dynamic content based on showModal state */}
             {/* ----------------- Update Mobile Modal ----------------- */}
-            {showModal === 'updateMobile' && (
+            {showModal === "updateMobile" && (
               <form
                 onSubmit={(e) => {
-                  e.preventDefault()
-                  const newNumber = e.target.number.value
-                  handleUpdateMobile(newNumber)
+                  e.preventDefault();
+                  const newNumber = e.target.number.value;
+                  handleUpdateMobile(newNumber);
                 }}
                 className="space-y-4"
               >
@@ -558,7 +566,7 @@ const ProfilePage = () => {
                   type="text"
                   name="number"
                   placeholder="Enter new mobile number"
-                  defaultValue={userData?.phone || ''}
+                  defaultValue={userData?.phone || ""}
                   className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                 />
                 <button
@@ -571,14 +579,14 @@ const ProfilePage = () => {
                       <LoadingSpinner size="h-5 w-5" /> Updating...
                     </span>
                   ) : (
-                    'Update'
+                    "Update"
                   )}
                 </button>
               </form>
             )}
 
             {/* ----------------- Verify Email Modal ----------------- */}
-            {showModal === 'verifyEmail' && (
+            {showModal === "verifyEmail" && (
               <div className="text-sm text-gray-400">
                 <p className="mb-4">
                   We'll send a verification link to your email (
@@ -594,25 +602,25 @@ const ProfilePage = () => {
                       <LoadingSpinner size="h-5 w-5" /> Sending...
                     </span>
                   ) : (
-                    'Send Verification Email'
+                    "Send Verification Email"
                   )}
                 </button>
               </div>
             )}
 
             {/* ----------------- Edit Profile Modal ----------------- */}
-            {showModal === 'editProfile' && (
+            {showModal === "editProfile" && (
               <form
                 onSubmit={(e) => {
-                  e.preventDefault()
+                  e.preventDefault();
                   const profileData = {
                     name: e.target.name.value,
                     dob: e.target.dob.value,
                     state: e.target.state.value,
                     district: e.target.district.value,
                     gender: e.target.gender.value,
-                  }
-                  handleEditProfile(profileData)
+                  };
+                  handleEditProfile(profileData);
                 }}
                 className="space-y-3"
               >
@@ -620,7 +628,7 @@ const ProfilePage = () => {
                   type="text"
                   name="name"
                   placeholder="Full Name"
-                  defaultValue={userData?.name || ''}
+                  defaultValue={userData?.name || ""}
                   className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                 />
                 <input
@@ -628,8 +636,8 @@ const ProfilePage = () => {
                   name="dob"
                   defaultValue={
                     userData?.dob
-                      ? new Date(userData.dob).toISOString().split('T')[0]
-                      : ''
+                      ? new Date(userData.dob).toISOString().split("T")[0]
+                      : ""
                   }
                   className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                 />
@@ -638,19 +646,19 @@ const ProfilePage = () => {
                   type="text"
                   name="state"
                   placeholder="State"
-                  defaultValue={userData?.state || ''}
+                  defaultValue={userData?.state || ""}
                   className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                 />
                 <input
                   type="text"
                   name="district"
                   placeholder="District"
-                  defaultValue={userData?.district || ''}
+                  defaultValue={userData?.district || ""}
                   className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                 />
                 <select
                   name="gender"
-                  defaultValue={userData?.gender || ''}
+                  defaultValue={userData?.gender || ""}
                   className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                 >
                   <option value="" disabled>
@@ -670,22 +678,22 @@ const ProfilePage = () => {
                       <LoadingSpinner size="h-5 w-5" /> Saving...
                     </span>
                   ) : (
-                    'Save'
+                    "Save"
                   )}
                 </button>
               </form>
             )}
 
             {/* ----------------- Edit Preferences Modal ----------------- */}
-            {showModal === 'editPreferences' && (
+            {showModal === "editPreferences" && (
               <form
                 onSubmit={(e) => {
-                  e.preventDefault()
+                  e.preventDefault();
                   const preferences = {
                     updates: e.target.updates.checked,
                     surveys: e.target.surveys.checked,
-                  }
-                  handleEditPreferences(preferences)
+                  };
+                  handleEditPreferences(preferences);
                 }}
                 className="space-y-3"
               >
@@ -717,22 +725,22 @@ const ProfilePage = () => {
                       <LoadingSpinner size="h-5 w-5" /> Saving...
                     </span>
                   ) : (
-                    'Save'
+                    "Save"
                   )}
                 </button>
               </form>
             )}
 
             {/* ----------------- Change Pin Modal ----------------- */}
-            {showModal === 'changePin' && (
+            {showModal === "changePin" && (
               <form
                 onSubmit={(e) => {
-                  e.preventDefault()
+                  e.preventDefault();
                   const pinData = {
                     oldPin: e.target.oldPin.value,
                     newPin: e.target.newPin.value,
-                  }
-                  handleChangePin(pinData)
+                  };
+                  handleChangePin(pinData);
                 }}
                 className="space-y-3"
               >
@@ -760,19 +768,19 @@ const ProfilePage = () => {
                       <LoadingSpinner size="h-5 w-5" /> Updating...
                     </span>
                   ) : (
-                    'Update PIN'
+                    "Update PIN"
                   )}
                 </button>
               </form>
             )}
 
             {/* ----------------- Contact Support Modal ----------------- */}
-            {showModal === 'contactSupport' && (
+            {showModal === "contactSupport" && (
               <form
                 onSubmit={(e) => {
-                  e.preventDefault()
-                  const message = e.target.message.value
-                  handleContactSupport(message)
+                  e.preventDefault();
+                  const message = e.target.message.value;
+                  handleContactSupport(message);
                 }}
                 className="space-y-3"
               >
@@ -793,20 +801,20 @@ const ProfilePage = () => {
                       <LoadingSpinner size="h-5 w-5" /> Sending...
                     </span>
                   ) : (
-                    'Send Request'
+                    "Send Request"
                   )}
                 </button>
               </form>
             )}
             {/* ----------------- Enhanced Update Image Modal ----------------- */}
-            {showModal === 'updateImage' && (
+            {showModal === "updateImage" && (
               <div className="space-y-4">
                 {/* Image Preview */}
                 <div className="flex justify-center">
                   <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-[var(--color-primary)] relative">
                     <Image
                       id="imagePreview"
-                      src={userData?.image || '/default-avatar.png'}
+                      src={userData?.image || "/default-avatar.png"}
                       alt="Preview"
                       fill
                       className="object-cover"
@@ -820,15 +828,15 @@ const ProfilePage = () => {
                   id="imageInput"
                   accept="image/*"
                   onChange={(e) => {
-                    const file = e.target.files[0]
+                    const file = e.target.files[0];
                     if (file) {
                       // Preview image
-                      const reader = new FileReader()
+                      const reader = new FileReader();
                       reader.onload = (e) => {
-                        document.getElementById('imagePreview').src =
-                          e.target.result
-                      }
-                      reader.readAsDataURL(file)
+                        document.getElementById("imagePreview").src =
+                          e.target.result;
+                      };
+                      reader.readAsDataURL(file);
                     }
                   }}
                   className="w-full p-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[var(--color-primary)] file:text-white hover:file:bg-[var(--color-primary-hover)]"
@@ -837,12 +845,12 @@ const ProfilePage = () => {
                 <div className="flex gap-2">
                   <button
                     onClick={() => {
-                      const fileInput = document.getElementById('imageInput')
-                      const file = fileInput.files[0]
+                      const fileInput = document.getElementById("imageInput");
+                      const file = fileInput.files[0];
                       if (file) {
-                        handleUpdateImage(file)
+                        handleUpdateImage(file);
                       } else {
-                        toast.error('Please select an image first')
+                        toast.error("Please select an image first");
                       }
                     }}
                     disabled={loading}
@@ -853,7 +861,7 @@ const ProfilePage = () => {
                         <LoadingSpinner size="h-5 w-5" /> Uploading...
                       </span>
                     ) : (
-                      'Upload Image'
+                      "Upload Image"
                     )}
                   </button>
                 </div>
@@ -875,7 +883,7 @@ const ProfilePage = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default ProfilePage
+export default ProfilePage;
