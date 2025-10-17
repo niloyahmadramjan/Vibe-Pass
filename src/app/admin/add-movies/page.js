@@ -152,7 +152,7 @@ export default function AddMoviesPage() {
         initial="hidden"
         animate="visible"
         variants={containerVariants}
-        className="max-w-4xl mx-auto"
+        className="max-w-6xl mx-auto"
       >
         {/* Header */}
         <motion.div variants={itemVariants} className="text-center mb-8">

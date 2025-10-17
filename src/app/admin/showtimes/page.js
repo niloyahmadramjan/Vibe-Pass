@@ -15,7 +15,7 @@ import { HiDotsHorizontal } from "react-icons/hi";
 import { FiEdit2, FiTrash2, FiCalendar, FiClock, FiDollarSign, FiMapPin } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
-import AdminLoading from "../components/AdminLoading";
+import AdminLoading from '../components/AdminLoading';
 import Image from "next/image";
 
 export default function ShowtimesPage() {
@@ -188,26 +188,26 @@ export default function ShowtimesPage() {
                   transition={{ duration: 0.3 }}
                 >
                   {/* Movie Info */}
-               
+
 
                   <td className="py-4 px-6">
                     <div className="flex items-center space-x-4">
-                     
-                        <Image
-                          src={st.movieId.poster_path}
-                          alt={st.movieId.title}
-                        
-                          width={48}
-                          height={48}
-                          className="rounded-lg object-cover shadow-lg"
-                          // sizes="(max-width: 768px) 100vw, 50px"
-                        />
-                      </div>
-                      <div>
-                        <p className="text-white font-medium">{st.movieId.title}</p>
-                        <p className="text-gray-400 text-sm">Movie</p>
-                      </div>
-                  
+
+                      <Image
+                        src={st.movieId.poster_path}
+                        alt={st.movieId.title}
+
+                        width={48}
+                        height={48}
+                        className="rounded-lg object-cover shadow-lg"
+                      // sizes="(max-width: 768px) 100vw, 50px"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-white font-medium">{st.movieId.title}</p>
+                      <p className="text-gray-400 text-sm">Movie</p>
+                    </div>
+
                   </td>
 
                   {/* Date & Time */}
@@ -377,6 +377,27 @@ export default function ShowtimesPage() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

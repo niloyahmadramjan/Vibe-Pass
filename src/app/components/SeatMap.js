@@ -63,7 +63,7 @@ export default function SeatMap({
         center={[23.8103, 90.4125]}
         zoom={7}
         scrollWheelZoom={true}
-        style={{ height: '100%', width: '100%' }}
+        style={{ height: '100%', width: '100%',zIndex:"50"}}
         whenCreated={(mapInstance) => (mapRef.current = mapInstance)}
       >
         {/* Light Map Tiles */}
