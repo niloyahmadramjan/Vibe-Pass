@@ -8,7 +8,7 @@ import 'swiper/css/navigation'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import BookingLocationModal from './BookingLocationModal' // ✅ modal import
-import axiosSecure from '../api/axiosHook/useAxiosSecure'
+import axiosPublic from '../api/axiosHook/useAxiosPublic'
 
 // 🔹 Loading Spinner
 function Spinner() {
@@ -52,7 +52,7 @@ export default function MovieCard() {
       try {
         const results = await Promise.all(
           categories.map(async (cat) => {
-            const res = await axiosSecure.get(`/api/movies/category/${cat.key}`)
+            const res = await axiosPublic.get(`/api/movies/category/${cat.key}`)
             return { key: cat.key, movies: res.data || [] }
 
           })
@@ -94,9 +94,10 @@ export default function MovieCard() {
             key={cat.key}
             onClick={() => setActiveTab(cat.key)}
             className={`px-3 py-2 sm:px-4 sm:py-2 rounded-md text-sm sm:text-base font-semibold transition-colors duration-300 
-              ${activeTab === cat.key
-                ? 'bg-red-600 text-white'
-                : 'bg-zinc-800 text-gray-300 hover:bg-red-500 hover:text-white'
+              ${
+                activeTab === cat.key
+                  ? 'bg-red-600 text-white'
+                  : 'bg-zinc-800 text-gray-300 hover:bg-red-500 hover:text-white'
               }`}
           >
             {cat.label}
@@ -129,14 +130,14 @@ export default function MovieCard() {
                 <div className="relative w-full h-[70%] sm:h-[67%]">
                   <Image
                     src={
-                      typeof movie.poster_path === "string" && movie.poster_path.startsWith("http")
+                      typeof movie.poster_path === 'string' &&
+                      movie.poster_path.startsWith('http')
                         ? movie.poster_path // full URL (like i.ibb.co)
                         : IMG_URL + movie.poster_path // TMDB partial path
                     }
-                    alt={movie.title || "Movie Poster"}
+                    alt={movie.title || 'Movie Poster'}
                     fill
                     className="object-cover"
-             
                   />
 
                   <div className="absolute inset-0 bg-red-500 opacity-0 group-hover:opacity-20 transition duration-300"></div>
@@ -148,24 +149,29 @@ export default function MovieCard() {
                     {movie.title}
                   </p>
 
-                  <div className="flex flex-col gap-2">
-                    {/* Book Now */}
+                  <div
+                    className={`flex flex-col gap-2
+                      `}
+                  >
+                    {/* Book Now (only if not upcoming) */}
                     {activeTab !== 'upcoming' && (
                       <button
                         onClick={() => handleBookNow(movie)}
                         className="w-10/12 flex justify-center mx-auto py-1 rounded-lg btn-secondary font-semibold 
-                          hover:bg-red-700 transition duration-300
-                          opacity-100 lg:opacity-0 group-hover:opacity-100"
+        hover:bg-red-700 transition duration-300
+        opacity-100 lg:opacity-0 group-hover:opacity-100"
                       >
                         Book Now
                       </button>
                     )}
 
-                    {/* Details */}
+                    {/* Details (always visible) */}
                     <Link href={`/movies/${movie.id}`}>
                       <button
-                        className="w-10/12 flex justify-center mx-auto py-1 text-white bg-red-600 rounded-lg 
-                          hover:bg-red-700 transition duration-300"
+                        className={`${
+                          activeTab === 'upcoming' ? 'mt-5' : ''
+                        } flex justify-center mx-auto py-1 text-white w-10/12 bg-red-600 rounded-lg 
+        hover:bg-red-700 transition duration-300`}
                       >
                         Details
                       </button>

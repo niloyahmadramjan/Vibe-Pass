@@ -9,7 +9,7 @@ import {
 } from "react-icons/fi";
 import StatCard from "../components/StartCard";
 import UniversalTable from "../components/UniversalTable";
-// import AdminLoading from "../components/AdminLoading";
+import AdminLoading from '../components/AdminLoading';
 import Swal from "sweetalert2";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -56,7 +56,7 @@ export default function CouponsPage() {
     },
     onSuccess: () => {
       toast.success(editCoupon ? "🎉 Coupon updated successfully!" : "🎉 Coupon created successfully!");
-      queryClient.invalidateQueries(["coupons"]); 
+      queryClient.invalidateQueries(["coupons"]);
       closeModal();
     },
     onError: () => {
@@ -71,9 +71,9 @@ export default function CouponsPage() {
       await axiosSecure.delete(`/api/coupons/${id}`);
     },
     onSuccess: () => {
-      toast.success(  "Coupon delete successfully!");
+      toast.success("Coupon delete successfully!");
 
-      queryClient.invalidateQueries(["coupons"]); 
+      queryClient.invalidateQueries(["coupons"]);
     },
     onError: () => {
       Swal.fire("Error!", "Something went wrong.", "error");
@@ -81,7 +81,7 @@ export default function CouponsPage() {
   });
 
   const fetchCoupons = async () => {
- 
+
     queryClient.invalidateQueries(["coupons"]);
   };
 
@@ -182,7 +182,7 @@ export default function CouponsPage() {
           title="Total Coupons"
           value={stats.totalCoupons}
           icon={<FiTag />}
-          color="from-purple-500 to-pink-500"       />
+          color="from-purple-500 to-pink-500" />
         <StatCard
           title="Active Coupons"
           value={stats.activeCoupons}
@@ -203,7 +203,7 @@ export default function CouponsPage() {
         />
       </div>
 
-   
+
 
       {/* Content */}
       {coupons.length === 0 ? (
@@ -218,14 +218,14 @@ export default function CouponsPage() {
             Create Coupon
           </button>
         </div>
-      ) : 
-            <CouponsTable
+      ) :
+        <CouponsTable
           coupons={coupons}
           onEdit={openModal}
           onDelete={handleDelete}
           onCopy={copyToClipboard}
         />
-    }
+      }
 
       {/* Modal */}
       <AnimatePresence>

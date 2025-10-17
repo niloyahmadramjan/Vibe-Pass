@@ -20,14 +20,14 @@ axiosSecure.interceptors.request.use(
     // If not found, fallback to NextAuth session token
     if (!token) {
      const session = await getSession()
-     console.log(session.accessToken) 
+    //  console.log(session.accessToken) 
       if (session?.accessToken) {
         token = session.accessToken
       }
     }
 
     // Attach final token
-    if (token) {
+    if (token) { 
       config.headers.Authorization = `Bearer ${token}`
     }
 

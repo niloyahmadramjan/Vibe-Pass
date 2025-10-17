@@ -1,14 +1,14 @@
-
 'use client';
 import { useState } from 'react';
-import { FiUser, FiFilm, FiCalendar, FiClock,FiDollarSign, FiSearch, FiRefreshCw,FiCheckCircle, FiXCircle, FiEye, FiDownload, FiShoppingCart
+import {
+    FiUser, FiFilm, FiCalendar, FiClock, FiDollarSign, FiSearch, FiRefreshCw, FiCheckCircle, FiXCircle, FiEye, FiDownload, FiShoppingCart
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import AdminLoading from '../components/AdminLoading';
 import axiosSecure from '@/app/api/axiosHook/useAxiosSecure';
 import { FaTicketAlt } from 'react-icons/fa';
 import { useQuery } from '@tanstack/react-query';
-import TicketPDF from '../components/TicketPDF';
+
 
 export default function TicketManagement() {
     const [searchTerm, setSearchTerm] = useState('');
@@ -18,7 +18,7 @@ export default function TicketManagement() {
     const [selectedTicket, setSelectedTicket] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const ticketsPerPage = 10;
-    console.log(statusFilter)
+
     // Fetch tickets using React Query
     const { data: tickets = [], isLoading, error, refetch } = useQuery({
         queryKey: ['tickets'],
@@ -35,7 +35,7 @@ export default function TicketManagement() {
             }
         }
     });
-    console.log(tickets)
+
     // Filter tickets
     const filteredTickets = tickets.filter(ticket => {
         const matchesSearch =
@@ -93,9 +93,45 @@ export default function TicketManagement() {
     };
 
     // Download ticket as PDF
-    const handleDownloadTicket = (ticket) => {
-        TicketPDF.generatePDF(ticket);
-        toast.success(`Downloading ticket for ${ticket.userName}`);
+    const handleDownloadTicket = async (ticket) => {
+        try {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/generate-ticket-pdf`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        movieTitle: ticket.movieTitle,
+                        theaterName: ticket.theaterName,
+                        showDate: ticket.showDate,
+                        showTime: ticket.showTime,
+                        selectedSeats: ticket.selectedSeats,
+                        totalAmount: ticket.totalAmount,
+                        transactionId: ticket.transactionId,
+                        screen: ticket.screen,
+                        status: ticket.paymentStatus,
+                        userName: ticket.userName,
+                        userEmail: ticket.userEmail,
+                        bookingId: ticket.bookingId,
+                    }),
+                }
+            );
+
+            if (!response.ok) throw new Error("Failed to download PDF");
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `ticket-${ticket.bookingId || ticket.transactionId}.pdf`;
+            link.click();
+            window.URL.revokeObjectURL(url);
+
+            toast.success('Ticket downloaded successfully!');
+        } catch (error) {
+            console.error("Download failed:", error);
+            toast.error('Failed to download ticket');
+        }
     };
 
     // Format time
@@ -106,6 +142,24 @@ export default function TicketManagement() {
         const ampm = hour >= 12 ? 'PM' : 'AM';
         const formattedHour = hour % 12 || 12;
         return `${formattedHour}:${minutes} ${ampm}`;
+    };
+
+    // Improved pagination - show limited page numbers
+    const getVisiblePages = () => {
+        const visiblePages = 5; // Show max 5 page numbers
+        let startPage = Math.max(1, currentPage - Math.floor(visiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + visiblePages - 1);
+
+        // Adjust if we're near the end
+        if (endPage - startPage + 1 < visiblePages) {
+            startPage = Math.max(1, endPage - visiblePages + 1);
+        }
+
+        const pages = [];
+        for (let i = startPage; i <= endPage; i++) {
+            pages.push(i);
+        }
+        return pages;
     };
 
     if (isLoading) {
@@ -191,7 +245,7 @@ export default function TicketManagement() {
 
             {/* Filters */}
             <div className="bg-gradient-to-br from-gray-900 to-gray-900/55 rounded-2xl border border-gray-700 p-6 shadow-2xl mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Search */}
                     <div className="relative">
                         <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -214,7 +268,6 @@ export default function TicketManagement() {
                         <option value="paid">Paid</option>
                         <option value="unpaid">Unpaid</option>
                         <option value="cancelled">Cancelled</option>
-
                     </select>
 
                     {/* Date Filter */}
@@ -226,18 +279,7 @@ export default function TicketManagement() {
                     />
 
                     {/* Reset Filters */}
-                    <button
-                        onClick={() => {
-                            setSearchTerm('');
-                            setStatusFilter('all');
-                            setSelectedDate('');
-                            setCurrentPage(1);
-                        }}
-                        className="px-4 py-3 bg-gray-700 hover:bg-gray-600 border border-gray-600 rounded-xl text-white transition-colors flex items-center justify-center gap-2"
-                    >
-                        <FiRefreshCw />
-                        Reset Filters
-                    </button>
+                   
                 </div>
             </div>
 
@@ -332,36 +374,71 @@ export default function TicketManagement() {
                 )}
             </div>
 
-            {/* Pagination */}
+            {/* Improved Pagination */}
             {totalPages > 1 && (
-                <div className="flex justify-center items-center gap-4">
+                <div className="flex justify-center items-center gap-2 flex-wrap">
                     <button
                         onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                         disabled={currentPage === 1}
-                        className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:text-gray-500 rounded-xl text-white transition-colors"
+                        className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:text-gray-500 rounded-xl text-white transition-colors flex items-center gap-2"
                     >
                         Previous
                     </button>
 
-                    <div className="flex gap-2">
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                    {/* Show first page if not in visible range */}
+                    {currentPage > 3 && (
+                        <>
                             <button
-                                key={page}
-                                onClick={() => setCurrentPage(page)}
-                                className={`px-4 py-2 rounded-xl transition-colors ${currentPage === page
+                                onClick={() => setCurrentPage(1)}
+                                className={`px-4 py-2 rounded-xl transition-colors ${1 === currentPage
                                     ? 'bg-purple-600 text-white'
                                     : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                                     }`}
                             >
-                                {page}
+                                1
                             </button>
-                        ))}
-                    </div>
+                            {currentPage > 4 && (
+                                <span className="px-2 text-gray-400">...</span>
+                            )}
+                        </>
+                    )}
+
+                    {/* Visible page numbers */}
+                    {getVisiblePages().map(page => (
+                        <button
+                            key={page}
+                            onClick={() => setCurrentPage(page)}
+                            className={`px-4 py-2 rounded-xl transition-colors ${page === currentPage
+                                ? 'bg-purple-600 text-white'
+                                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                }`}
+                        >
+                            {page}
+                        </button>
+                    ))}
+
+                    {/* Show last page if not in visible range */}
+                    {currentPage < totalPages - 2 && (
+                        <>
+                            {currentPage < totalPages - 3 && (
+                                <span className="px-2 text-gray-400">...</span>
+                            )}
+                            <button
+                                onClick={() => setCurrentPage(totalPages)}
+                                className={`px-4 py-2 rounded-xl transition-colors ${totalPages === currentPage
+                                    ? 'bg-purple-600 text-white'
+                                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                    }`}
+                            >
+                                {totalPages}
+                            </button>
+                        </>
+                    )}
 
                     <button
                         onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                         disabled={currentPage === totalPages}
-                        className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:text-gray-500 rounded-xl text-white transition-colors"
+                        className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:text-gray-500 rounded-xl text-white transition-colors flex items-center gap-2"
                     >
                         Next
                     </button>

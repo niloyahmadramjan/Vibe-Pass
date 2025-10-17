@@ -2,7 +2,8 @@
 
 import axiosSecure from '@/app/api/axiosHook/useAxiosSecure';
 import React, { useEffect, useState } from 'react';
-import {FiSearch,FiDownload,FiClock, FiUser, FiDollarSign, FiCheckCircle, FiXCircle, FiAlertCircle, FiBarChart2, FiCalendar, FiTrash2,FiEye,FiChevronLeft,
+import {
+  FiSearch, FiDownload, FiClock, FiUser, FiDollarSign, FiCheckCircle, FiXCircle, FiAlertCircle, FiBarChart2, FiCalendar, FiTrash2, FiEye, FiChevronLeft,
   FiChevronRight
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -358,17 +359,7 @@ export default function BookingsPage() {
                   <option value="month">Last Month</option>
                 </select>
 
-                {/* Items Per Page */}
-                <select
-                  value={itemsPerPage}
-                  onChange={(e) => setItemsPerPage(Number(e.target.value))}
-                  className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="5">5 per page</option>
-                  <option value="10">10 per page</option>
-                  <option value="20">20 per page</option>
-                  <option value="50">50 per page</option>
-                </select>
+                {/* Items Per Page */}      
               </div>
 
               <div className="flex items-center gap-3">
@@ -398,7 +389,7 @@ export default function BookingsPage() {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-6 p-4 rounded-xl border border-gray-800">
-         
+
           <div className="flex items-center gap-2">
             <button
               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
@@ -419,8 +410,8 @@ export default function BookingsPage() {
                     key={page}
                     onClick={() => setCurrentPage(page)}
                     className={`px-3 py-2 rounded-lg transition-colors ${currentPage === page
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                       }`}
                   >
                     {page}
@@ -583,7 +574,7 @@ function BookingModal({ booking, onClose, onUpdateStatus, getStatusColor, getSta
             </div>
           </div>
 
-   
+
         </div>
       </motion.div>
     </motion.div>

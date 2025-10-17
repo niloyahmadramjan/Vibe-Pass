@@ -6,13 +6,13 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, Pagination } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/pagination'
-import axiosSecure from '../api/axiosHook/useAxiosSecure'
+import axiosPublic from '../api/axiosHook/useAxiosPublic'
 
 export default function HeroSection() {
   const [movies, setMovies] = useState([])
   const [trailerKey, setTrailerKey] = useState(null)
   const router = useRouter()
-  const [trailerUrl, setTrailerUrl] = useState("")
+  const [trailerUrl, setTrailerUrl] = useState('')
 
   // const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY
   // const url = 'https://image.tmdb.org/t/p/w500'
@@ -20,10 +20,10 @@ export default function HeroSection() {
   useEffect(() => {
     async function fetchMovies() {
       try {
-        // 🔹 Use axiosSecure to call your backend API
+        // 🔹 Use axiosPublic to call your backend API
         const [hollywoodRes, bollywoodRes] = await Promise.all([
-          axiosSecure.get("/api/movies/category/trending"),
-          axiosSecure.get("/api/movies/category/genreAction"),
+          axiosPublic.get('/api/movies/category/trending'),
+          axiosPublic.get('/api/movies/category/genreAction'),
         ])
 
         const hollywoodData = hollywoodRes.data
@@ -36,51 +36,51 @@ export default function HeroSection() {
         ].filter((m) => m.backdrop_path)
 
         // Remove duplicates by id
-        const unique = Array.from(new Map(merged.map((m) => [m.id, m])).values())
+        const unique = Array.from(
+          new Map(merged.map((m) => [m.id, m])).values()
+        )
 
         // Pick top movies for hero section
         setMovies(unique.slice(9, 25))
       } catch (err) {
-        console.error("Error fetching movies:", err)
+        console.error('Error fetching movies:', err)
       }
     }
     fetchMovies()
   }, [])
 
-
-
-
   const fetchTrailer = async (tmdbId) => {
     try {
-      console.log("🎥 Fetching trailer for TMDB ID:", tmdbId);
+      console.log('🎥 Fetching trailer for TMDB ID:', tmdbId)
 
       // ✅ Call your backend API
-      const res = await axiosSecure.get(`/api/movies/${tmdbId}/videos`);
+      const res = await axiosPublic.get(`/api/movies/${tmdbId}/videos`)
 
       if (res.status === 200) {
-        const results = res.data.results;
+        const results = res.data.results
 
         const trailer = results.find(
-          (v) => v.type === "Trailer" && v.site === "YouTube"
-        );
+          (v) => v.type === 'Trailer' && v.site === 'YouTube'
+        )
 
         if (trailer) {
-          setTrailerUrl(`https://www.youtube.com/embed/${trailer.key}?autoplay=1`);
-          setTrailerKey(true);
+          setTrailerUrl(
+            `https://www.youtube.com/embed/${trailer.key}?autoplay=1`
+          )
+          setTrailerKey(true)
         } else {
-          alert("Trailer not available!");
+          alert('Trailer not available!')
         }
       } else {
-        console.error("Failed to fetch trailer: Status", res.status);
+        console.error('Failed to fetch trailer: Status', res.status)
       }
     } catch (error) {
-      console.error("🎬 Failed to fetch trailer:", error);
+      console.error('🎬 Failed to fetch trailer:', error)
     }
-  };
-
+  }
 
   return (
-    <section className="w-full h-[44vh] lg:h-[80vh] relative mb-5 md:mb-10 pt-16 md:pt-0">
+    <section className="w-full h-[44vh] lg:h-[80vh] relative mb-7 md:mb-10 pt-16 md:pt-0">
       <Swiper
         modules={[Autoplay, Pagination]}
         autoplay={{
@@ -90,17 +90,18 @@ export default function HeroSection() {
         }}
         pagination={{ clickable: true }}
         loop={true}
-        className="w-full h-full custom-swiper">
+        className="w-full h-full custom-swiper"
+      >
         {movies.map((movie) => (
           <SwiperSlide key={movie.id}>
             <div
               className="w-full h-[40vh] lg:h-[100vh] bg-cover bg-center relative flex items-center"
               style={{
                 backgroundImage: movie.backdrop_path
-                  ? movie.backdrop_path.startsWith("http")
+                  ? movie.backdrop_path.startsWith('http')
                     ? `url(${movie.backdrop_path})` // full URL (like i.ibb.co)
                     : `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})` // TMDB path
-                  : "url(/fallback-banner.jpg)", // optional fallback
+                  : 'url(/fallback-banner.jpg)', // optional fallback
               }}
             >
               <div className="absolute inset-0 bg-[linear-gradient(to_top,black_0%,black_30%,rgba(0,0,0,0.8)_40%,rgba(0,0,0,0.3)_50%)]"></div>
@@ -125,7 +126,7 @@ export default function HeroSection() {
                         onClick={() => router.push(`/movies/${movie.id}`)}
                         className=" px-2 lg:px-5 py-1 lg:py-3  rounded-lg bg-red-600 hover:bg-red-700 transition"
                       >
-                        Book Now
+                        Details
                       </button>
                     </div>
                   </div>

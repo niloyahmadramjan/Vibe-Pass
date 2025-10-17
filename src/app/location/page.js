@@ -4,21 +4,18 @@ import { useState, useEffect, useRef } from 'react'
 import { FaMapMarkerAlt, FaChevronDown, FaSearchLocation } from 'react-icons/fa'
 import SeatMap from '../components/SeatMap'
 import { locations } from '../lib/locations'
-import Swal from 'sweetalert2'
 
 export default function LocationPage() {
   const [selectedDivision, setSelectedDivision] = useState('')
   const [selectedDistrict, setSelectedDistrict] = useState('')
   const [districts, setDistricts] = useState([])
   const [selectedLocation, setSelectedLocation] = useState(null)
-  const [selectedCinema, setSelectedCinema] = useState(null) // ✅ নতুন state
-  const [isLoading, setIsLoading] = useState(false)
+  const [selectedCinema, setSelectedCinema] = useState(null)
 
   const mapRef = useRef(null)
 
   const uniqueDivisions = [...new Set(locations.map((loc) => loc.region))]
 
-  // যখন Division select হবে তখন districts আপডেট হবে
   useEffect(() => {
     if (selectedDivision) {
       const filteredDistricts = locations
@@ -35,7 +32,7 @@ export default function LocationPage() {
     }
   }, [selectedDivision])
 
-  // District change হলে location আপডেট হবে
+ 
   useEffect(() => {
     if (selectedDistrict && selectedDivision) {
       const loc = locations.find(
@@ -43,48 +40,21 @@ export default function LocationPage() {
       )
       setSelectedLocation(loc || null)
       setSelectedCinema(null)
+
+      if (loc && mapRef.current?.flyTo) {
+        mapRef.current.flyTo([loc.latitude, loc.longitude], 10, {
+          duration: 2,
+        })
+      }
     } else {
       setSelectedLocation(null)
       setSelectedCinema(null)
     }
   }, [selectedDistrict, selectedDivision])
 
-  // Location এ zoom
-  const handleFindCinemas = () => {
-    if (selectedLocation && mapRef.current) {
-      setIsLoading(true)
-
-      setTimeout(() => {
-        mapRef.current?.scrollIntoView({ behavior: 'smooth' })
-      }, 100)
-
-      setTimeout(() => {
-        if (mapRef.current.flyTo) {
-          mapRef.current.flyTo(
-            [selectedLocation.latitude, selectedLocation.longitude],
-            10,
-            { duration: 2 }
-          )
-        }
-        setIsLoading(false)
-
-        Swal.fire({
-          icon: 'success',
-          title: 'Cinemas Found!',
-          text: `Now viewing cinemas in ${selectedLocation.district}, ${selectedLocation.region}`,
-          confirmButtonText: 'OK',
-          confirmButtonColor: '#3085d6',
-          background: '#1e1e1e',
-          color: '#fff',
-        })
-      }, 500)
-    }
-  }
-
-  // ✅ Cinema select করলে শুধু ওইটা দেখাবে
+  
   const handleSelectCinema = (cinema) => {
     setSelectedCinema(cinema)
-
     if (mapRef.current && selectedLocation) {
       mapRef.current.flyTo(
         [selectedLocation.latitude, selectedLocation.longitude],
@@ -100,17 +70,16 @@ export default function LocationPage() {
         {/* Header */}
         <div className="text-center mb-10">
           <h1 className="text-4xl font-bold text-white mb-3">
-            Find Cinemas And Setup Your Location
+            Find Cinemas By Location
           </h1>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-            Select your division and district to discover cinema locations and
-            zoom to them on the map
+            Select your division and district to view all nearby cinema halls.
           </p>
         </div>
 
         {/* Division + District Select */}
         <div className="rounded-2xl shadow-xl p-6 mb-8 border border-gray-700 bg-transparent">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
             {/* Division */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -165,21 +134,10 @@ export default function LocationPage() {
                 </div>
               </div>
             </div>
-
-            {/* Button */}
-            <div>
-              <button
-                onClick={handleFindCinemas}
-                disabled={!selectedLocation || isLoading}
-                className="w-full bg-[#E50914] disabled:bg-[#7a3d3f] text-white py-3 px-6 rounded-lg font-medium"
-              >
-                {isLoading ? 'Loading...' : 'Set Your Location'}
-              </button>
-            </div>
           </div>
         </div>
 
-        {/* Cinemas */}
+        {/* Cinemas auto-show */}
         {selectedLocation && (
           <div className="rounded-2xl shadow-md p-6 mb-8 border border-gray-700 bg-transparent">
             <h2 className="text-2xl font-semibold text-white mb-6 pb-2 border-b border-gray-700 flex items-center gap-2">
@@ -205,11 +163,6 @@ export default function LocationPage() {
                     <p className="text-sm text-gray-400">
                       {selectedLocation.district}
                     </p>
-                    {selectedCinema === cinema && (
-                      <button className="bg-red-600 text-white py-2 rounded-md mt-2 hover:bg-red-700 transition">
-                        Book Now
-                      </button>
-                    )}
                   </div>
                 </div>
               ))}
@@ -222,7 +175,7 @@ export default function LocationPage() {
           <SeatMap
             locations={locations}
             selectedLocation={selectedLocation}
-            selectedCinema={selectedCinema} 
+            selectedCinema={selectedCinema}
             mapRef={mapRef}
           />
         </div>

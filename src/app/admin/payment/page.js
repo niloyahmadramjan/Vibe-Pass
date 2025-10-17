@@ -51,7 +51,7 @@ export default function PaymentsPage() {
                 day: item.name,
                 amount: item.revenue
             })));
-;
+            ;
             // setRevenueData(chartData);
 
         } catch (error) {
@@ -266,8 +266,8 @@ export default function PaymentsPage() {
                 <button
                     onClick={() => setActiveTab('today')}
                     className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center gap-2 ${activeTab === 'today'
-                            ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25'
-                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25'
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                         }`}
                 >
                     <FiCalendar className="text-lg" />
@@ -276,8 +276,8 @@ export default function PaymentsPage() {
                 <button
                     onClick={() => setActiveTab('weekly')}
                     className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center gap-2 ${activeTab === 'weekly'
-                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
-                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                         }`}
                 >
                     <FiBarChart2 className="text-lg" />
@@ -334,8 +334,8 @@ export default function PaymentsPage() {
                                     {recentPayments.length} transactions
                                 </span>
                                 <span className={`px-2 py-1 rounded-full text-xs font-semibold ${activeTab === 'today'
-                                        ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                                        : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                                    ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                                    : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
                                     }`}>
                                     {activeTab === 'today' ? 'TODAY' : 'THIS WEEK'}
                                 </span>
@@ -435,8 +435,8 @@ export default function PaymentsPage() {
                                     }`}>
                                     <div className="flex items-center gap-3">
                                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${activeTab === 'today'
-                                                ? 'bg-green-500/20'
-                                                : 'bg-blue-500/20'
+                                            ? 'bg-green-500/20'
+                                            : 'bg-blue-500/20'
                                             }`}>
                                             <FiDollarSign className={
                                                 activeTab === 'today' ? 'text-green-400' : 'text-blue-400'
