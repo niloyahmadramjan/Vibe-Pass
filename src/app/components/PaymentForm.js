@@ -103,13 +103,13 @@ export default function PaymentForm({ session }) {
         const data = await res.json();
         // Update booking
         await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/bookings/${session._id}`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/ticket/bookings/${session._id}`,
           {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ status: "paid" }),
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'paid' }),
           }
-        );
+        )
         Swal.fire({
           icon: "success",
           title: "Payment Successful ",

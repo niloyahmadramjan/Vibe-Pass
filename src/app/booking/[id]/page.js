@@ -356,42 +356,41 @@ console.log(id)
   }
 
   // ✅ Confirm booking
-  const confirmBooking = async () => {
-    try {
-      setShowBookingConfirm(false)
-      const bookingPayload = {
-        movieId: id,
-        movieTitle: movieData.title,
-        theaterName: theaterName,
-        showId: selectedTime?.id,
-        showDate: selectedDate,
-        showTime: selectedTime?.time,
-        screen: 'Screen 1',
-        selectedSeats,
-        totalAmount: totalPrice,
-        userId: user?.id,
-        userName: user?.name || 'User',
-        userEmail: user?.email,
-      }
-
-      const response = await axiosSecure.post(
-        '/api/ticket/booking',
-        bookingPayload
-      )
-      setBookingData(response.data.booking)
-      setBookingSuccess(true)
-      toast.success('Booking confirmed successfully!')
-
-      setTimeout(() => {
-        setSelectedSeats([])
-      }, 2000)
-    } catch (error) {
-      console.error('Booking error:', error)
-      toast.error(
-        error.response?.data?.error || 'Server error while saving booking'
-      )
+// ✅ Updated confirmBooking with coupon support
+const confirmBooking = async (couponData) => {
+  try {
+    setShowBookingConfirm(false)
+    const bookingPayload = {
+      movieId: id,
+      movieTitle: movieData.title,
+      theaterName: theaterName,
+      showId: selectedTime?.id,
+      showDate: selectedDate,
+      showTime: selectedTime?.time,
+      screen: 'Screen 1',
+      selectedSeats,
+      totalAmount: couponData?.finalPrice || totalPrice, // ✅ Use discounted price
+      originalAmount: totalPrice, // ✅ Store original
+      appliedCoupon: couponData?.appliedCoupon || null, // ✅ Store coupon
+      discount: couponData?.discount || 0, // ✅ Store discount
+      userId: user?.id,
+      userName: user?.name || 'User',
+      userEmail: user?.email,
     }
+
+    const response = await axiosSecure.post('/api/ticket/booking', bookingPayload)
+    setBookingData(response.data.booking)
+    setBookingSuccess(true)
+    toast.success('Booking confirmed successfully!')
+    
+    setTimeout(() => {
+      setSelectedSeats([])
+    }, 2000)
+  } catch (error) {
+    console.error('Booking error:', error)
+    toast.error(error.response?.data?.error || 'Server error while saving booking')
   }
+}
 
   // ✅ NEW: Handle payment method selection
   const handlePaymentMethodSelect = (paymentMethod) => {

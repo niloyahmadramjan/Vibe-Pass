@@ -137,8 +137,8 @@ export default function Navbar() {
             </div>
 
             {/* Right - Auth (desktop) */}
-            <div className="hidden lg:flex items-center">
-              {status === "loading" ? (
+            <div className="hidden xl:flex items-center">
+              {status === 'loading' ? (
                 <div className="animate-spin h-6 w-6 rounded-full border-2 border-red-500 border-t-transparent"></div>
               ) : user ? (
                 <div className="flex items-center gap-3 relative group">
