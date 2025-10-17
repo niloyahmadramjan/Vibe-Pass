@@ -60,6 +60,7 @@ export default function CouponsPage() {
       closeModal();
     },
     onError: () => {
+      console.error("Save Coupon Error:", error.response?.data || error.message);
       toast.error("❌ Error saving coupon");
     },
   });
@@ -152,7 +153,7 @@ export default function CouponsPage() {
     totalDiscount: coupons.reduce((sum, c) => sum + (c.discountValue || 0), 0)
   };
 
-  if (isLoading || loading) return <AdminLoading />;
+  // if (isLoading || loading) return <AdminLoading />;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-6">
