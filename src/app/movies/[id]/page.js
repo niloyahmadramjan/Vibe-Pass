@@ -6,6 +6,7 @@ import AllTheatersLocation from '@/app/location/AllTheatersLocation'
 import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 
 export default function MovieDetailsPage() {
   const params = useParams()
@@ -19,13 +20,19 @@ export default function MovieDetailsPage() {
   const [nearbyTheaters, setNearbyTheaters] = useState([])
   const [selectedCinema, setSelectedCinema] = useState(null)
   const [selectionMode, setSelectionMode] = useState('auto')
-  
+
   const [showTrailer, setShowTrailer] = useState(false);
   const [trailerUrl, setTrailerUrl] = useState("");
   const router = useRouter()
   const IMG_URL = "https://image.tmdb.org/t/p/w500";
   // Fetch Hall Data
+// popularity...................convate 1k 1M 
 
+  const formatPopularity = (num) => {
+    if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + 'M';
+    if (num >= 1_000) return (num / 1_000).toFixed(1) + 'K';
+    return num.toFixed(1);
+  };
 
   useEffect(() => {
     const fetchHallData = async () => {
@@ -100,7 +107,7 @@ export default function MovieDetailsPage() {
 
 
   const fetchTrailer = async (id) => {
-    console.log("id",id)
+    console.log("id", id)
     try {
       console.log("🎥 Fetching trailer for TMDB ID:", id);
       const res = await axiosPublic.get(`/api/movies/${id}/videos`);
@@ -115,42 +122,56 @@ export default function MovieDetailsPage() {
           setTrailerUrl(`https://www.youtube.com/embed/${trailer.key}?autoplay=1`);
           setShowTrailer(true);
         } else {
-          alert("Trailer not available!");
+          toast.error("Trailer not available!")
         }
       } else {
         console.error("Failed to fetch trailer: Status", res.status);
       }
     } catch (error) {
-      console.error("🎬 Failed to fetch trailer:", error);
+      console.error(" Failed to fetch trailer:", error);
     }
   };
+  
 
   if (loading) return <LoadingSpinner />
   if (!movie)
     return (
       <div className="p-6 text-center text-red-500 bg-gray-900 min-h-screen">
-         Movie not found!
+        Movie not found!
       </div>
     )
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white">
       {/* Enhanced Banner */}
-      <div className="relative w-full h-96 sm:h-80 md:h-96 lg:h-[500px] xl:h-[600px] overflow-hidden">
-        <Image
+      <div className="w-full h-[40vh] lg:h-[100vh] bg-cover bg-center relative flex items-center"
+      
+        style={{
+          backgroundImage: movie.poster_path
+            ? movie.poster_path.startsWith("http")
+              ? `url(${movie.poster_path})` // full URL (like i.ibb.co)
+              : `url(https://image.tmdb.org/t/p/original${movie.poster_path})` // TMDB path
+            : "url(/fallback-banner.jpg)", // optional fallback
+        }}>
+        {/* <Image
           fill
           src={
             typeof movie.poster_path === "string" && movie.poster_path.startsWith("http")
               ? movie.poster_path // full URL (like i.ibb.co)
               : IMG_URL + movie.poster_path // TMDB partial path
           }
-         
-          
+
+
           alt={movie.title}
           className="object-cover w-full h-full"
           priority
           sizes="(max-width: 640px) 100vw, (max-width: 768px) 100vw, (max-width: 1024px) 100vw, 100vw"
-        />
+        /> */}
+
+
+          
+             
+        
 
         {/* Enhanced Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/70 to-transparent" />
@@ -261,23 +282,23 @@ export default function MovieDetailsPage() {
 
             {/* Action Buttons - Responsive */}
             <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4 pt-3 sm:pt-4">
-         
-                <button
-                onClick={() => fetchTrailer(movie.id )}
-                  className="px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 rounded-lg bg-red-600 hover:bg-red-700 transition-all duration-300 hover:scale-105 flex items-center gap-2 shadow-lg text-sm sm:text-base whitespace-nowrap"
-                >
-                  <svg
-                    className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                  Watch Trailer
-                </button>
-          
 
-              <button className="px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 rounded-lg bg-gray-700 hover:bg-gray-600 transition-all duration-300 hover:scale-105 flex items-center gap-2 shadow-lg text-sm sm:text-base whitespace-nowrap">
+              <button
+                onClick={() => fetchTrailer(movie.id)}
+                className="px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 rounded-lg bg-red-600 hover:bg-red-700 transition-all duration-300 hover:scale-105 flex items-center gap-2 shadow-lg text-sm sm:text-base whitespace-nowrap"
+              >
+                <svg
+                  className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+                Watch Trailer
+              </button>
+
+
+              {/* <button className="px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 rounded-lg bg-gray-700 hover:bg-gray-600 transition-all duration-300 hover:scale-105 flex items-center gap-2 shadow-lg text-sm sm:text-base whitespace-nowrap">
                 <svg
                   className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
                   fill="none"
@@ -292,7 +313,7 @@ export default function MovieDetailsPage() {
                   />
                 </svg>
                 Watchlist
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
@@ -366,19 +387,19 @@ export default function MovieDetailsPage() {
                   </div>
                   <div>
                     <h3 className="text-red-400 font-semibold mb-1 sm:mb-2 text-sm sm:text-base">
-                      Status
+                    Orginal Language
                     </h3>
                     <p className="text-white font-medium text-base sm:text-lg">
-                      {movie.status}
+                      {movie.original_title}
                     </p>
                   </div>
                   <div>
                     <h3 className="text-red-400 font-semibold mb-1 sm:mb-2 text-sm sm:text-base">
-                      Budget
+                      Vote
                     </h3>
                     <p className="text-white font-medium text-base sm:text-lg">
-                      {movie.budget
-                        ? `$${movie.budget.toLocaleString()}`
+                      {movie.vote_count
+                        ? `${movie.vote_count}`
                         : 'Not available'}
                     </p>
                   </div>
@@ -386,25 +407,18 @@ export default function MovieDetailsPage() {
                 <div className="space-y-3 sm:space-y-4">
                   <div>
                     <h3 className="text-red-400 font-semibold mb-1 sm:mb-2 text-sm sm:text-base">
-                      Production
+                      Popularity
                     </h3>
-                    <p className="text-white font-medium text-base sm:text-lg line-clamp-2">
-                      {movie.production_companies
-                        ?.slice(0, 2)
-                        .map((pc) => pc.name)
-                        .join(', ') || 'Not available'}
-                      {movie.production_companies?.length > 2 && '...'}
+                    <p className="text-white font-medium text-base sm:text-lg">
+                      {movie.popularity ? formatPopularity(movie.popularity) : 'Not available'}
                     </p>
                   </div>
                   <div>
                     <h3 className="text-red-400 font-semibold mb-1 sm:mb-2 text-sm sm:text-base">
-                      Top Cast
+                      Vote Avarage
                     </h3>
                     <p className="text-white font-medium text-base sm:text-lg line-clamp-2">
-                      {movie.credits?.cast
-                        ?.slice(0, 3)
-                        .map((actor) => actor.name)
-                        .join(', ') || 'Not available'}
+                      {movie?.vote_average}
                     </p>
                   </div>
                 </div>
@@ -448,8 +462,8 @@ export default function MovieDetailsPage() {
                   <button
                     onClick={() => setSelectionMode("auto")}
                     className={`flex-1 py-2 px-2 sm:px-3 rounded-md font-semibold transition-all text-xs sm:text-sm ${selectionMode === "auto"
-                        ? "bg-red-600 text-white shadow-lg"
-                        : "text-gray-400 hover:text-white"
+                      ? "bg-red-600 text-white shadow-lg"
+                      : "text-gray-400 hover:text-white"
                       }`}
                   >
                     Auto
@@ -457,8 +471,8 @@ export default function MovieDetailsPage() {
                   <button
                     onClick={() => setSelectionMode("manual")}
                     className={`flex-1 py-2 px-2 sm:px-3 rounded-md font-semibold transition-all text-xs sm:text-sm ${selectionMode === "manual"
-                        ? "bg-red-600 text-white shadow-lg"
-                        : "text-gray-400 hover:text-white"
+                      ? "bg-red-600 text-white shadow-lg"
+                      : "text-gray-400 hover:text-white"
                       }`}
                   >
                     Manual
@@ -530,8 +544,8 @@ export default function MovieDetailsPage() {
           )}
 
 
-         
-        
+
+
 
         </div>
       </div>

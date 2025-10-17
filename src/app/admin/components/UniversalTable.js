@@ -3,7 +3,7 @@
 
 import { motion } from 'framer-motion';
 import { FiCalendar, FiClock, FiDollarSign, } from "react-icons/fi";
-import AdminLoading from './AdminLoading';
+import AdminLoading from '../components/AdminLoading';
 
 export default function UniversalTable({
     data = [],

@@ -19,12 +19,12 @@ import {
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import axiosSecure from '@/app/api/axiosHook/useAxiosSecure'
-import AdminLoading from '../components/AdminLoading'
 import StatCard from '../components/StartCard'
 import Image from 'next/image'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'  // ✅ must be this exact lin
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import AdminLoading from '../components/AdminLoading'
 
 export default function UserManagementPage() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -393,7 +393,7 @@ export default function UserManagementPage() {
             className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
           >
             <FiDownload size={18} />
-            All user 
+            All user
           </button>
         </div>
       </div>
@@ -715,8 +715,8 @@ function EditUserModal({ user, onClose, onSave, loading }) {
                 type="button"
                 onClick={toggleRole}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${formData.role === 'admin'
-                    ? 'bg-purple-600'
-                    : 'bg-gray-600'
+                  ? 'bg-purple-600'
+                  : 'bg-gray-600'
                   }`}
               >
                 <span
