@@ -44,7 +44,7 @@ const ProfilePage = () => {
         setUserData(response.data);
       } catch (err) {
         console.error("Failed to fetch user data:", err);
-        toast.error("Failed to load user data ❌");
+        toast.error("Failed to load user data ");
       } finally {
         setLoading(false);
       }
@@ -83,10 +83,10 @@ const ProfilePage = () => {
       );
 
       setUserData((prev) => ({ ...prev, image: response.data.imageUrl }));
-      toast.success("Profile image updated successfully ✅");
+      toast.success("Profile image updated successfully ");
     } catch (err) {
       console.error("Image upload failed:", err);
-      toast.error("Failed to update profile image ❌");
+      toast.error("Failed to update profile image ");
     } finally {
       setLoading(false);
     }
@@ -106,7 +106,7 @@ const ProfilePage = () => {
       setShowModal(null);
     } catch (err) {
       console.error("Mobile update failed:", err);
-      toast.error("Failed to update mobile ❌");
+      toast.error("Failed to update mobile ");
     } finally {
       setLoading(false);
     }
@@ -576,7 +576,7 @@ const ProfilePage = () => {
                 >
                   {loading ? (
                     <span className="flex items-center justify-center">
-                      <LoadingSpinner size="h-5 w-5" /> Updating...
+                      Updating...
                     </span>
                   ) : (
                     "Update"
@@ -599,7 +599,7 @@ const ProfilePage = () => {
                 >
                   {loading ? (
                     <span className="flex items-center justify-center">
-                      <LoadingSpinner size="h-5 w-5" /> Sending...
+                     ending...
                     </span>
                   ) : (
                     "Send Verification Email"
@@ -675,7 +675,7 @@ const ProfilePage = () => {
                 >
                   {loading ? (
                     <span className="flex items-center justify-center">
-                      <LoadingSpinner size="h-5 w-5" /> Saving...
+                     Saving...
                     </span>
                   ) : (
                     "Save"
@@ -722,7 +722,7 @@ const ProfilePage = () => {
                 >
                   {loading ? (
                     <span className="flex items-center justify-center">
-                      <LoadingSpinner size="h-5 w-5" /> Saving...
+                      Saving...
                     </span>
                   ) : (
                     "Save"
@@ -765,7 +765,7 @@ const ProfilePage = () => {
                 >
                   {loading ? (
                     <span className="flex items-center justify-center">
-                      <LoadingSpinner size="h-5 w-5" /> Updating...
+                      Updating...
                     </span>
                   ) : (
                     "Update PIN"
@@ -798,7 +798,7 @@ const ProfilePage = () => {
                 >
                   {loading ? (
                     <span className="flex items-center justify-center">
-                      <LoadingSpinner size="h-5 w-5" /> Sending...
+                      Sending...
                     </span>
                   ) : (
                     "Send Request"
@@ -858,7 +858,7 @@ const ProfilePage = () => {
                   >
                     {loading ? (
                       <span className="flex items-center justify-center">
-                        <LoadingSpinner size="h-5 w-5" /> Uploading...
+                        Uploading...
                       </span>
                     ) : (
                       "Upload Image"
