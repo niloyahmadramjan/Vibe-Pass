@@ -7,13 +7,12 @@ const axiosPublic = axios.create({
   },
 })
 
-// Optional: basic error handler
 axiosPublic.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    console.error('Public API Error:', error.response?.data || error.message)
-    return Promise.reject(error)
+  (res) => res,
+  (err) => {
+    console.error('Public API Error:', err.response?.data || err.message)
+    return Promise.reject(err)
   }
 )
 
-export default axiosPublic
+export default axiosPublic 

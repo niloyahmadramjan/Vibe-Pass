@@ -19,13 +19,15 @@ export const AuthProvider = ({ children }) => {
 
     // ✅ Case 1: NextAuth social login
     if (session?.user) {
-      setUser({
-        name: session.user.name,
-        email: session.user.email,
-        image: session.user.image,
-        provider: 'social',
-      })
-      setLoading(false)
+      axiosSecure
+        .get('/api/user/info') // backend theke fresh data
+        .then((res) => {
+          setUser(res.data)
+        })
+        .catch(() => {
+          logout()
+        })
+        .finally(() => setLoading(false))
     } else {
       // ✅ Case 2: Custom JWT login
       const token = localStorage.getItem('token')
@@ -54,7 +56,7 @@ export const AuthProvider = ({ children }) => {
       setUser(res.data)
     } catch (error) {
       console.error('Failed to fetch user after login:', error)
-      setUser(null)
+      setUser(null) 
     }
   }
 
