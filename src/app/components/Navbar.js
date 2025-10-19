@@ -522,7 +522,7 @@ export default function Navbar() {
             ) : (
               <Link
                 href="/login"
-                className="w-full flex items-center justify-center px-4 py-2 rounded-md font-bold bg-red-600 hover:bg-red-700 text-white transition-colors duration-200"
+                className="w-full flex items-center justify-center px-4 py-2 rounded-md font-bold bg-red-600 hover:bg-red-700 !text-white transition-colors duration-200"
                 onClick={() => setOpen(false)}
               >
                 <FiUser className="mr-2" /> Login
