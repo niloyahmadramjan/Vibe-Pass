@@ -1,4 +1,4 @@
-// components/UserChatModal.jsx
+
 'use client'
 
 import { useEffect, useState, useRef } from 'react';
@@ -6,11 +6,11 @@ import { io } from 'socket.io-client';
 import { useAuth } from '@/app/context/AuthContext';
 import axiosSecure from '@/app/api/axiosHook/useAxiosSecure';
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000';
+const SOCKET_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 const SPECIFIC_ADMIN_ID = '68e53b9752ef9ea3f4aa5566';
 const SPECIFIC_ADMIN_NAME = 'Support Team';
 
-export default function UserChatModal({ isOpen, onClose }) {
+export default function AdminChat({ isOpen, onClose }) {
     const { user } = useAuth();
     const [socket, setSocket] = useState(null);
     const [text, setText] = useState('');
@@ -168,14 +168,14 @@ export default function UserChatModal({ isOpen, onClose }) {
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center md:items-end  justify-end p-4 bg-black/50 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center md:justify-end md:items-end p-4 bg-black/50 backdrop-blur-sm"
             onClick={handleBackdropClick}
         >
-            {/* Modal Container - Small height, positioned on right side */}
-            <div className="bg-gradient-to-b from-gray-900 to-gray-800 rounded-2xl border border-gray-700/50 shadow-2xl w-full max-w-md h-96 flex flex-col transform transition-all duration-300 ">
+            {/* Modal Container */}
+            <div className="bg-gradient-to-b from-gray-900 to-gray-800 rounded-2xl border border-gray-700/50 shadow-2xl  w-full max-w-lg h-[500px] flex flex-col">
 
                 {/* Modal Header with Close Button */}
-                <div className="p-4 border-b border-gray-700/50 bg-gradient-to-r from-blue-600/20 to-purple-600/20 flex items-center justify-between">
+                <div className="p-4 border-b border-gray-700/50 bg-gradient-to-r from-red-900/35 to-orange-800/5 flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                         <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                             <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -216,7 +216,7 @@ export default function UserChatModal({ isOpen, onClose }) {
                     </button>
                 </div>
 
-                {/* Messages Area - Compact height, no horizontal scroll */}
+                {/* Messages Area */}
                 <div className="flex-1 overflow-y-auto p-4 scrollbar-hide">
                     {loading ? (
                         <div className="flex flex-col items-center justify-center h-full space-y-2">
@@ -321,9 +321,6 @@ export default function UserChatModal({ isOpen, onClose }) {
                     )}
                 </div>
             </div>
-
-            {/* Global CSS to hide scrollbars */}
-         
         </div>
     );
 }

@@ -5,7 +5,7 @@ import { useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
 import axiosSecure from '@/app/api/axiosHook/useAxiosSecure';
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000';
+const SOCKET_URL = process.env.NEXT_PUBLIC_BACKEND_URL ;
 const SPECIFIC_ADMIN_ID = '68e53b9752ef9ea3f4aa5566';
 const SPECIFIC_ADMIN_NAME = 'Support Team';
 
