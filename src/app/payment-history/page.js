@@ -1,6 +1,6 @@
-'use client'
-import { useState, useEffect } from 'react'
-import { useAuth } from '../context/AuthContext'
+"use client";
+import { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
 import {
   FiDollarSign,
   FiCreditCard,
@@ -12,133 +12,134 @@ import {
   FiTrendingUp,
   FiPieChart,
   FiGlobe,
-} from 'react-icons/fi'
-import LoadingSpinner from '../hooks/LoadingSpiner'
+  FiChevronLeft,
+  FiChevronRight,
+} from "react-icons/fi";
+import LoadingSpinner from "../hooks/LoadingSpiner";
 
 export default function PaymentHistory() {
-  const { user } = useAuth()
-  const userEmail = user?.email
-  const [payments, setPayments] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [totalExpenseUSD, setTotalExpenseUSD] = useState(0)
-  const [totalExpenseBDT, setTotalExpenseBDT] = useState(0)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage] = useState(10)
+  const { user } = useAuth();
+  const userEmail = user?.email;
+  const [payments, setPayments] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [totalExpenseUSD, setTotalExpenseUSD] = useState(0);
+  const [totalExpenseBDT, setTotalExpenseBDT] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
 
   useEffect(() => {
-    if (!userEmail) return
+    if (!userEmail) return;
 
     const fetchPayments = async () => {
       try {
-        setIsLoading(true)
+        setIsLoading(true);
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/payments/user?userEmail=${userEmail}`
-        )
+        );
 
-        if (!response.ok) throw new Error('Payment fetch failed')
-        const data = await response.json()
-        setPayments(data)
+        if (!response.ok) throw new Error("Payment fetch failed");
+        const data = await response.json();
+        setPayments(data);
 
         // Calculate total expenses by currency
         const usdExpense = data
           .filter(
             (payment) =>
-              payment.status === 'paid' &&
-              (payment.currency === 'usd' || !payment.currency)
+              payment.status === "paid" &&
+              (payment.currency === "usd" || !payment.currency)
           )
-          .reduce((total, payment) => total + payment.amount, 0)
+          .reduce((total, payment) => total + payment.amount, 0);
 
         const bdtExpense = data
           .filter(
-            (payment) =>
-              payment.status === 'paid' && payment.currency === 'BDT'
+            (payment) => payment.status === "paid" && payment.currency === "BDT"
           )
-          .reduce((total, payment) => total + payment.amount, 0)
+          .reduce((total, payment) => total + payment.amount, 0);
 
-        setTotalExpenseUSD(usdExpense)
-        setTotalExpenseBDT(bdtExpense)
+        setTotalExpenseUSD(usdExpense);
+        setTotalExpenseBDT(bdtExpense);
       } catch (error) {
-        console.error('❌ Fetch payments error:', error)
+        console.error("❌ Fetch payments error:", error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchPayments()
-  }, [userEmail])
+    fetchPayments();
+  }, [userEmail]);
 
-  console.log(payments)
+  console.log(payments);
 
   // Pagination logic
-  const indexOfLastItem = currentPage * itemsPerPage
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage
-  const currentPayments = payments.slice(indexOfFirstItem, indexOfLastItem)
-  const totalPages = Math.ceil(payments.length / itemsPerPage)
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentPayments = payments.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(payments.length / itemsPerPage);
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-  }
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
-  const formatCurrency = (amount, currency = 'usd') => {
+  const formatCurrency = (amount, currency = "usd") => {
     const currencyConfig = {
-      usd: { style: 'currency', currency: 'USD' },
-      bdt: { style: 'currency', currency: 'BDT' },
-    }
+      usd: { style: "currency", currency: "USD" },
+      bdt: { style: "currency", currency: "BDT" },
+    };
 
-    const config = currencyConfig[currency.toLowerCase()] || currencyConfig.usd
+    const config = currencyConfig[currency.toLowerCase()] || currencyConfig.usd;
 
     return new Intl.NumberFormat(
-      currency === 'bdt' ? 'bn-BD' : 'en-US',
+      "en-IN", // Use English digits for BDT
       config
-    ).format(amount)
-  }
+    ).format(amount);
+  };
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'paid':
-        return <FiCheckCircle className="text-green-500" />
-      case 'pending':
-        return <FiClock className="text-yellow-500" />
-      case 'failed':
-        return <FiClock className="text-red-500" />
+      case "paid":
+        return <FiCheckCircle className="text-green-500" />;
+      case "pending":
+        return <FiClock className="text-yellow-500" />;
+      case "failed":
+        return <FiClock className="text-red-500" />;
       default:
-        return <FiClock className="text-gray-500" />
+        return <FiClock className="text-gray-500" />;
     }
-  }
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'paid':
-        return 'text-green-400 bg-green-400/10 border-green-400/20'
-      case 'pending':
-        return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20'
-      case 'failed':
-        return 'text-red-400 bg-red-400/10 border-red-400/20'
+      case "paid":
+        return "text-green-400 bg-green-400/10 border-green-400/20";
+      case "pending":
+        return "text-yellow-400 bg-yellow-400/10 border-yellow-400/20";
+      case "failed":
+        return "text-red-400 bg-red-400/10 border-red-400/20";
       default:
-        return 'text-gray-400 bg-gray-400/10 border-gray-400/20'
+        return "text-gray-400 bg-gray-400/10 border-gray-400/20";
     }
-  }
+  };
 
   // Calculate statistics
-  const totalTransactions = payments.length
-  const successfulPayments = payments.filter((p) => p.status === 'paid').length
-  const pendingPayments = payments.filter((p) => p.status === 'pending').length
-  const failedPayments = payments.filter((p) => p.status === 'failed').length
+  const totalTransactions = payments.length;
+  const successfulPayments = payments.filter((p) => p.status === "paid").length;
+  const pendingPayments = payments.filter((p) => p.status === "pending").length;
+  const failedPayments = payments.filter((p) => p.status === "failed").length;
 
   // Pagination controls
-  const paginate = (pageNumber) => setCurrentPage(pageNumber)
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
   const nextPage = () =>
-    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-  const prevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1))
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  const prevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
 
   if (isLoading) {
-    return <LoadingSpinner />
+    return <LoadingSpinner />;
   }
 
   return (
@@ -172,7 +173,7 @@ export default function PaymentHistory() {
                 </h3>
                 <div className="flex items-baseline gap-2">
                   <span className="text-xl md:text-3xl font-bold text-blue-400 truncate">
-                    {formatCurrency(totalExpenseUSD, 'usd')}
+                    {formatCurrency(totalExpenseUSD, "usd")}
                   </span>
                 </div>
                 <p className="text-gray-400 text-xs md:text-sm mt-2">
@@ -194,7 +195,7 @@ export default function PaymentHistory() {
                 </h3>
                 <div className="flex items-baseline gap-2">
                   <span className="text-xl md:text-3xl font-bold text-green-400 truncate">
-                    {formatCurrency(totalExpenseBDT, 'bdt')}
+                    {formatCurrency(totalExpenseBDT, "bdt")}
                   </span>
                 </div>
                 <p className="text-gray-400 text-xs md:text-sm mt-2">
@@ -269,12 +270,12 @@ export default function PaymentHistory() {
                   Total Spent
                 </div>
                 <div className="text-lg md:text-xl font-bold text-purple-400 truncate">
-                  {formatCurrency(totalExpenseUSD + totalExpenseBDT, 'usd')}
+                  {formatCurrency(totalExpenseUSD + totalExpenseBDT, "usd")}
                 </div>
               </div>
               <div className="h-6 md:h-8 w-px bg-gray-600"></div>
               <div className="text-gray-400 text-xs md:text-sm whitespace-nowrap">
-                {payments.length} transaction{payments.length !== 1 ? 's' : ''}
+                {payments.length} transaction{payments.length !== 1 ? "s" : ""}
               </div>
             </div>
           </div>
@@ -324,7 +325,7 @@ export default function PaymentHistory() {
                               {formatCurrency(payment.amount, payment.currency)}
                             </div>
                             <div className="text-gray-400 text-xs md:text-sm mt-1 capitalize">
-                              {payment.currency?.toUpperCase() || 'USD'}
+                              {payment.currency?.toUpperCase() || "USD"}
                             </div>
                           </div>
                         </div>
@@ -341,7 +342,7 @@ export default function PaymentHistory() {
                                   Movie
                                 </div>
                                 <div className="text-white font-medium truncate text-sm md:text-base">
-                                  {payment.sessionTitle || 'N/A'}
+                                  {payment.sessionTitle || "N/A"}
                                 </div>
                               </div>
                             </div>
@@ -353,7 +354,7 @@ export default function PaymentHistory() {
                                   Booking ID
                                 </div>
                                 <div className="text-white font-mono text-xs truncate">
-                                  {payment.bookingId || 'N/A'}
+                                  {payment.bookingId || "N/A"}
                                 </div>
                               </div>
                             </div>
@@ -367,7 +368,7 @@ export default function PaymentHistory() {
                                   Provider
                                 </div>
                                 <div className="text-white font-medium capitalize text-sm md:text-base">
-                                  {payment.provider || 'N/A'}
+                                  {payment.provider || "N/A"}
                                 </div>
                               </div>
                             </div>
@@ -381,7 +382,7 @@ export default function PaymentHistory() {
                                 <div className="text-white text-xs md:text-sm">
                                   {payment.createdAt
                                     ? formatDate(payment.createdAt)
-                                    : 'N/A'}
+                                    : "N/A"}
                                 </div>
                               </div>
                             </div>
@@ -409,21 +410,18 @@ export default function PaymentHistory() {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 md:pt-6 border-t border-gray-700/50">
-                  <div className="text-gray-400 text-sm">
-                    Showing {indexOfFirstItem + 1}-
-                    {Math.min(indexOfLastItem, payments.length)} of{' '}
-                    {payments.length} transactions
-                  </div>
+                <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
                   <div className="flex items-center gap-2">
+                    {/* Previous Button */}
                     <button
                       onClick={prevPage}
                       disabled={currentPage === 1}
-                      className="px-3 py-2 md:px-4 md:py-2 rounded-lg bg-gray-800/50 border border-gray-600 text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/50 transition-colors text-sm md:text-base"
+                      className="p-2 rounded-lg bg-gray-800/50 border border-gray-600 text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/50 transition-colors"
                     >
-                      Previous
+                      <FiChevronLeft size={18} />
                     </button>
 
+                    {/* Page Numbers */}
                     <div className="flex items-center gap-1">
                       {Array.from({ length: totalPages }, (_, i) => i + 1)
                         .filter(
@@ -433,9 +431,8 @@ export default function PaymentHistory() {
                             (page >= currentPage - 1 && page <= currentPage + 1)
                         )
                         .map((page, index, array) => {
-                          // Add ellipsis for gaps in pagination
                           const showEllipsis =
-                            index > 0 && page - array[index - 1] > 1
+                            index > 0 && page - array[index - 1] > 1;
                           return (
                             <div key={page} className="flex items-center">
                               {showEllipsis && (
@@ -443,25 +440,26 @@ export default function PaymentHistory() {
                               )}
                               <button
                                 onClick={() => paginate(page)}
-                                className={`px-3 py-2 md:px-4 md:py-2 rounded-lg border transition-colors text-sm md:text-base ${
+                                className={`px-3 py-2 rounded-lg border transition-colors text-sm ${
                                   currentPage === page
-                                    ? 'bg-purple-500/20 border-purple-500/50 text-purple-400'
-                                    : 'bg-gray-800/50 border-gray-600 text-gray-300 hover:bg-gray-700/50'
+                                    ? "bg-purple-500/20 border-purple-500/50 text-purple-400"
+                                    : "bg-gray-800/50 border-gray-600 text-gray-300 hover:bg-gray-700/50"
                                 }`}
                               >
                                 {page}
                               </button>
                             </div>
-                          )
+                          );
                         })}
                     </div>
 
+                    {/* Next Button */}
                     <button
                       onClick={nextPage}
                       disabled={currentPage === totalPages}
-                      className="px-3 py-2 md:px-4 md:py-2 rounded-lg bg-gray-800/50 border border-gray-600 text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/50 transition-colors text-sm md:text-base"
+                      className="p-2 rounded-lg bg-gray-800/50 border border-gray-600 text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/50 transition-colors"
                     >
-                      Next
+                      <FiChevronRight size={18} />
                     </button>
                   </div>
                 </div>
@@ -471,5 +469,5 @@ export default function PaymentHistory() {
         </div>
       </div>
     </div>
-  )
+  );
 }

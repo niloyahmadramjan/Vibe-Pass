@@ -36,7 +36,7 @@ function MyBooking() {
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage] = useState(10)
+  const [itemsPerPage] = useState(7)
 
   useEffect(() => {
     if (!userEmail) {
@@ -129,34 +129,34 @@ function MyBooking() {
     setActionMenuOpen(null)
   }
 
-  const handleRefund = async (booking) => {
-    Swal.fire({
-      title: 'Request Refund?',
-      text: 'Are you sure you want to request a refund for this booking?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, request refund',
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          // Add your refund API call here
-          await axiosSecure.post(`/api/ticket/${booking._id}/refund`)
-          Swal.fire('Success!', 'Refund request has been submitted.', 'success')
-          // Refresh bookings
-          const { data } = await axiosSecure.get(
-            `api/ticket/my-bookings?userEmail=${userEmail}`
-          )
-          setBookings(data)
-        } catch (error) {
-          console.error('Error processing refund:', error)
-          Swal.fire('Error!', 'Failed to process refund request.', 'error')
-        }
-        setActionMenuOpen(null)
-      }
-    })
-  }
+  // const handleRefund = async (booking) => {
+  //   Swal.fire({
+  //     title: 'Request Refund?',
+  //     text: 'Are you sure you want to request a refund for this booking?',
+  //     icon: 'question',
+  //     showCancelButton: true,
+  //     confirmButtonColor: '#3085d6',
+  //     cancelButtonColor: '#d33',
+  //     confirmButtonText: 'Yes, request refund',
+  //   }).then(async (result) => {
+  //     if (result.isConfirmed) {
+  //       try {
+  //         // Add your refund API call here
+  //         await axiosSecure.post(`/api/ticket/${booking._id}/refund`)
+  //         Swal.fire('Success!', 'Refund request has been submitted.', 'success')
+  //         // Refresh bookings
+  //         const { data } = await axiosSecure.get(
+  //           `api/ticket/my-bookings?userEmail=${userEmail}`
+  //         )
+  //         setBookings(data)
+  //       } catch (error) {
+  //         console.error('Error processing refund:', error)
+  //         Swal.fire('Error!', 'Failed to process refund request.', 'error')
+  //       }
+  //       setActionMenuOpen(null)
+  //     }
+  //   })
+  // }
 
   const getStatusBadge = (status) => {
     const baseClasses =
@@ -345,7 +345,7 @@ function MyBooking() {
                             </button>
                           )}
 
-                          {booking.paymentStatus === 'paid' &&
+                          {/* {booking.paymentStatus === 'paid' &&
                             booking.status !== 'cancelled' && (
                               <button
                                 onClick={() => handleRefund(booking)}
@@ -354,7 +354,7 @@ function MyBooking() {
                                 <FiArrowLeft size={14} />
                                 <span>Request Refund</span>
                               </button>
-                            )}
+                            )} */}
 
                           {/* Always show delete button, but disable for paid bookings that aren't cancelled */}
                           <button
@@ -495,7 +495,7 @@ function MyBooking() {
                           />
                         </button>
 
-                        {/* Refund Button for paid bookings */}
+                        {/* Refund Button for paid bookings
                         {booking.paymentStatus === 'paid' &&
                           booking.status !== 'cancelled' && (
                             <button
@@ -508,7 +508,7 @@ function MyBooking() {
                                 className="text-purple-400 group-hover:text-purple-300"
                               />
                             </button>
-                          )}
+                          )} */}
 
                         {/* Delete Button - Always visible but conditionally disabled */}
                         <button
@@ -542,12 +542,8 @@ function MyBooking() {
 
         {/* Pagination Controls */}
         {totalPages > 1 && (
-          <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="text-gray-400 text-sm">
-              Showing {indexOfFirstItem + 1}-
-              {Math.min(indexOfLastItem, bookings.length)} of {bookings.length}{' '}
-              bookings
-            </div>
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+            
 
             <div className="flex items-center gap-2">
               {/* Previous Button */}
