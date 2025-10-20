@@ -1,14 +1,16 @@
-
 'use client'
 
 import { useState } from 'react'
 import ContactSupportSection from './ContactModal'
-import UserChatModal from './UserLiveChat' // New modal component
+import AiChat from './AiChat'
+import AdminChat from './UserLiveChat'
 
 const QnA = () => {
   const [activeIndex, setActiveIndex] = useState(null)
   const [selectedCategory, setSelectedCategory] = useState('booking')
-  const [isChatModalOpen, setIsChatModalOpen] = useState(false) // Modal state
+  const [isChatTypePopupOpen, setIsChatTypePopupOpen] = useState(false)
+  const [isAiChatOpen, setIsAiChatOpen] = useState(false)
+  const [isAdminChatOpen, setIsAdminChatOpen] = useState(false)
 
   // FAQ data array with questions and answers
   const faqData = [
@@ -127,14 +129,21 @@ const QnA = () => {
     return colors[category] || 'bg-[#D32F2F]'
   }
 
+  // Handle chat type selection
+  const handleChatTypeSelect = (chatType) => {
+    setIsChatTypePopupOpen(false)
+
+    if (chatType === 'quick') {
+      setIsAiChatOpen(true)
+    } else if (chatType === 'admin') {
+      setIsAdminChatOpen(true)
+    }
+  }
+
   return (
-<>
-    <section className="py-16  relative overflow-hidden">
-      <div className="container mx-auto px-4 max-w-6xl relative z-10">
-       
-
+    <>
+      <section className="py-16 relative overflow-hidden">
         <div className="container mx-auto px-4 max-w-6xl relative z-10">
-
           {/* Header Section */}
           <div className="text-center mb-12 fade-in">
             <div className="inline-flex items-center gap-2 mb-4">
@@ -163,15 +172,15 @@ const QnA = () => {
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
                 className={`px-4 py-2 rounded-full border transition-all duration-300 ${selectedCategory === category.id
-                    ? 'bg-[#D32F2F] border-[#D32F2F] text-white shadow-lg shadow-red-500/25'
-                    : 'border-[#333] text-[#B0B0B0] hover:border-[#D32F2F] hover:text-white'
+                  ? 'bg-[#D32F2F] border-[#D32F2F] text-white shadow-lg shadow-red-500/25'
+                  : 'border-[#333] text-[#B0B0B0] hover:border-[#D32F2F] hover:text-white'
                   }`}
               >
                 <span className="font-medium">{category.name}</span>
                 <span
                   className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${selectedCategory === category.id
-                      ? 'bg-white text-[#D32F2F]'
-                      : 'bg-[#333] text-[#B0B0B0]'
+                    ? 'bg-white text-[#D32F2F]'
+                    : 'bg-[#333] text-[#B0B0B0]'
                     }`}
                 >
                   {category.count}
@@ -187,8 +196,8 @@ const QnA = () => {
                 <div
                   key={faq.id}
                   className={`bg-[#1E1E1E] border border-[#333] rounded-2xl overflow-hidden transition-all duration-300 hover:border-[#D32F2F]/50 ${activeIndex === index
-                      ? 'ring-2 ring-[#D32F2F]/20 border-[#D32F2F]'
-                      : ''
+                    ? 'ring-2 ring-[#D32F2F]/20 border-[#D32F2F]'
+                    : ''
                     }`}
                 >
                   <button
@@ -255,9 +264,9 @@ const QnA = () => {
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <ContactSupportSection />
-              {/* Live Chat Button - Opens modal on right side */}
+              {/* Live Chat Button - Opens chat type popup */}
               <button
-                onClick={() => setIsChatModalOpen(true)}
+                onClick={() => setIsChatTypePopupOpen(true)}
                 className="btn-secondary border-2 border-[#D32F2F] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#D32F2F] transition-all duration-300"
               >
                 Live Chat
@@ -290,14 +299,58 @@ const QnA = () => {
             }
           }
         `}</style>
-      </div>
       </section>
-     
 
-      {/* Chat Modal Component - Opens on right side */}
-      <UserChatModal
-        isOpen={isChatModalOpen}
-        onClose={() => setIsChatModalOpen(false)}
+      {/* Simple Chat Type Selection Popup */}
+      {isChatTypePopupOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#1E1E1E] border border-[#333] rounded-2xl p-6 max-w-sm w-full mx-auto">
+            <h3 className="text-xl font-bold text-white mb-4 text-center">
+              Choose Chat Type
+            </h3>
+
+            <div className="space-y-3">
+              <button
+                onClick={() => handleChatTypeSelect('quick')}
+                className="w-full bg-gradient-to-r from-[#D32F2F] to-[#FF5252] hover:from-[#B71C1C] hover:to-[#D32F2F] text-white py-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-3"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Quick Chat (AI)
+              </button>
+
+              <button
+                onClick={() => handleChatTypeSelect('admin')}
+                className="w-full bg-gradient-to-r from-[#2196F3] to-[#21CBF3] hover:from-[#1976D2] hover:to-[#2196F3] text-white py-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-3"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                Admin Chat
+              </button>
+            </div>
+
+            <button
+              onClick={() => setIsChatTypePopupOpen(false)}
+              className="w-full mt-4 text-[#B0B0B0] hover:text-white py-2 rounded-lg font-medium transition-all duration-300 border border-[#333] hover:border-[#555]"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* AI Chat Component */}
+      <AiChat
+        isOpen={isAiChatOpen}
+        onClose={() => setIsAiChatOpen(false)}
+      />
+
+      {/* Admin Chat Component */}
+      <AdminChat
+        isOpen={isAdminChatOpen}
+        onClose={() => setIsAdminChatOpen(false)}
       />
     </>
   )
