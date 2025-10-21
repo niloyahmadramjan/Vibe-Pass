@@ -11,6 +11,7 @@ export default function TicketDetailsPage() {
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
 
   useEffect(() => {
     if (!id) return;
@@ -54,47 +55,6 @@ export default function TicketDetailsPage() {
     fetchBooking();
   }, [ticket?.bookingId]);
 
-  // pdf
-//  const handleDownloadPDF = async () => {
-//    setDownloading(true);
-//    try {
-//      const response = await fetch(
-//        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/generate-ticket-pdf`,
-//        {
-//          method: "POST",
-//          headers: { "Content-Type": "application/json" },
-//          body: JSON.stringify({
-//            movieTitle: booking.movieTitle,
-//            theaterName: booking.theaterName,
-//            showDate: booking.showDate,
-//            showTime: booking.showTime,
-//            selectedSeats: booking.selectedSeats,
-//            totalAmount: booking.totalAmount,
-//            transactionId: ticket.transactionId,
-//            screen: booking.screen,
-//            status: ticket.status,
-//            userName:booking.userName,
-//            userEmail: booking.userEmail,
-//          }),
-//        }
-//      );
-
-//      if (!response.ok) throw new Error("Failed to download PDF");
-
-//      const blob = await response.blob();
-//      const url = window.URL.createObjectURL(blob);
-//      const link = document.createElement("a");
-//      link.href = url;
-//      link.download = `ticket-${ticket.transactionId}.pdf`;
-//      link.click();
-//      window.URL.revokeObjectURL(url);
-//    } catch (error) {
-//      console.error("Download failed:", error);
-//    } finally {
-//      setDownloading(false);
-//    }
-//  };
-
  const handleDownloadPDF = async (bookingId) => {
    try {
     setDownloading(true)
@@ -126,6 +86,7 @@ export default function TicketDetailsPage() {
      alert('Failed to download ticket PDF.')
    }
  }
+ 
 
   if (loading) {
     return (
@@ -158,7 +119,7 @@ export default function TicketDetailsPage() {
 
   return (
     <div className="py-8 px-4 sm:px-6 lg:px-8 pt-20 pb-15">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-2">Your Ticket</h1>
@@ -190,18 +151,7 @@ export default function TicketDetailsPage() {
             <div className="md:col-span-1 flex flex-col items-center">
               <div className="bg-gray-200 p-6 rounded-xl shadow-inner mb-4">
                 <QRCodeCanvas
-                  value={JSON.stringify({
-                    transactionId: ticket.transactionId,
-                    status: 'paid',
-                    movieTitle: booking.movieTitle,
-                    theaterName: booking.theaterName,
-                    screen: booking.screen,
-                    showDate: booking.showDate,
-                    showTime: booking.showTime,
-                    seats: booking.selectedSeats,
-                    userName: booking.userName,
-                    userEmail: booking.userEmail,
-                  })}
+                  value={`${baseUrl}/verify-qr/${booking.qrSignature}`}
                   size={180}
                   bgColor="#FFFFFF"
                   fgColor="#000000"
