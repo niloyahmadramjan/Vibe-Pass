@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { QRCodeCanvas } from "qrcode.react";
+import axiosPublic from "@/app/api/axiosHook/useAxiosPublic";
 
 export default function TicketDetailsPage() {
   const { id } = useParams();
@@ -54,45 +55,77 @@ export default function TicketDetailsPage() {
   }, [ticket?.bookingId]);
 
   // pdf
- const handleDownloadPDF = async () => {
-   setDownloading(true);
+//  const handleDownloadPDF = async () => {
+//    setDownloading(true);
+//    try {
+//      const response = await fetch(
+//        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/generate-ticket-pdf`,
+//        {
+//          method: "POST",
+//          headers: { "Content-Type": "application/json" },
+//          body: JSON.stringify({
+//            movieTitle: booking.movieTitle,
+//            theaterName: booking.theaterName,
+//            showDate: booking.showDate,
+//            showTime: booking.showTime,
+//            selectedSeats: booking.selectedSeats,
+//            totalAmount: booking.totalAmount,
+//            transactionId: ticket.transactionId,
+//            screen: booking.screen,
+//            status: ticket.status,
+//            userName:booking.userName,
+//            userEmail: booking.userEmail,
+//          }),
+//        }
+//      );
+
+//      if (!response.ok) throw new Error("Failed to download PDF");
+
+//      const blob = await response.blob();
+//      const url = window.URL.createObjectURL(blob);
+//      const link = document.createElement("a");
+//      link.href = url;
+//      link.download = `ticket-${ticket.transactionId}.pdf`;
+//      link.click();
+//      window.URL.revokeObjectURL(url);
+//    } catch (error) {
+//      console.error("Download failed:", error);
+//    } finally {
+//      setDownloading(false);
+//    }
+//  };
+
+ const handleDownloadPDF = async (bookingId) => {
    try {
-     const response = await fetch(
-       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/generate-ticket-pdf`,
-       {
-         method: "POST",
-         headers: { "Content-Type": "application/json" },
-         body: JSON.stringify({
-           movieTitle: booking.movieTitle,
-           theaterName: booking.theaterName,
-           showDate: booking.showDate,
-           showTime: booking.showTime,
-           selectedSeats: booking.selectedSeats,
-           totalAmount: booking.totalAmount,
-           transactionId: ticket.transactionId,
-           screen: booking.screen,
-           status: ticket.status,
-           userName:booking.userName,
-           userEmail: booking.userEmail,
-         }),
-       }
-     );
+    setDownloading(true)
+     const response = await axiosPublic.post(
+       '/api/generate-ticket-pdf',
+       { bookingId },
+       { responseType: 'blob' } // important for binary PDF
+     )
 
-     if (!response.ok) throw new Error("Failed to download PDF");
+     // Create blob URL and trigger direct download
+     const blob = new Blob([response.data], { type: 'application/pdf' })
+     const url = window.URL.createObjectURL(blob)
 
-     const blob = await response.blob();
-     const url = window.URL.createObjectURL(blob);
-     const link = document.createElement("a");
-     link.href = url;
-     link.download = `ticket-${ticket.transactionId}.pdf`;
-     link.click();
-     window.URL.revokeObjectURL(url);
+     // Create invisible download link
+     const link = document.createElement('a')
+     link.href = url
+     link.download = `VibePass-Ticket-${bookingId}.pdf` // Set filename
+     document.body.appendChild(link)
+
+     // Trigger download
+     link.click()
+
+     // Clean up
+     document.body.removeChild(link)
+     window.URL.revokeObjectURL(url)
+     setDownloading(false)
    } catch (error) {
-     console.error("Download failed:", error);
-   } finally {
-     setDownloading(false);
+     console.error('Error generating PDF:', error)
+     alert('Failed to download ticket PDF.')
    }
- };
+ }
 
   if (loading) {
     return (
@@ -159,7 +192,7 @@ export default function TicketDetailsPage() {
                 <QRCodeCanvas
                   value={JSON.stringify({
                     transactionId: ticket.transactionId,
-                    status: "paid",
+                    status: 'paid',
                     movieTitle: booking.movieTitle,
                     theaterName: booking.theaterName,
                     screen: booking.screen,
@@ -182,7 +215,7 @@ export default function TicketDetailsPage() {
               </p>
 
               <button
-                onClick={handleDownloadPDF}
+                onClick={() => handleDownloadPDF(booking._id)}
                 disabled={downloading}
                 className="w-full bg-gradient-to-r from-[#CC2027] to-[#E53935] text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -211,7 +244,7 @@ export default function TicketDetailsPage() {
                     Generating PDF...
                   </span>
                 ) : (
-                  "Download PDF Ticket"
+                  'Download PDF Ticket'
                 )}
               </button>
             </div>
@@ -237,12 +270,12 @@ export default function TicketDetailsPage() {
                   <DetailItem
                     label="Date & Time"
                     value={`${new Date(booking.showDate).toLocaleDateString(
-                      "en-US",
+                      'en-US',
                       {
-                        weekday: "short",
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
+                        weekday: 'short',
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
                       }
                     )} at ${booking.showTime}`}
                   />
@@ -260,7 +293,7 @@ export default function TicketDetailsPage() {
                   />
                   <DetailItem
                     label="Seats"
-                    value={booking.selectedSeats.join(", ")}
+                    value={booking.selectedSeats.join(', ')}
                   />
                   <DetailItem
                     label="Total Amount"
@@ -305,7 +338,7 @@ export default function TicketDetailsPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 // Reusable Detail Item Component
