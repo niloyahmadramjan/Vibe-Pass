@@ -147,7 +147,7 @@ export default function AdminChatDrawer({ isOpen, onClose }) {
 
     return (
         <div className="fixed inset-0 z-40 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-gradient-to-b from-gray-900 to-gray-800 rounded-2xl border border-gray-700/50 shadow-2xl w-6xl max-w-xl h-96 flex flex-col transform transition-all duration-300 overflow-hidden">
+            <div className="bg-gradient-to-b from-gray-900 to-gray-800 rounded-2xl border border-gray-700/50 shadow-2xl w-xl max-w-7xl h-full flex flex-col transform transition-all duration-300 overflow-hidden">
 
                 {/* Header */}
                 <div className="p-4 border-b border-gray-700/50 bg-gradient-to-r from-blue-600/20 to-purple-600/20 flex items-center justify-between">

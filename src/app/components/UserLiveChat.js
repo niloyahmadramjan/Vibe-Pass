@@ -1,7 +1,7 @@
 
 'use client'
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from '@/app/context/AuthContext';
 import axiosSecure from '@/app/api/axiosHook/useAxiosSecure';
@@ -10,7 +10,7 @@ const SOCKET_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 const SPECIFIC_ADMIN_ID = '68e53b9752ef9ea3f4aa5566';
 const SPECIFIC_ADMIN_NAME = 'Support Team';
 
-export default function AdminChat({ isOpen, onClose }) {
+export default function AdminChat({ isOpen, onClose, embedded = false }) {
     const { user } = useAuth();
     const [socket, setSocket] = useState(null);
     const [text, setText] = useState('');
@@ -69,20 +69,14 @@ export default function AdminChat({ isOpen, onClose }) {
 
         // Cleanup function to disconnect socket
         return () => {
-            console.log('🧹 User: Cleaning up socket');
+            console.log(' User: Cleaning up socket');
             newSocket.disconnect();
         };
     }, [user?._id, isOpen]);
 
     // Load messages when connection is established and modal is open
-    useEffect(() => {
-        if (connectionStatus === 'connected' && user?._id && isOpen) {
-            loadMessages();
-        }
-    }, [connectionStatus, user?._id, isOpen]);
-
-    // Load chat messages from API
-    const loadMessages = async () => {
+    // Load chat messages from API (declare first)
+    const loadMessages = useCallback(async () => {
         try {
             setLoading(true);
             const res = await axiosSecure.get(
@@ -94,7 +88,15 @@ export default function AdminChat({ isOpen, onClose }) {
         } finally {
             setLoading(false);
         }
-    };
+    }, [user?._id]);
+
+    // Then use it in useEffect
+    useEffect(() => {
+        if (connectionStatus === 'connected' && user?._id && isOpen) {
+            loadMessages();
+        }
+    }, [connectionStatus, user?._id, isOpen, loadMessages]);
+
 
     // Auto scroll to bottom when new messages arrive
     useEffect(() => {
@@ -165,6 +167,124 @@ export default function AdminChat({ isOpen, onClose }) {
 
     // Don't render if modal is closed
     if (!isOpen) return null;
+    // AdminChat component for embedded mode
+    if (embedded) {
+        return (
+            <div className="flex flex-col h-full">
+                {/* Connection Status Bar for embedded mode */}
+                <div className="px-4 py-2 bg-gray-800/50 border-b border-gray-700/30 flex items-center justify-between">
+                    <div className={`flex items-center space-x-2 ${connectionStatus === 'connected' ? 'text-green-400' : 'text-red-400'
+                        }`}>
+                        <div className={`w-2 h-2 rounded-full ${connectionStatus === 'connected' ? 'bg-green-400 animate-pulse' : 'bg-red-400'
+                            }`}></div>
+                        <span className="text-xs font-medium capitalize">{connectionStatus}</span>
+                    </div>
+                    <button
+                        onClick={refreshMessages}
+                        className="text-xs text-gray-400 hover:text-white transition-colors flex-shrink-0"
+                    >
+                        Refresh
+                    </button>
+                </div>
+
+                {/* Messages Area - Fixed height */}
+                <div className="flex-1 overflow-y-auto p-4"
+                    style={{
+                        height: '300px', // Fixed height
+                        maxHeight: '300px'
+                    }}>
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center h-full space-y-2">
+                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                            <p className="text-gray-400 text-xs">Loading messages...</p>
+                        </div>
+                    ) : messages.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center h-full text-center space-y-3">
+                            <div className="w-12 h-12 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-xl flex items-center justify-center">
+                                <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                </svg>
+                            </div>
+                            <div className="space-y-1">
+                                <h3 className="text-sm font-semibold text-white">Start a conversation</h3>
+                                <p className="text-gray-400 text-xs">
+                                    Send your first message to our support team
+                                </p>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            {messages.map((message) => {
+                                const isMine = message.senderId === user._id;
+                                const isTemp = message._id.startsWith('temp-');
+                                return (
+                                    <div
+                                        key={message._id}
+                                        className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
+                                    >
+                                        <div
+                                            className={`max-w-[85%] px-3 py-2 rounded-xl text-xs shadow-lg transition-all duration-200 break-words ${isMine
+                                                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-br-none shadow-blue-500/25'
+                                                : 'bg-gray-700/80 text-white rounded-bl-none shadow-gray-700/25'
+                                                } ${isTemp ? 'opacity-70 border border-dashed border-yellow-400/50' : ''}`}
+                                        >
+                                            <div className="whitespace-pre-wrap break-words overflow-hidden">
+                                                {message.text}
+                                            </div>
+                                            <div className={`mt-1 flex justify-between items-center text-xs ${isMine ? 'text-blue-100/80' : 'text-gray-400'
+                                                }`}>
+                                                <span className="flex-shrink-0">
+                                                    {new Date(message.createdAt).toLocaleTimeString([], {
+                                                        hour: '2-digit',
+                                                        minute: '2-digit'
+                                                    })}
+                                                </span>
+                                                <span className="ml-2 font-medium flex-shrink-0">
+                                                    {isMine ? 'You' : 'Support'}
+                                                    {isTemp && ' • Sending...'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                            <div ref={endRef} />
+                        </div>
+                    )}
+                </div>
+
+                {/* Input Area - Fixed at bottom */}
+                <div className="flex-shrink-0 p-4 border-t border-gray-700 bg-gray-800">
+                    <div className="flex gap-2 items-center justify-center">
+                        <div className="flex-1 min-w-0">
+                            <textarea
+                                value={text}
+                                onChange={(e) => setText(e.target.value)}
+                                onKeyDown={handleKeyPress}
+                                className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-white placeholder-gray-400 resize-none transition-all duration-200 text-sm"
+                                placeholder="Type your message..."
+                                rows="1"
+                                disabled={connectionStatus !== 'connected'}
+                                style={{
+                                    minHeight: '45px',
+                                    maxHeight: '100px',
+                                }}
+                            />
+                        </div>
+                        <button
+                            onClick={sendMessage}
+                            disabled={!text.trim() || connectionStatus !== 'connected'}
+                            className="px-4 py-3 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 text-white rounded-lg transition-all duration-200 font-semibold flex items-center space-x-1 shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div

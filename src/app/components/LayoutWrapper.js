@@ -2,6 +2,7 @@
 import { usePathname } from 'next/navigation'
 import Navbar from './Navbar'
 import Footer from './Footer'
+import ChatIcon from './ChatIcon' 
 
 export default function LayoutWrapper({ children }) {
   const pathname = usePathname()
@@ -15,6 +16,7 @@ export default function LayoutWrapper({ children }) {
       {!hideNavFooter && <Navbar />}
       {children}
       {!hideNavFooter && <Footer />}
+      {!hideNavFooter && <ChatIcon />}
     </div>
   )
 }
