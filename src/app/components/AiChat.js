@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import axiosSecure from "@/app/api/axiosHook/useAxiosSecure";
 import { useAuth } from "@/app/context/AuthContext";
 
-export default function AiChat({ isOpen, onClose, embedded = false }) {
+export default function AiChat({ embedded, isOpen, onClose, showHeader, isMobile, className }) {
     const { user } = useAuth();
     const [message, setMessage] = useState("");
     const [chat, setChat] = useState([]);

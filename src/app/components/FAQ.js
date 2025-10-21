@@ -379,7 +379,7 @@ const QnA = () => {
       {/* Unified Chat Component with Tabs - NO BLUR */}
       {(activeChat === 'ai' || activeChat === 'admin') && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center md:justify-end md:items-end p-4 bg-black/50"
+          className="fixed inset-0 z-50 flex items-center justify-center md:justify-end p-4 bg-black/50"
           onClick={handleCloseChat} // Close when clicking on backdrop
         >
           <div
