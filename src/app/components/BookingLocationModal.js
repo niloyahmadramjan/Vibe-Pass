@@ -224,7 +224,7 @@ export default function BookingLocationModal({
                   }}
                   className="w-full py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 rounded-xl font-bold text-white shadow-lg transform hover:scale-[1.02] transition-all duration-300"
                 >
-                  🎬 Proceed to Seating
+                 Proceed to Seating
                 </button>
 
                 <button
