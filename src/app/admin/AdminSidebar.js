@@ -40,7 +40,7 @@ const pathname = usePathname()
     { name: 'Users', path: '/admin/users', icon: <FiUsers /> },
     // { name: 'Loyalty', path: '/admin/loyalty', icon: <FiGift /> },
     { name: 'Analytics', path: '/admin/analytics', icon: <FiBarChart2 /> },
-    // { name: 'Marketing', path: '/admin/marketing', icon: <FiMail /> },
+    { name: 'Chat', path: '/admin/chat', icon: <FiMail /> }, // শুধু একবার
     { name: 'Go Back Home', path: '/', icon: <FiHome /> },
   ];
 

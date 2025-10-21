@@ -1,16 +1,73 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import ContactSupportSection from './ContactModal'
 import AiChat from './AiChat'
 import AdminChat from './UserLiveChat'
+import { useAuth } from '@/app/context/AuthContext'
+import { useRouter } from 'next/navigation'
 
 const QnA = () => {
+  const { user, loading } = useAuth()
+  const router = useRouter()
   const [activeIndex, setActiveIndex] = useState(null)
   const [selectedCategory, setSelectedCategory] = useState('booking')
-  const [isChatTypePopupOpen, setIsChatTypePopupOpen] = useState(false)
-  const [isAiChatOpen, setIsAiChatOpen] = useState(false)
-  const [isAdminChatOpen, setIsAdminChatOpen] = useState(false)
+  const [activeChat, setActiveChat] = useState(null) // 'ai' or 'admin'
+  const chatRef = useRef(null)
+
+  // Disable body scroll when chat is open - FIXED VERSION
+  useEffect(() => {
+    if (activeChat) {
+      // Save current scroll position
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.overflow = 'hidden';
+    } else {
+      // Restore scroll position
+      const scrollY = document.body.style.top;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.overflow = '';
+
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      }
+    }
+
+    // Cleanup function
+    return () => {
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.overflow = '';
+      window.scrollTo(0, 0);
+    };
+  }, [activeChat]);
+
+  // Handle click outside chat to close
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (activeChat && chatRef.current && !chatRef.current.contains(event.target)) {
+        handleCloseChat();
+      }
+    };
+
+    // Add event listener when chat is open
+    if (activeChat) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    // Cleanup event listener
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [activeChat]);
 
   // FAQ data array with questions and answers
   const faqData = [
@@ -129,229 +186,296 @@ const QnA = () => {
     return colors[category] || 'bg-[#D32F2F]'
   }
 
-  // Handle chat type selection
-  const handleChatTypeSelect = (chatType) => {
-    setIsChatTypePopupOpen(false)
-
-    if (chatType === 'quick') {
-      setIsAiChatOpen(true)
-    } else if (chatType === 'admin') {
-      setIsAdminChatOpen(true)
+  // Handle Live Chat click - Check login first
+  const handleLiveChatClick = () => {
+    if (!user) {
+      // Redirect to login page if not logged in
+      router.push('/login')
+      return
     }
+
+    // If logged in, directly open Admin Chat (no popup)
+    setActiveChat('admin')
+  }
+
+  // Close active chat
+  const handleCloseChat = () => {
+    setActiveChat(null)
+  }
+
+  // Switch between chat types
+  const switchToAiChat = () => {
+    setActiveChat('ai')
+  }
+
+  const switchToAdminChat = () => {
+    setActiveChat('admin')
   }
 
   return (
     <>
-      <section className="py-16 relative overflow-hidden">
-        <div className="container mx-auto px-4 max-w-6xl relative z-10">
-          {/* Header Section */}
-          <div className="text-center mb-12 fade-in">
-            <div className="inline-flex items-center gap-2 mb-4">
-              <div className="w-3 h-3 bg-[#D32F2F] rounded-full"></div>
-              <span className="text-[#FFD700] font-semibold text-sm uppercase tracking-wider">
-                FAQ
-              </span>
-              <div className="w-3 h-3 bg-[#D32F2F] rounded-full"></div>
-            </div>
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Frequently Asked
-              <span className="text-gradient bg-gradient-to-r from-[#D32F2F] to-[#FF5252] bg-clip-text text-transparent">
-                {' '}
-                Questions
-              </span>
-            </h2>
-            <p className="text-[#B0B0B0] text-lg max-w-7xl mx-auto">
-              Find quick answers to common questions about booking, payments, and your movie experience.
-            </p>
-          </div>
-
-          {/* Category Filter Buttons */}
-          <div className="flex flex-wrap justify-center gap-3 mb-8">
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`px-4 py-2 rounded-full border transition-all duration-300 ${selectedCategory === category.id
-                  ? 'bg-[#D32F2F] border-[#D32F2F] text-white shadow-lg shadow-red-500/25'
-                  : 'border-[#333] text-[#B0B0B0] hover:border-[#D32F2F] hover:text-white'
-                  }`}
-              >
-                <span className="font-medium">{category.name}</span>
-                <span
-                  className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${selectedCategory === category.id
-                    ? 'bg-white text-[#D32F2F]'
-                    : 'bg-[#333] text-[#B0B0B0]'
-                    }`}
-                >
-                  {category.count}
+      {/* Main content with conditional overflow */}
+      <div className={activeChat ? 'overflow-hidden h-screen' : ''}>
+        <section className="py-16 relative overflow-hidden">
+          <div className="container mx-auto px-4 max-w-6xl relative z-10">
+            {/* Header Section */}
+            <div className="text-center mb-12 fade-in">
+              <div className="inline-flex items-center gap-2 mb-4">
+                <div className="w-3 h-3 bg-[#D32F2F] rounded-full"></div>
+                <span className="text-[#FFD700] font-semibold text-sm uppercase tracking-wider">
+                  FAQ
                 </span>
-              </button>
-            ))}
-          </div>
+                <div className="w-3 h-3 bg-[#D32F2F] rounded-full"></div>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                Frequently Asked
+                <span className="text-gradient bg-gradient-to-r from-[#D32F2F] to-[#FF5252] bg-clip-text text-transparent">
+                  {' '}
+                  Questions
+                </span>
+              </h2>
+              <p className="text-[#B0B0B0] text-lg max-w-7xl mx-auto">
+                Find quick answers to common questions about booking, payments, and your movie experience.
+              </p>
+            </div>
 
-          {/* FAQ Accordion Items */}
-          <div className="max-w-4xl mx-auto">
-            <div className="grid gap-4">
-              {filteredFaqs.map((faq, index) => (
-                <div
-                  key={faq.id}
-                  className={`bg-[#1E1E1E] border border-[#333] rounded-2xl overflow-hidden transition-all duration-300 hover:border-[#D32F2F]/50 ${activeIndex === index
-                    ? 'ring-2 ring-[#D32F2F]/20 border-[#D32F2F]'
-                    : ''
+            {/* Category Filter Buttons */}
+            <div className="flex flex-wrap justify-center gap-3 mb-8">
+              {categories.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className={`px-4 py-2 rounded-full border transition-all duration-300 ${selectedCategory === category.id
+                    ? 'bg-[#D32F2F] border-[#D32F2F] text-white shadow-lg shadow-red-500/25'
+                    : 'border-[#333] text-[#B0B0B0] hover:border-[#D32F2F] hover:text-white'
                     }`}
                 >
-                  <button
-                    className="w-full px-6 py-5 text-left flex items-center justify-between focus:outline-none"
-                    onClick={() => toggleAccordion(index)}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div
-                        className={`w-2 h-2 rounded-full mt-3 ${getCategoryColor(
-                          faq.category
-                        )}`}
-                      ></div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-white pr-8">
-                          {faq.question}
-                        </h3>
-                        <span
-                          className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(
-                            faq.category
-                          )} text-white bg-opacity-20`}
-                        >
-                          {faq.category}
-                        </span>
-                      </div>
-                    </div>
-                    <div
-                      className={`transform transition-transform duration-300 ${activeIndex === index ? 'rotate-180' : ''
-                        }`}
-                    >
-                      <svg
-                        className="w-6 h-6 text-[#D32F2F]"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </div>
-                  </button>
-                  <div
-                    className={`px-6 pb-5 transition-all duration-300 ${activeIndex === index ? 'block' : 'hidden'
+                  <span className="font-medium">{category.name}</span>
+                  <span
+                    className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${selectedCategory === category.id
+                      ? 'bg-white text-[#D32F2F]'
+                      : 'bg-[#333] text-[#B0B0B0]'
                       }`}
                   >
-                    <div className="pl-6 border-l-2 border-[#D32F2F]">
-                      <p className="text-[#B0B0B0] leading-relaxed">
-                        {faq.answer}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                    {category.count}
+                  </span>
+                </button>
               ))}
             </div>
-          </div>
 
-          {/* Contact Call-to-Action Section */}
-          <div className="text-center mt-12 pt-8 border-t border-[#333]">
-            <p className="text-[#B0B0B0] mb-6">
-              Still have questions? We're here to help!
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <ContactSupportSection />
-              {/* Live Chat Button - Opens chat type popup */}
-              <button
-                onClick={() => setIsChatTypePopupOpen(true)}
-                className="btn-secondary border-2 border-[#D32F2F] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#D32F2F] transition-all duration-300"
-              >
-                Live Chat
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Custom CSS Styles */}
-        <style jsx>{`
-          .text-gradient {
-            background: linear-gradient(135deg, #d32f2f 0%, #ff5252 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-          }
-
-          .fade-in {
-            animation: fadeIn 0.8s ease-out;
-          }
-
-          @keyframes fadeIn {
-            from {
-              opacity: 0;
-              transform: translateY(30px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-        `}</style>
-      </section>
-
-      {/* Simple Chat Type Selection Popup */}
-      {isChatTypePopupOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1E1E1E] border border-[#333] rounded-2xl p-6 max-w-sm w-full mx-auto">
-            <h3 className="text-xl font-bold text-white mb-4 text-center">
-              Choose Chat Type
-            </h3>
-
-            <div className="space-y-3">
-              <button
-                onClick={() => handleChatTypeSelect('quick')}
-                className="w-full bg-gradient-to-r from-[#D32F2F] to-[#FF5252] hover:from-[#B71C1C] hover:to-[#D32F2F] text-white py-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-3"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                Quick Chat (AI)
-              </button>
-
-              <button
-                onClick={() => handleChatTypeSelect('admin')}
-                className="w-full bg-gradient-to-r from-[#2196F3] to-[#21CBF3] hover:from-[#1976D2] hover:to-[#2196F3] text-white py-3 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-3"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                Admin Chat
-              </button>
+            {/* FAQ Accordion Items */}
+            <div className="max-w-4xl mx-auto">
+              <div className="grid gap-4">
+                {filteredFaqs.map((faq, index) => (
+                  <div
+                    key={faq.id}
+                    className={`bg-[#1E1E1E] border border-[#333] rounded-2xl overflow-hidden transition-all duration-300 hover:border-[#D32F2F]/50 ${activeIndex === index
+                      ? 'ring-2 ring-[#D32F2F]/20 border-[#D32F2F]'
+                      : ''
+                      }`}
+                  >
+                    <button
+                      className="w-full px-6 py-5 text-left flex items-center justify-between focus:outline-none"
+                      onClick={() => toggleAccordion(index)}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div
+                          className={`w-2 h-2 rounded-full mt-3 ${getCategoryColor(
+                            faq.category
+                          )}`}
+                        ></div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-white pr-8">
+                            {faq.question}
+                          </h3>
+                          <span
+                            className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(
+                              faq.category
+                            )} text-white bg-opacity-20`}
+                          >
+                            {faq.category}
+                          </span>
+                        </div>
+                      </div>
+                      <div
+                        className={`transform transition-transform duration-300 ${activeIndex === index ? 'rotate-180' : ''
+                          }`}
+                      >
+                        <svg
+                          className="w-6 h-6 text-[#D32F2F]"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      </div>
+                    </button>
+                    <div
+                      className={`px-6 pb-5 transition-all duration-300 ${activeIndex === index ? 'block' : 'hidden'
+                        }`}
+                    >
+                      <div className="pl-6 border-l-2 border-[#D32F2F]">
+                        <p className="text-[#B0B0B0] leading-relaxed">
+                          {faq.answer}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <button
-              onClick={() => setIsChatTypePopupOpen(false)}
-              className="w-full mt-4 text-[#B0B0B0] hover:text-white py-2 rounded-lg font-medium transition-all duration-300 border border-[#333] hover:border-[#555]"
-            >
-              Cancel
-            </button>
+            {/* Contact Call-to-Action Section */}
+            <div className="text-center mt-12 pt-8 border-t border-[#333]">
+              <p className="text-[#B0B0B0] mb-6">
+                Still have questions? We're here to help!
+              </p>
+              <div className="flex flex-wrap justify-center gap-4">
+                <ContactSupportSection />
+                {/* Live Chat Button - Now directly opens Admin Chat if logged in */}
+                <button
+                  onClick={handleLiveChatClick}
+                  className="btn-secondary border-2 border-[#D32F2F] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#D32F2F] transition-all duration-300"
+                >
+                  Live Chat
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Custom CSS Styles */}
+          <style jsx>{`
+            .text-gradient {
+              background: linear-gradient(135deg, #d32f2f 0%, #ff5252 100%);
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              background-clip: text;
+            }
+
+            .fade-in {
+              animation: fadeIn 0.8s ease-out;
+            }
+
+            @keyframes fadeIn {
+              from {
+                opacity: 0;
+                transform: translateY(30px);
+              }
+              to {
+                opacity: 1;
+                transform: translateY(0);
+              }
+            }
+          `}</style>
+        </section>
+      </div>
+
+      {/* Unified Chat Component with Tabs - NO BLUR */}
+      {(activeChat === 'ai' || activeChat === 'admin') && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center md:justify-end p-4 bg-black/50"
+          onClick={handleCloseChat} // Close when clicking on backdrop
+        >
+          <div
+            ref={chatRef}
+            className="bg-gradient-to-b from-gray-900 to-gray-800 rounded-2xl border border-gray-700/50 shadow-2xl w-full max-w-lg h-[550px] flex flex-col"
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside chat
+          >
+            {/* Chat Header with Tabs */}
+            <div className="p-4 border-b border-gray-700/50 bg-gradient-to-r from-gray-800 to-gray-900 broder-t-xl">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-3">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${activeChat === 'ai'
+                    ? 'bg-gradient-to-br from-red-500 to-red-600'
+                    : 'bg-gradient-to-br from-blue-500 to-blue-600'
+                    }`}>
+                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      {activeChat === 'ai' ? (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                      ) : (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                      )}
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-white">
+                      {activeChat === 'ai' ? 'VibePass AI Assistant' : 'Live Support'}
+                    </h2>
+                    <p className="text-gray-400 text-xs">
+                      {activeChat === 'ai' ? 'Powered by Gemini AI' : "We're here to help you!"}
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleCloseChat}
+                  className="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all duration-200 hover:scale-110"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Tab Buttons */}
+              <div className="flex space-x-2">
+                <button
+                  onClick={switchToAdminChat}
+                  className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${activeChat === 'admin'
+                    ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
+                    : 'bg-gray-700/50 text-gray-300 hover:bg-gray-600'
+                    }`}
+                >
+                  <div className="flex items-center justify-center space-x-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    <span>Admin Chat</span>
+                  </div>
+                </button>
+
+                <button
+                  onClick={switchToAiChat}
+                  className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${activeChat === 'ai'
+                    ? 'bg-red-500 text-white shadow-lg shadow-red-500/25'
+                    : 'bg-gray-700/50 text-gray-300 hover:bg-gray-600'
+                    }`}
+                >
+                  <div className="flex items-center justify-center space-x-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                    <span>AI Chat</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* Chat Content */}
+            <div className="flex-1">
+              {activeChat === 'ai' ? (
+                <AiChat
+                  isOpen={true}
+                  onClose={handleCloseChat}
+                  embedded={true}
+                />
+              ) : (
+                <AdminChat
+                  isOpen={true}
+                  onClose={handleCloseChat}
+                  embedded={true}
+                />
+              )}
+            </div>
           </div>
         </div>
       )}
-
-      {/* AI Chat Component */}
-      <AiChat
-        isOpen={isAiChatOpen}
-        onClose={() => setIsAiChatOpen(false)}
-      />
-
-      {/* Admin Chat Component */}
-      <AdminChat
-        isOpen={isAdminChatOpen}
-        onClose={() => setIsAdminChatOpen(false)}
-      />
     </>
   )
 }
