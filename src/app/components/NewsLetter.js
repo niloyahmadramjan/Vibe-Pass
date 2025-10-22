@@ -1,140 +1,134 @@
-"use client";
+'use client'
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from 'react'
 import {
   FiMail,
-  FiCheck,
-  FiAlertCircle,
   FiBell,
   FiStar,
   FiShield,
-  FiUsers,
-  FiHeart,
-  FiClock,
   FiFilm,
-  FiPlay,
-  FiArrowRight,
   FiSend,
-} from "react-icons/fi";
-import { MdOutlinePrivacyTip } from "react-icons/md";
-import Swal from "sweetalert2";
-import axiosSecure from "../api/axiosHook/useAxiosSecure";
+} from 'react-icons/fi'
+import { MdOutlinePrivacyTip } from 'react-icons/md'
+import Swal from 'sweetalert2'
+import axiosSecure from '../api/axiosHook/useAxiosSecure'
+import axios from 'axios'
 
 function NewsLetter() {
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [isSubscribed, setIsSubscribed] = useState(false);
-  const [message, setMessage] = useState({ type: "", text: "" });
-  const [mounted, setMounted] = useState(false);
-  const formRef = useRef(null);
+  const [email, setEmail] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [isSubscribed, setIsSubscribed] = useState(false)
+  const [message, setMessage] = useState({ type: '', text: '' })
+  const [mounted, setMounted] = useState(false)
+  const formRef = useRef(null)
 
-  // ✅ Fix hydration mismatch by delaying render until mounted
+  // Fix hydration mismatch by delaying render until mounted
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    setMounted(true)
+  }, [])
 
-  if (!mounted) return null;
+  if (!mounted) return null
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setMessage({ type: "error", text: "Please enter a valid email address" });
-      return;
+      setMessage({ type: 'error', text: 'Please enter a valid email address' })
+      return
     }
 
-    setLoading(true);
-    setMessage({ type: "", text: "" });
+    setLoading(true)
+    setMessage({ type: '', text: '' })
 
     try {
-      const response = await axiosSecure.post("/api/newsletter/subscribe", {
+      const response = await axiosSecure.post('/api/newsletter/subscribe', {
         email,
-      });
+      })
 
       if (response.data.success) {
         Swal.fire({
-          title: "🎉 Subscribed Successfully!",
+          title: ' Subscribed Successfully!',
           text: "Welcome to our cinema family! You'll receive exclusive updates.",
-          icon: "success",
-          confirmButtonColor: "#ef4444",
-          background: "#0f172a",
-          color: "#fff",
-        });
+          icon: 'success',
+          confirmButtonColor: '#ef4444',
+          background: '#0f172a',
+          color: '#fff',
+        })
 
-        setIsSubscribed(true);
-        setEmail("");
+        setIsSubscribed(true)
+        setEmail('')
         setMessage({
-          type: "success",
+          type: 'success',
           text: "You're successfully subscribed!",
-        });
+        })
       } else {
         Swal.fire({
-          title: "Already Subscribed!",
-          text: "You're already part of our cinema community 🍿",
-          icon: "info",
-          confirmButtonColor: "#ef4444",
-          background: "#0f172a",
-          color: "#fff",
-        });
+          title: 'Already Subscribed!',
+          text: "You're already part of our cinema community ",
+          icon: 'info',
+          confirmButtonColor: '#ef4444',
+          background: '#0f172a',
+          color: '#fff',
+        })
         setMessage({
-          type: "error",
-          text: response.data.message || "Already subscribed",
-        });
-        setIsSubscribed(true);
+          type: 'error',
+          text: response.data.message || 'Already subscribed',
+        })
+        setIsSubscribed(true)
       }
     } catch (error) {
       Swal.fire({
-        title: "Server Error!",
-        text: error.response?.data?.message || "Please try again later.",
-        icon: "error",
-        confirmButtonColor: "#ef4444",
-        background: "#0f172a",
-        color: "#fff",
-      });
+        title: 'Server Error!',
+        text: error.response?.data?.message || 'Please try again later.',
+        icon: 'error',
+        confirmButtonColor: '#ef4444',
+        background: '#0f172a',
+        color: '#fff',
+      })
       setMessage({
-        type: "error",
-        text: error.response?.data?.message || "Server error, try again later",
-      });
+        type: 'error',
+        text: error.response?.data?.message || 'Server error, try again later',
+      })
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const features = [
     {
       icon: FiBell,
-      title: "First to Know",
+      title: 'First to Know',
       description:
-        "Be the first to hear about new releases and special screenings",
-      color: "from-blue-500 to-cyan-500",
-      bgColor: "bg-blue-500/10",
-      borderColor: "border-blue-500/20",
+        'Be the first to hear about new releases and special screenings',
+      color: 'from-blue-500 to-cyan-500',
+      bgColor: 'bg-blue-500/10',
+      borderColor: 'border-blue-500/20',
     },
     {
       icon: FiStar,
-      title: "Exclusive Deals",
-      description: "Get special discounts and offers before anyone else",
-      color: "from-amber-500 to-orange-500",
-      bgColor: "bg-amber-500/10",
-      borderColor: "border-amber-500/20",
+      title: 'Exclusive Deals',
+      description: 'Get special discounts and offers before anyone else',
+      color: 'from-amber-500 to-orange-500',
+      bgColor: 'bg-amber-500/10',
+      borderColor: 'border-amber-500/20',
     },
     {
       icon: FiShield,
-      title: "No Spam",
-      description: "Quality content only. Unsubscribe anytime with one click",
-      color: "from-emerald-500 to-green-500",
-      bgColor: "bg-emerald-500/10",
-      borderColor: "border-emerald-500/20",
+      title: 'No Spam',
+      description: 'Quality content only. Unsubscribe anytime with one click',
+      color: 'from-emerald-500 to-green-500',
+      bgColor: 'bg-emerald-500/10',
+      borderColor: 'border-emerald-500/20',
     },
     {
       icon: FiFilm,
-      title: "Behind the Scenes",
-      description: "Access exclusive content and interviews with filmmakers",
-      color: "from-purple-500 to-pink-500",
-      bgColor: "bg-purple-500/10",
-      borderColor: "border-purple-500/20",
+      title: 'Behind the Scenes',
+      description: 'Access exclusive content and interviews with filmmakers',
+      color: 'from-purple-500 to-pink-500',
+      bgColor: 'bg-purple-500/10',
+      borderColor: 'border-purple-500/20',
     },
-  ];
+  ]
 
   return (
     <div className="min-h-screen py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
@@ -144,7 +138,7 @@ function NewsLetter() {
             <FiMail className="text-white text-2xl" />
           </div>
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-            Never Miss a{" "}
+            Never Miss a{' '}
             <span className="bg-gradient-to-r from-red-500 via-orange-500 to-red-600 bg-clip-text text-transparent animate-gradient bg-300%">
               Blockbuster
             </span>
@@ -180,7 +174,6 @@ function NewsLetter() {
                   </div>
                 ))}
               </div>
-              
             </div>
           </div>
 
@@ -206,9 +199,9 @@ function NewsLetter() {
               {message.text && (
                 <div
                   className={`p-3 rounded-xl border text-sm ${
-                    message.type === "success"
-                      ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                      : "bg-red-500/10 border-red-500/20 text-red-400"
+                    message.type === 'success'
+                      ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                      : 'bg-red-500/10 border-red-500/20 text-red-400'
                   }`}
                 >
                   {message.text}
@@ -220,15 +213,15 @@ function NewsLetter() {
                 disabled={loading || isSubscribed}
                 className={`w-full py-4 rounded-2xl font-semibold transition-all duration-300 ${
                   isSubscribed
-                    ? "bg-gray-700 text-gray-300 cursor-not-allowed"
-                    : "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white"
+                    ? 'bg-gray-700 text-gray-300 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white'
                 }`}
               >
                 {loading
-                  ? "Securing Your Spot..."
+                  ? 'Securing Your Spot...'
                   : isSubscribed
-                  ? "Subscribed ✅"
-                  : "Subscribe Now"}
+                  ? 'Subscribed '
+                  : 'Subscribe Now'}
               </button>
             </form>
             <p className="text-sm text-slate-400 text-center pt-8 flex gap-1 items-center justify-center lg:pb-42">
@@ -257,7 +250,7 @@ function NewsLetter() {
         }
       `}</style>
     </div>
-  );
+  )
 }
 
-export default NewsLetter;
+export default NewsLetter
