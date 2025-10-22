@@ -1,66 +1,73 @@
-"use client";
+'use client'
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react'
 import {
   useStripe,
   useElements,
-  CardNumberElement,  
+  CardNumberElement,
   CardExpiryElement,
   CardCvcElement,
-} from "@stripe/react-stripe-js";
-import Swal from "sweetalert2";
-import { useRouter } from "next/navigation";
-import { FaCreditCard, FaUser, FaCalendarAlt, FaLock } from "react-icons/fa";
+} from '@stripe/react-stripe-js'
+import Swal from 'sweetalert2'
+import { useRouter } from 'next/navigation'
+import { FaCreditCard, FaCalendarAlt, FaLock } from 'react-icons/fa'
+import axiosSecure from '../api/axiosHook/useAxiosSecure' 
+
 
 export default function PaymentForm({ session }) {
-  const stripe = useStripe();
-  const elements = useElements();
-  const router = useRouter();
-  // console.log("session", session._id)
+  const stripe = useStripe()
+  const elements = useElements()
+  const router = useRouter()
 
-  const [clientSecret, setClientSecret] = useState("");
-  const [processing, setProcessing] = useState(false);
+  const [clientSecret, setClientSecret] = useState('')
+  const [processing, setProcessing] = useState(false)
 
   const elementOptions = {
     style: {
       base: {
-        color: "#ffffff", // 🔥 makes text white
-        fontSize: "16px",
-        fontFamily: "Inter, sans-serif",
-        "::placeholder": {
-          color: "#9ca3af", // placeholder gray
+        color: '#ffffff',
+        fontSize: '16px',
+        fontFamily: 'Inter, sans-serif',
+        '::placeholder': {
+          color: '#9ca3af',
         },
       },
       invalid: {
-        color: "#ff4d4f", // error text red
+        color: '#ff4d4f',
       },
     },
-  };
+  }
 
-  // ✅ Create PaymentIntent on load
+  // ✅ Create PaymentIntent on load (using axiosSecure)
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/payments`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        amount: session.totalAmount ,
-        bookingId: session._id,
-        
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.clientSecret) setClientSecret(data.clientSecret);
-      })
-      .catch((err) => Swal.fire("Error", err.message, "error"));
-  }, [session]);
+    if (!session?._id || !session?.totalAmount) return
 
-  //  Handle Stripe payment
+    const createPaymentIntent = async () => {
+      try {
+        const res = await axiosSecure.post('/api/payments', {
+          amount: session.totalAmount,
+          bookingId: session._id
+        })
+
+        if (res.data?.clientSecret) {
+          setClientSecret(res.data.clientSecret)
+        } else {
+          Swal.fire('Error', 'Failed to initialize payment intent', 'error')
+        }
+      } catch (err) {
+        Swal.fire('Error', err?.message || 'Payment setup failed', 'error')
+      }
+    }
+
+    createPaymentIntent()
+  }, [session])
+
+  // ✅ Handle Stripe payment
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!stripe || !elements || !clientSecret) return;
+    e.preventDefault()
+    if (!stripe || !elements || !clientSecret) return
 
-    setProcessing(true);
+    setProcessing(true)
 
     try {
       const { error, paymentIntent } = await stripe.confirmCardPayment(
@@ -69,73 +76,59 @@ export default function PaymentForm({ session }) {
           payment_method: {
             card: elements.getElement(CardNumberElement),
             billing_details: {
-              name: session.userName,
-              email: session.userEmail,
+              name: session?.userName || 'Unknown User',
+              email: session?.userEmail || 'No Email',
             },
           },
         }
-      );
+      )
 
-      if (error) throw error;
+      if (error) throw error
 
-      if (paymentIntent?.status === "succeeded") {
-        // Save payment
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/payments/confirm-payment`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              transactionId: paymentIntent.id,
-              amount: paymentIntent.amount,
-              status: paymentIntent.status,
-              bookingId: session._id,
-              sessionTitle: session.movieTitle,
-              userEmail: session.userEmail,
-              userName: session.userName,
-              theaterName: session.theaterName,
-              showTime: session.showTime,
-              selectedSeats: session.selectedSeats,
-              screen: session.screen,
-            }),
-          }
-        );
-        const data = await res.json();
-        // Update booking
-        await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/ticket/bookings/${session._id}`,
-          {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: 'paid' }),
-          }
-        )
+      if (paymentIntent?.status === 'succeeded') {
+        // ✅ Save payment in DB (axiosSecure)
+        const res = await axiosSecure.post('/api/payments/confirm-payment', {
+          transactionId: paymentIntent.id,
+          amount: paymentIntent.amount,
+          status: paymentIntent.status,
+          bookingId: session._id,
+          sessionTitle: session.movieTitle,
+          userEmail: session.userEmail,
+          userName: session.userName,
+          theaterName: session.theaterName,
+          showTime: session.showTime,
+          selectedSeats: session.selectedSeats,
+          screen: session.screen,
+        })
+
+        const data = res.data
+
         Swal.fire({
-          icon: "success",
-          title: "Payment Successful ",
-          text: "Redirecting you to your tickets...",
+          icon: 'success',
+          title: 'Payment Successful',
+          text: 'Redirecting you to your ticket...',
           timer: 2000,
           showConfirmButton: false,
-        });
-        // show 2 second after dynamic id show ticket-Details/Id
-        setTimeout(
-          () => router.push(`/ticket-Details/${data.payment._id}`),
-          2000
-        );
+        })
+
+        // ✅ Redirect to ticket details page
+        if (data?.payment?._id) {
+          setTimeout(() => router.push(`/ticket-Details/${session._id}`), 2000)
+        }
       }
     } catch (err) {
       Swal.fire({
-        icon: "error",
-        title: "Payment Failed",
-        text: err.message,
-      });
+        icon: 'error',
+        title: 'Payment Failed',
+        text: err?.message || 'Something went wrong during payment',
+      })
     } finally {
-      setProcessing(false);
+      setProcessing(false)
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen pt-20 md:pt-0 font-[Inter]  p-6 flex items-center justify-center text-white">
+    <div className="min-h-screen pt-20 md:pt-0 font-[Inter] p-6 flex items-center justify-center text-white">
       <div className="w-full max-w-4xl">
         <div className="rounded-3xl shadow-2xl overflow-hidden backdrop-filter backdrop-blur-lg bg-opacity-90 border border-gray-700">
           <div className="flex flex-col md:flex-row p-6 gap-8">
@@ -157,7 +150,7 @@ export default function PaymentForm({ session }) {
                   <div className="flex justify-between items-end">
                     <div>
                       <div className="text-xs opacity-70 mb-1">CARDHOLDER</div>
-                      <div className="font-semibold">{session.userName}</div>
+                      <div className="font-semibold">{session?.userName}</div>
                     </div>
                     <div>
                       <div className="text-xs opacity-70 mb-1">VALID THRU</div>
@@ -168,7 +161,7 @@ export default function PaymentForm({ session }) {
               </div>
             </div>
 
-            {/* Form Section */}
+            {/* Payment Form Section */}
             <div className="w-full md:w-1/2 p-4 flex flex-col justify-center">
               <h1 className="text-2xl font-bold text-center mb-6">
                 Payment Details
@@ -191,6 +184,7 @@ export default function PaymentForm({ session }) {
                       <CardExpiryElement options={elementOptions} />
                     </div>
                   </div>
+
                   <div className="relative">
                     <FaLock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
                     <div className="w-full pl-12 pr-4 py-3 border border-gray-600 rounded-lg bg-[var(--color-bg-dark)]">
@@ -203,7 +197,7 @@ export default function PaymentForm({ session }) {
                 <div className="mt-8 text-center">
                   <div className="mb-2 font-medium">Payment Amount:</div>
                   <div className="text-3xl font-bold text-[var(--color-primary)]">
-                    ৳{session.totalAmount}
+                    ৳{session?.totalAmount}
                   </div>
                 </div>
 
@@ -213,7 +207,9 @@ export default function PaymentForm({ session }) {
                   disabled={!stripe || !clientSecret || processing}
                   className="w-full mt-6 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white py-4 px-6 rounded-xl font-bold text-lg shadow-lg focus:ring-4 focus:ring-[var(--color-primary)] transition-all duration-200 transform hover:-translate-y-1"
                 >
-                  {processing ? "Processing..." : `PAY ৳${session.totalAmount}`}
+                  {processing
+                    ? 'Processing...'
+                    : `PAY ৳${session?.totalAmount}`}
                 </button>
 
                 {/* Security Note */}
@@ -227,5 +223,5 @@ export default function PaymentForm({ session }) {
         </div>
       </div>
     </div>
-  );
+  )
 }
