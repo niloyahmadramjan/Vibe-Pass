@@ -95,44 +95,45 @@ export default function TicketManagement() {
     // Download ticket as PDF
     const handleDownloadTicket = async (ticket) => {
         try {
-            const response = await fetch(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/generate-ticket-pdf`,
+            // ✅ Send POST request with ticket data
+            const response = await axiosSecure.post("/api/generate-ticket-pdf",
                 {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        movieTitle: ticket.movieTitle,
-                        theaterName: ticket.theaterName,
-                        showDate: ticket.showDate,
-                        showTime: ticket.showTime,
-                        selectedSeats: ticket.selectedSeats,
-                        totalAmount: ticket.totalAmount,
-                        transactionId: ticket.transactionId,
-                        screen: ticket.screen,
-                        status: ticket.paymentStatus,
-                        userName: ticket.userName,
-                        userEmail: ticket.userEmail,
-                        bookingId: ticket.bookingId,
-                    }),
+                   
+                    movieTitle: ticket.movieTitle,
+                    theaterName: ticket.theaterName,
+                    showDate: ticket.showDate,
+                    showTime: ticket.showTime,
+                    selectedSeats: ticket.selectedSeats,
+                    totalAmount: ticket.totalAmount,
+                    transactionId: ticket.transactionId,
+                    screen: ticket.screen,
+                    status: ticket.paymentStatus,
+                    userName: ticket.userName,
+                    userEmail: ticket.userEmail,
+                    bookingId: ticket._id,
+                },
+                {
+                    responseType: "blob", // ✅ Important: PDF is binary data
                 }
             );
 
-            if (!response.ok) throw new Error("Failed to download PDF");
-
-            const blob = await response.blob();
+            // ✅ Create a download link for PDF
+            const blob = new Blob([response.data], { type: "application/pdf" });
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.href = url;
             link.download = `ticket-${ticket.bookingId || ticket.transactionId}.pdf`;
             link.click();
-            window.URL.revokeObjectURL(url);
 
-            toast.success('Ticket downloaded successfully!');
+            // ✅ Clean up
+            window.URL.revokeObjectURL(url);
+            toast.success("Ticket downloaded successfully!");
         } catch (error) {
             console.error("Download failed:", error);
-            toast.error('Failed to download ticket');
+            toast.error("Failed to download ticket");
         }
     };
+
 
     // Format time
     const formatTime = (time) => {
