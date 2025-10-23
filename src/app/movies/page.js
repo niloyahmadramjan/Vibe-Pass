@@ -155,7 +155,7 @@ export default function MoviesPage() {
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white px-4 md:px-6 py-10 pt-25 max-w-7xl mx-auto">
+    <div className="min-h-screen  text-white px-4 md:px-6 py-10 pt-25 max-w-7xl mx-auto">
       {/* Header Section */}
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">

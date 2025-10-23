@@ -1,99 +1,68 @@
-"use client";
+'use client'
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { QRCodeCanvas } from "qrcode.react";
+import { useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
+import { QRCodeCanvas } from 'qrcode.react'
+import axiosPublic from '@/app/api/axiosHook/useAxiosPublic'
 
 export default function TicketDetailsPage() {
-  const { id } = useParams();
-  const [ticket, setTicket] = useState(null);
-  const [booking, setBooking] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [downloading, setDownloading] = useState(false);
+  const { id } = useParams() // bookingId from URL
+  const [booking, setBooking] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [downloading, setDownloading] = useState(false)
 
-  useEffect(() => {
-    if (!id) return;
-    // payment data
-    const fetchPayment = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/payments/${id}`
-        );
-        if (!response.ok) throw new Error("Payment fetch failed");
-        const data = await response.json();
-        // console.log("✅ Payment Data:", data);
-        setTicket(data);
-      } catch (err) {
-        console.error("❌ Error fetching payment:", err);
-      }
-    };
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL
 
-    fetchPayment();
-  }, [id]);
+  // ✅ Fetch booking data by ID
+ useEffect(() => {
+   if (!id) return
 
-  useEffect(() => {
-    if (!ticket?.bookingId) return;
-    // booking cinemas data
-    const fetchBooking = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/ticket/bookings/${ticket.bookingId}`
-        );
-        if (!response.ok) throw new Error("Booking fetch failed");
-        const data = await response.json();
-        setBooking(data);
-      } catch (err) {
-        console.error("❌ Error fetching booking:", err);
-        setLoading(false); 
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBooking();
-  }, [ticket?.bookingId]);
-
-  // pdf
- const handleDownloadPDF = async () => {
-   setDownloading(true);
-   try {
-     const response = await fetch(
-       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/generate-ticket-pdf`,
-       {
-         method: "POST",
-         headers: { "Content-Type": "application/json" },
-         body: JSON.stringify({
-           movieTitle: booking.movieTitle,
-           theaterName: booking.theaterName,
-           showDate: booking.showDate,
-           showTime: booking.showTime,
-           selectedSeats: booking.selectedSeats,
-           totalAmount: booking.totalAmount,
-           transactionId: ticket.transactionId,
-           screen: booking.screen,
-           status: ticket.status,
-           userName:booking.userName,
-           userEmail: booking.userEmail,
-         }),
-       }
-     );
-
-     if (!response.ok) throw new Error("Failed to download PDF");
-
-     const blob = await response.blob();
-     const url = window.URL.createObjectURL(blob);
-     const link = document.createElement("a");
-     link.href = url;
-     link.download = `ticket-${ticket.transactionId}.pdf`;
-     link.click();
-     window.URL.revokeObjectURL(url);
-   } catch (error) {
-     console.error("Download failed:", error);
-   } finally {
-     setDownloading(false);
+   const fetchBooking = async () => {
+     try {
+       const response = await axiosPublic.get(`/api/ticket/bookings/${id}`)
+       setBooking(response.data)
+     } catch (err) {
+       console.error('❌ Error fetching booking:', err)
+     } finally {
+       setLoading(false)
+     }
    }
- };
 
+   fetchBooking()
+ }, [id])
+
+
+  // ✅ Download PDF Ticket
+  const handleDownloadPDF = async (bookingId) => {
+    try {
+      setDownloading(true)
+
+      const response = await axiosPublic.post(
+        '/api/generate-ticket-pdf',
+        { bookingId },
+        { responseType: 'blob' }
+      )
+
+      const blob = new Blob([response.data], { type: 'application/pdf' })
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `VibePass-Ticket-${bookingId}.pdf`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+
+      setDownloading(false)
+    } catch (error) {
+      console.error('Error generating PDF:', error)
+      alert('Failed to download ticket PDF.')
+      setDownloading(false)
+    }
+  }
+
+  // ✅ Loading state
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -104,10 +73,11 @@ export default function TicketDetailsPage() {
           </p>
         </div>
       </div>
-    );
+    )
   }
 
-  if (!ticket?._id || !booking?._id) {
+  // ✅ Booking not found
+  if (!booking?._id) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="text-center p-8 bg-red-50 rounded-xl max-w-md">
@@ -120,12 +90,16 @@ export default function TicketDetailsPage() {
           </p>
         </div>
       </div>
-    );
+    )
   }
 
+  // ✅ Fallback if booking has no payment info
+  const paymentStatus = booking?.paymentStatus || 'unknown'
+  const transactionId = booking?.transactionId || 'N/A'
+  
   return (
     <div className="py-8 px-4 sm:px-6 lg:px-8 pt-20 pb-15">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-2">Your Ticket</h1>
@@ -135,18 +109,24 @@ export default function TicketDetailsPage() {
         </div>
 
         {/* Main Ticket Card */}
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden ">
+        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
           {/* Status Banner */}
           <div className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-hover)] p-4 text-white">
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-2xl font-bold"> {booking.movieTitle}</h2>
+                <h2 className="text-2xl font-bold">{booking.movieTitle}</h2>
                 <p className="opacity-90">
                   {booking.theaterName} • Screen {booking.screen}
                 </p>
               </div>
-              <span className="px-3 py-1 rounded-full text-sm font-medium bg-green-200 text-green-900">
-                {ticket.status?.toUpperCase()}
+              <span
+                className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  paymentStatus === 'paid'
+                    ? 'bg-green-200 text-green-900'
+                    : 'bg-yellow-200 text-yellow-900'
+                }`}
+              >
+                {paymentStatus.toUpperCase()}
               </span>
             </div>
           </div>
@@ -157,18 +137,7 @@ export default function TicketDetailsPage() {
             <div className="md:col-span-1 flex flex-col items-center">
               <div className="bg-gray-200 p-6 rounded-xl shadow-inner mb-4">
                 <QRCodeCanvas
-                  value={JSON.stringify({
-                    transactionId: ticket.transactionId,
-                    status: "paid",
-                    movieTitle: booking.movieTitle,
-                    theaterName: booking.theaterName,
-                    screen: booking.screen,
-                    showDate: booking.showDate,
-                    showTime: booking.showTime,
-                    seats: booking.selectedSeats,
-                    userName: booking.userName,
-                    userEmail: booking.userEmail,
-                  })}
+                  value={`${baseUrl}/verify-qr/${booking.qrSignature}`}
                   size={180}
                   bgColor="#FFFFFF"
                   fgColor="#000000"
@@ -182,7 +151,7 @@ export default function TicketDetailsPage() {
               </p>
 
               <button
-                onClick={handleDownloadPDF}
+                onClick={() => handleDownloadPDF(booking._id)}
                 disabled={downloading}
                 className="w-full bg-gradient-to-r from-[#CC2027] to-[#E53935] text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -211,7 +180,7 @@ export default function TicketDetailsPage() {
                     Generating PDF...
                   </span>
                 ) : (
-                  "Download PDF Ticket"
+                  'Download PDF Ticket'
                 )}
               </button>
             </div>
@@ -228,7 +197,7 @@ export default function TicketDetailsPage() {
                   <DetailItem label="Theater" value={booking.theaterName} />
                   <DetailItem
                     label="Seat Number"
-                    value={booking.selectedSeats[0]}
+                    value={booking.selectedSeats?.[0] || 'N/A'}
                   />
                   <DetailItem
                     label="Screen"
@@ -237,12 +206,12 @@ export default function TicketDetailsPage() {
                   <DetailItem
                     label="Date & Time"
                     value={`${new Date(booking.showDate).toLocaleDateString(
-                      "en-US",
+                      'en-US',
                       {
-                        weekday: "short",
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
+                        weekday: 'short',
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
                       }
                     )} at ${booking.showTime}`}
                   />
@@ -255,19 +224,22 @@ export default function TicketDetailsPage() {
                   </h3>
                   <DetailItem
                     label="Transaction ID"
-                    value={ticket.transactionId}
+                    value={transactionId}
                     mono
                   />
                   <DetailItem
                     label="Seats"
-                    value={booking.selectedSeats.join(", ")}
+                    value={booking.selectedSeats?.join(', ') || 'N/A'}
                   />
                   <DetailItem
                     label="Total Amount"
                     value={`৳${booking.totalAmount}`}
                     highlight
                   />
-                  <DetailItem label="Payment Status" value={ticket.status} />
+                  <DetailItem
+                    label="Payment Status"
+                    value={paymentStatus.toUpperCase()}
+                  />
                 </div>
 
                 {/* Customer Information */}
@@ -305,21 +277,21 @@ export default function TicketDetailsPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-// Reusable Detail Item Component
+// ✅ Reusable Detail Item Component
 function DetailItem({ label, value, mono = false, highlight = false }) {
   return (
     <div className="flex justify-between items-start">
       <span className="text-sm font-medium text-gray-500">{label}:</span>
       <span
-        className={`text-sm text-right ${mono ? "font-mono" : ""} ${
-          highlight ? "font-bold text-[#CC2027]" : "text-gray-900"
+        className={`text-sm text-right ${mono ? 'font-mono' : ''} ${
+          highlight ? 'font-bold text-[#CC2027]' : 'text-gray-900'
         }`}
       >
         {value}
       </span>
     </div>
-  );
+  )
 }

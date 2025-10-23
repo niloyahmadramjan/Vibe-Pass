@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useSearchParams } from 'next/navigation'
 import {
   FaTicketAlt,
   FaQrcode,
@@ -32,7 +31,6 @@ export default function VerifyQRPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [verificationResult, setVerificationResult] = useState(null)
   const [scanMode, setScanMode] = useState(false)
-  const searchParams = useSearchParams()
 
   // Handle manual QR data input
   const handleManualVerify = async (e) => {
@@ -148,9 +146,9 @@ export default function VerifyQRPage() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-[#CC2027] rounded-2xl mb-6">
+          {/* <div className="inline-flex items-center justify-center w-20 h-20 bg-[#CC2027] rounded-2xl mb-6">
             <FaTicketAlt className="text-3xl text-white" />
-          </div>
+          </div> */}
           <h1 className="text-4xl font-bold text-white mb-4">Verify Ticket</h1>
           <p className="text-lg text-gray-300 max-w-2xl mx-auto">
             Scan or enter QR code to verify ticket authenticity and access

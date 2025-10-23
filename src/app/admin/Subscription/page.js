@@ -246,11 +246,11 @@ export default function SubscriptionTable() {
                                     <button
                                         type="submit"
                                         disabled={sending}
-                                        className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors font-medium text-sm flex items-center space-x-1 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                                        className="mt-4 lg:mt-0 flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-xl text-white font-semibold transition-all duration-300 shadow-lg shadow-purple-500/25"
                                     >
                                         {sending ? (
                                             <>
-                                                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                                                <div className="mt-4 lg:mt-0 flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-xl text-white font-semibold transition-all duration-300 shadow-lg shadow-purple-500/25"></div>
                                                 <span>Sending...</span>
                                             </>
                                         ) : (
@@ -380,7 +380,7 @@ export default function SubscriptionTable() {
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => setNotificationModalOpen(true)}
-                                className="px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl flex items-center space-x-2 text-sm"
+                                className="mt-4 lg:mt-0 flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-xl text-white font-semibold transition-all duration-300 shadow-lg shadow-purple-500/25"
                             >
                                 <Send size={14} />
                                 <span>Send Announcement</span>
