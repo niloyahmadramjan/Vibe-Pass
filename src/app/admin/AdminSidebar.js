@@ -10,6 +10,8 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { RiCoupon2Fill } from 'react-icons/ri';
 import { usePathname } from 'next/navigation';
+import { SubscriptIcon } from 'lucide-react';
+import { MdSubscriptions } from "react-icons/md";
 
 export default function AdminSidebar({ toggleSidebar, isOpen }) {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -39,9 +41,12 @@ const pathname = usePathname()
     // { name: 'Showtimes', path: '/admin/add-showtimes', icon: <FiClock /> },
     { name: 'Users', path: '/admin/users', icon: <FiUsers /> },
     // { name: 'Loyalty', path: '/admin/loyalty', icon: <FiGift /> },
+    { name: 'Subscription', path: '/admin/Subscription', icon: <MdSubscriptions /> },
     { name: 'Analytics', path: '/admin/analytics', icon: <FiBarChart2 /> },
-    { name: 'Chat', path: '/admin/chat', icon: <FiMail /> }, // শুধু একবার
+    
+    { name: 'Chat', path: '/admin/chat', icon: <FiMail /> }, 
     { name: 'Go Back Home', path: '/', icon: <FiHome /> },
+    
   ];
 
   return (

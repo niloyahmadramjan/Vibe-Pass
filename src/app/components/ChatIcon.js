@@ -2,7 +2,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/app/context/AuthContext'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import AdminChat from './UserLiveChat'
 import AiChat from './AiChat'
 
@@ -12,6 +12,10 @@ export default function ChatIcon() {
     const [isMobile, setIsMobile] = useState(false)
     const { user } = useAuth()
     const router = useRouter()
+    const pathname = usePathname()
+
+    // Check if current page is home page
+    const isHomePage = pathname === '/'
 
     // Check if mobile on mount and resize
     useEffect(() => {
@@ -69,6 +73,11 @@ export default function ChatIcon() {
         }
     }, [showChatPanel, isMobile])
 
+    // Don't render anything if not on home page
+    if (!isHomePage) {
+        return null
+    }
+
     return (
         <>
             {/* Floating Chat Icon - Hide when chat panel is open */}
@@ -115,45 +124,47 @@ export default function ChatIcon() {
                 >
                     <div className={`
                         ${isMobile
-                            ? 'w-full h-[600px] pt-16 rounded-none'
-                            : 'w-[500px] h-[570px] rounded-2xl'
-                        } bg-gradient-to-b from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl flex flex-col
+                            ? 'w-full h-full rounded-none flex flex-col'
+                            : 'w-[500px] h-[600px] rounded-2xl flex flex-col'
+                        } bg-gradient-to-b from-gray-900 to-gray-800 border border-gray-700/50 shadow-2xl
                     `}>
                         {/* Header with Close Button */}
-                        <div className="flex-shrink-0 p-4 border-b border-gray-700/50 bg-gradient-to-r from-white/5 to-white/2 rounded-t-2xl flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
-                                <div className={`w-10 h-10 bg-gradient-to-br rounded-xl flex items-center justify-center ${activeTab === 'ai'
-                                    ? 'from-red-500 to-red-600'
-                                    : 'from-blue-500 to-blue-600'
-                                    }`}>
-                                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        {activeTab === 'ai' ? (
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                                        ) : (
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                                        )}
-                                    </svg>
+                        <div className="flex-shrink-0 p-4 border-b border-gray-700/50 bg-gradient-to-r from-white/5 to-white/2 rounded-t-2xl">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3">
+                                    <div className={`w-10 h-10 bg-gradient-to-br rounded-xl flex items-center justify-center ${activeTab === 'ai'
+                                        ? 'from-red-500 to-red-600'
+                                        : 'from-blue-500 to-blue-600'
+                                        }`}>
+                                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            {activeTab === 'ai' ? (
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                            ) : (
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                            )}
+                                        </svg>
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <h2 className={`font-bold text-white ${isMobile ? 'text-base' : 'text-lg'}`}>
+                                            {activeTab === 'ai' ? 'VibePass AI Assistant' : 'Live Support'}
+                                        </h2>
+                                        <p className="text-gray-400 text-sm">
+                                            {activeTab === 'ai' ? 'Powered by Gemini AI' : "We're here to help you!"}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div className="flex-1 min-w-0">
-                                    <h2 className={`font-bold text-white ${isMobile ? 'text-base' : 'text-lg'}`}>
-                                        {activeTab === 'ai' ? 'VibePass AI Assistant' : 'Live Support'}
-                                    </h2>
-                                    <p className="text-gray-400 text-sm">
-                                        {activeTab === 'ai' ? 'Powered by Gemini AI' : "We're here to help you!"}
-                                    </p>
-                                </div>
-                            </div>
 
-                            {/* Close Button - Top Right */}
-                            <button
-                                onClick={handleCloseButtonClick}
-                                className={`flex items-center justify-center bg-white/10 hover:bg-red-500/80 text-white rounded-lg transition-all duration-200 hover:scale-110 ${isMobile ? 'w-10 h-10' : 'w-8 h-8'}`}
-                                title="Close chat"
-                            >
-                                <svg className={`${isMobile ? 'w-5 h-5' : 'w-4 h-4'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
+                                {/* Close Button - Top Right */}
+                                <button
+                                    onClick={handleCloseButtonClick}
+                                    className={`flex items-center justify-center bg-white/10 hover:bg-red-500/80 text-white rounded-lg transition-all duration-200 hover:scale-110 ${isMobile ? 'w-10 h-10' : 'w-8 h-8'}`}
+                                    title="Close chat"
+                                >
+                                    <svg className={`${isMobile ? 'w-5 h-5' : 'w-4 h-4'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
 
                         {/* Tab Navigation */}
@@ -180,8 +191,8 @@ export default function ChatIcon() {
                             </div>
                         </div>
 
-                        {/* Chat Content */}
-                        <div className="flex-1 overflow-hidden">
+                        {/* Chat Content - This will now properly fill available space */}
+                        <div className="flex-1 min-h-0 overflow-hidden">
                             {activeTab === 'ai' ? (
                                 <AiChat
                                     embedded={true}
@@ -189,6 +200,7 @@ export default function ChatIcon() {
                                     onClose={closeChatPanel}
                                     showHeader={false}
                                     isMobile={isMobile}
+                                    className="h-full"
                                 />
                             ) : (
                                 <AdminChat
@@ -197,6 +209,7 @@ export default function ChatIcon() {
                                     onClose={closeChatPanel}
                                     showHeader={false}
                                     isMobile={isMobile}
+                                    className="h-full"
                                 />
                             )}
                         </div>
