@@ -58,14 +58,14 @@ export default function Footer() {
                   About
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="/blog"
                   className="!text-white hover:!text-[var(--color-primary-hover)] font-bold"
                 >
                   Blog
                 </Link>
-              </li>
+              </li> */}
               {/* <li>
                 <Link
                   href="/contact"
