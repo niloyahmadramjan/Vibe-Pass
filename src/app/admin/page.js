@@ -131,7 +131,7 @@ export default function AdminHomePage() {
           setCouponsData(couponsArray);
           setSummary(prev => ({ ...prev, totalCoupons: couponsArray.length }));
         } catch (error) {
-          console.log("⚠️ Coupons API not available");
+          // console.log("⚠️ Coupons API not available");
         }
 
         // 💳 PAYMENTS — safely handle missing API
@@ -143,7 +143,7 @@ export default function AdminHomePage() {
           setPaymentsData(paymentsArray);
           setSummary(prev => ({ ...prev, activePayments: paymentsArray.length }));
         } catch (error) {
-          console.log("⚠️ Payments API not available");
+          // console.log("⚠️ Payments API not available");
         }
 
       } catch (error) {

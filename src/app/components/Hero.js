@@ -51,7 +51,7 @@ export default function HeroSection() {
 
   const fetchTrailer = async (tmdbId) => {
     try {
-      console.log('🎥 Fetching trailer for TMDB ID:', tmdbId)
+      // console.log('🎥 Fetching trailer for TMDB ID:', tmdbId)
 
       // ✅ Call your backend API
       const res = await axiosPublic.get(`/api/movies/${tmdbId}/videos`)

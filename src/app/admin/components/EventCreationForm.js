@@ -117,10 +117,10 @@ const EventCreationForm = ({ onClose, onSubmit }) => {
                 createdBy: user._id
             };
 
-            console.log("📤 Sending event data:", submitData);
+            // console.log("📤 Sending event data:", submitData);
 
             const response = await axiosSecure.post("/api/events", submitData);
-            console.log("✅ Event created successfully:", response.data);
+            // console.log("✅ Event created successfully:", response.data);
 
             toast.success("Event created successfully!");
 

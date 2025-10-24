@@ -39,7 +39,7 @@ function UpcomingMoviesContent() {
   // Backend route: /api/movies/:id/videos
   const handleWatchTrailer = async (tmdbId) => {
     try {
-      console.log("🎥 Fetching trailer for TMDB ID:", tmdbId);
+      // console.log("🎥 Fetching trailer for TMDB ID:", tmdbId);
 
       // call from backend
       const res = await axiosPublic.get(`/api/movies/${tmdbId}/videos`);

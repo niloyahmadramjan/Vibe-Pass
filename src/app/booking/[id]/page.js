@@ -197,7 +197,7 @@ export default function MovieSeatBooking() {
   const id = params.id
   const { user } = useAuth()
   const searchParams = useSearchParams()
-console.log(id)
+// console.log(id)
   // States
   const [movieData, setMovieData] = useState(null)
   const [loading, setLoading] = useState(true)
