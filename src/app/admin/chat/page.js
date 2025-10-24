@@ -39,7 +39,7 @@ export default function AdminChatPage() {
 
     // Initialize socket for admin
     useEffect(() => {
-        console.log('🔄 Admin: Initializing socket connection...');
+        // console.log('🔄 Admin: Initializing socket connection...');
         const newSocket = io(SOCKET_URL, {
             transports: ['websocket', 'polling'],
             reconnection: true,
@@ -47,14 +47,14 @@ export default function AdminChatPage() {
         });
 
         newSocket.on('connect', () => {
-            console.log('✅ Admin: Socket Connected');
+            // console.log('✅ Admin: Socket Connected');
             setConnectionStatus('connected');
-            console.log('🛡️ Admin: Registering as:', SPECIFIC_ADMIN_ID);
+            // console.log('🛡️ Admin: Registering as:', SPECIFIC_ADMIN_ID);
             newSocket.emit('register_user', SPECIFIC_ADMIN_ID);
         });
 
         newSocket.on('disconnect', (reason) => {
-            console.log('❌ Admin: Socket Disconnected:', reason);
+            // console.log('❌ Admin: Socket Disconnected:', reason);
             setConnectionStatus('disconnected');
         });
 
@@ -64,12 +64,12 @@ export default function AdminChatPage() {
         });
 
         newSocket.on('registration_confirmed', (data) => {
-            console.log('✅ Admin: Registration Confirmed:', data);
+            // console.log('✅ Admin: Registration Confirmed:', data);
             loadUsers();
         });
 
         newSocket.on('receive_message', (msg) => {
-            console.log('📩 Admin: Received message:', msg);
+            // console.log('📩 Admin: Received message:', msg);
             setMessages(prev => {
                 if (prev.find(m => m._id === msg._id)) return prev;
                 const newMessages = [...prev, msg];
@@ -81,7 +81,7 @@ export default function AdminChatPage() {
         setSocket(newSocket);
 
         return () => {
-            console.log('🧹 Admin: Cleaning up socket');
+            // console.log('🧹 Admin: Cleaning up socket');
             newSocket.disconnect();
         };
     }, []);
@@ -95,7 +95,7 @@ export default function AdminChatPage() {
 
     const loadUsers = async () => {
         try {
-            console.log('👥 Admin: Loading users...');
+            // console.log('👥 Admin: Loading users...');
             const res = await axiosSecure.get('/api/chat/users');
             setUsers(res.data);
         } catch (error) {

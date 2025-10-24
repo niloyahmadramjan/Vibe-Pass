@@ -84,7 +84,7 @@ export default function EventsManagement() {
         if (!confirm('Are you sure you want to delete this event? This action cannot be undone.')) return;
 
         try {
-            console.log("🗑️ Deleting event:", eventId);
+            // console.log("🗑️ Deleting event:", eventId);
             await axiosSecure.delete(`/api/events/${eventId}`);
 
             setEvents(prev => prev.filter(event => event._id !== eventId));
@@ -97,7 +97,7 @@ export default function EventsManagement() {
     };
 
     const handleEditClick = (event) => {
-        console.log("✏️ Edit clicked for event:", event._id);
+        // console.log("✏️ Edit clicked for event:", event._id);
         setSelectedEvent(event);
         setShowEditForm(true);
     };

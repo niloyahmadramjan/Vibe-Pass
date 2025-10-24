@@ -22,7 +22,7 @@ export default function AdminChat({ isOpen, onClose, embedded = false }) {
   useEffect(() => {
     if (!user?._id || !isOpen) return
 
-    console.log('🔄 User: Initializing socket connection...')
+    // console.log('🔄 User: Initializing socket connection...')
     const newSocket = io(SOCKET_URL, {
       transports: ['websocket', 'polling'],
       reconnection: true,
@@ -31,14 +31,14 @@ export default function AdminChat({ isOpen, onClose, embedded = false }) {
 
     // Socket event handlers
     newSocket.on('connect', () => {
-      console.log('✅ User: Socket Connected')
+      // console.log('✅ User: Socket Connected')
       setConnectionStatus('connected')
-      console.log('👤 User: Registering user:', user._id)
+      // console.log('👤 User: Registering user:', user._id)
       newSocket.emit('register_user', user._id)
     })
 
     newSocket.on('disconnect', (reason) => {
-      console.log('❌ User: Socket Disconnected:', reason)
+      // console.log('❌ User: Socket Disconnected:', reason)
       setConnectionStatus('disconnected')
     })
 
@@ -48,11 +48,11 @@ export default function AdminChat({ isOpen, onClose, embedded = false }) {
     })
 
     newSocket.on('registration_confirmed', (data) => {
-      console.log('✅ User: Registration Confirmed:', data)
+      // console.log('✅ User: Registration Confirmed:', data)
     })
 
     newSocket.on('receive_message', (msg) => {
-      console.log('📩 User: Received message:', msg)
+      // console.log('📩 User: Received message:', msg)
       setMessages((prev) => {
         if (prev.find((m) => m._id === msg._id)) return prev
         const newMessages = [...prev, msg]
@@ -70,7 +70,7 @@ export default function AdminChat({ isOpen, onClose, embedded = false }) {
 
     // Cleanup function to disconnect socket
     return () => {
-      console.log(' User: Cleaning up socket')
+      // console.log(' User: Cleaning up socket')
       newSocket.disconnect()
     }
   }, [user?._id, isOpen])
@@ -105,7 +105,7 @@ export default function AdminChat({ isOpen, onClose, embedded = false }) {
   // Send message function
   const sendMessage = () => {
     if (!text.trim() || !user || !socket || connectionStatus !== 'connected') {
-      console.log('❌ Cannot send message - missing requirements')
+      // console.log('❌ Cannot send message - missing requirements')
       return
     }
 

@@ -145,7 +145,7 @@ export default function AddMoviesPage() {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 }
   };
-  console.log(formData)
+  // console.log(formData)
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0c0c14] via-[#0f1018] to-[#1e1233] py-8 px-4">
       <motion.div

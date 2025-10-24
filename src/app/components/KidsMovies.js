@@ -48,7 +48,7 @@ export default function KidsMovies() {
     fetchUpcoming()
   }, [])
   
-  console.log(movies)
+  // console.log(movies)
   if (loading) return <Spinner />
 
   // 🔹 Handle Book Now

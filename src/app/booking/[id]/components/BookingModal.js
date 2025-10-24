@@ -63,7 +63,7 @@ export default function BookingModal({
       totalAmount: totalPrice
     });
 
-    console.log('Coupon response:', response.data); // ✅ Debug log
+    // console.log('Coupon response:', response.data); // ✅ Debug log
 
     if (response.data.success) {
       setAppliedCoupon(couponCode.trim().toUpperCase());

@@ -98,7 +98,7 @@ export default function MoviesPage() {
   const fetchTrailer = async (movie) => {
     setTrailerLoading(movie.id)
     try {
-      console.log("🎥 Fetching trailer for TMDB ID:", movie.id);
+      // console.log("🎥 Fetching trailer for TMDB ID:", movie.id);
 
       // ✅ Call your backend API - same as HeroSection
       const res = await axiosPublic.get(`/api/movies/${movie.id}/videos`);

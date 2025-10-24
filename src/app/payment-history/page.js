@@ -68,7 +68,7 @@ export default function PaymentHistory() {
     fetchPayments();
   }, [userEmail]);
 
-  console.log(payments);
+  // console.log(payments);
 
   // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;

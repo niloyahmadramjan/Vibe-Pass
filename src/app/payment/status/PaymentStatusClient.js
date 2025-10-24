@@ -16,28 +16,28 @@ export default function PaymentStatusClient() {
 
     // ✅ SUCCESS
     if (status === 'success' && paymentId) {
-      toast.success('✅ Payment Successful! Redirecting to your ticket...')
+      toast.success('Payment Successful! Redirecting to your ticket...')
       setTimeout(() => {
         router.push(`/ticket-Details/${paymentId}`)
       }, 2000)
     }
     // ❌ FAIL
     else if (status === 'fail') {
-      toast.error('❌ Payment Failed! Please try again.')
+      toast.error(' Payment Failed! Please try again.')
       setTimeout(() => {
         router.push('/my-booking')
       }, 2000)
     }
     // ⚠️ CANCEL
     else if (status === 'cancel') {
-      toast('⚠️ Payment Cancelled by user.', { icon: '⚠️' })
+      toast(' Payment Cancelled by user.', { icon: '⚠️' })
       setTimeout(() => {
         router.push('/my-booking')
       }, 2000)
     }
     // ⚠️ INVALID or ERROR
     else {
-      toast.error('⚠️ Invalid Payment Response.')
+      toast.error('Invalid Payment Response.')
       setTimeout(() => {
         router.push('/')
       }, 2000)

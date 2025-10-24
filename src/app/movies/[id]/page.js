@@ -107,9 +107,9 @@ export default function MovieDetailsPage() {
 
 
   const fetchTrailer = async (id) => {
-    console.log("id", id)
+    // console.log("id", id)
     try {
-      console.log("🎥 Fetching trailer for TMDB ID:", id);
+      // console.log("🎥 Fetching trailer for TMDB ID:", id);
       const res = await axiosPublic.get(`/api/movies/${id}/videos`);
 
       if (res.status === 200) {
