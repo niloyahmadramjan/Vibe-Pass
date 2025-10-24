@@ -763,8 +763,23 @@ function MyOrder() {
                         </div>
                         <div>
                           <div className="text-white font-medium group-hover:text-blue-400 transition-colors">
-                            {order.movieTitle}
+                            {/* Mobile: first 2 words */}
+                            <span className="block md:hidden">
+                              {order.movieTitle
+                                .split(" ")
+                                .slice(0, 2)
+                                .join(" ") +
+                                (order.movieTitle.split(" ").length > 2
+                                  ? "..."
+                                  : "")}
+                            </span>
+
+                            {/* Medium and up: full title */}
+                            <span className="hidden md:block">
+                              {order.movieTitle}
+                            </span>
                           </div>
+
                           <div className="text-gray-400 text-sm mt-1">
                             {order.theaterName}
                             {order.screen &&

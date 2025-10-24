@@ -1,23 +1,32 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
-import React, { useEffect, useRef, useState } from 'react';
+import Image from "next/image";
+import Link from "next/link";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  FiX, FiHome, FiFilm, FiCalendar, FiClock, FiUsers,
-  FiGift, FiBarChart2, FiCreditCard, FiMail, FiSettings, FiTag
-} from 'react-icons/fi';
-import { useAuth } from '../context/AuthContext';
-import { RiCoupon2Fill } from 'react-icons/ri';
-import { usePathname } from 'next/navigation';
-import { SubscriptIcon } from 'lucide-react';
-import { MdSubscriptions } from "react-icons/md";
+  FiX,
+  FiHome,
+  FiFilm,
+  FiCalendar,
+  FiClock,
+  FiUsers,
+  FiGift,
+  FiBarChart2,
+  FiCreditCard,
+  FiMail,
+  FiSettings,
+  FiTag,
+  FiRotateCcw,
+} from "react-icons/fi";
+import { useAuth } from "../context/AuthContext";
+import { RiCoupon2Fill } from "react-icons/ri";
+import { usePathname } from "next/navigation";
 
 export default function AdminSidebar({ toggleSidebar, isOpen }) {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const { user } = useAuth();
-const pathname = usePathname()
+  const pathname = usePathname();
   // Close dropdown when clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -25,28 +34,30 @@ const pathname = usePathname()
         setUserDropdownOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const menuItems = [
-    { name: 'Dashboard', path: '/admin', icon: <FiHome /> },
-    { name: 'Movies', path: '/admin/add-movies', icon: <FiFilm /> },
-    { name: 'Tickets', path: '/admin/tickets', icon: <FiTag /> },
-    { name: 'Bookings', path: '/admin/bookings', icon: <FiTag /> },
-    { name: 'Payments', path: '/admin/payment', icon: <FiCreditCard /> },
-    { name: 'Coupons', path: '/admin/coupons', icon: <RiCoupon2Fill/>},
-    { name: 'Events', path: '/admin/events', icon: <FiCalendar /> },
+    { name: "Dashboard", path: "/admin", icon: <FiHome /> },
+    { name: "Movies", path: "/admin/add-movies", icon: <FiFilm /> },
+    { name: "Tickets", path: "/admin/tickets", icon: <FiTag /> },
+    { name: "Bookings", path: "/admin/bookings", icon: <FiTag /> },
+    { name: "Payments", path: "/admin/payment", icon: <FiCreditCard /> },
+    {
+      name: "Refound Request",
+      path: "/admin/refound_request",
+      icon: <FiRotateCcw />,
+    },
+    { name: "Coupons", path: "/admin/coupons", icon: <RiCoupon2Fill /> },
+    { name: "Events", path: "/admin/events", icon: <FiCalendar /> },
     // { name: 'Theaters', path: '/admin/theaters', icon: <FiFilm /> },
     // { name: 'Showtimes', path: '/admin/add-showtimes', icon: <FiClock /> },
-    { name: 'Users', path: '/admin/users', icon: <FiUsers /> },
+    { name: "Users", path: "/admin/users", icon: <FiUsers /> },
     // { name: 'Loyalty', path: '/admin/loyalty', icon: <FiGift /> },
-    { name: 'Subscription', path: '/admin/Subscription', icon: <MdSubscriptions /> },
-    { name: 'Analytics', path: '/admin/analytics', icon: <FiBarChart2 /> },
-    
-    { name: 'Chat', path: '/admin/chat', icon: <FiMail /> }, 
-    { name: 'Go Back Home', path: '/', icon: <FiHome /> },
-    
+    { name: "Analytics", path: "/admin/analytics", icon: <FiBarChart2 /> },
+    { name: "Chat", path: "/admin/chat", icon: <FiMail /> }, // শুধু একবার
+    { name: "Go Back Home", path: "/", icon: <FiHome /> },
   ];
 
   return (
@@ -57,24 +68,24 @@ const pathname = usePathname()
         <div className="lg:hidden">
           <div className="flex items-center justify-between p-4 border-b border-[#1e1f26]">
             {/* <div className="flex items-center gap-3"> */}
-              <div className="flex-shrink-0">
-                <Link
-                  href="/"
-                  className="flex-shrink-0 flex items-center space-x-2 group"
-                >
-                  <div className="relative group">
-                    <Image
-                      src="/favicon.png"
-                      width={50}
-                      height={50}
-                      alt="Picture of the author"
-                    />
-                  </div>
-                  <span className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
-                    VibePass
-                  </span>
-                </Link>
-              </div>
+            <div className="flex-shrink-0">
+              <Link
+                href="/"
+                className="flex-shrink-0 flex items-center space-x-2 group"
+              >
+                <div className="relative group">
+                  <Image
+                    src="/favicon.png"
+                    width={50}
+                    height={50}
+                    alt="Picture of the author"
+                  />
+                </div>
+                <span className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
+                  VibePass
+                </span>
+              </Link>
+            </div>
             {/* </div> */}
             <button
               onClick={toggleSidebar}
@@ -95,14 +106,14 @@ const pathname = usePathname()
                   {user?.image ? (
                     <Image
                       src={user.image}
-                      alt={user?.name || 'User'}
+                      alt={user?.name || "User"}
                       width={40}
                       height={40}
                       className="w-full h-full object-cover"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-purple-600 text-white font-bold">
-                      {user?.name?.charAt(0) || 'A'}
+                      {user?.name?.charAt(0) || "A"}
                     </div>
                   )}
                 </div>
@@ -133,7 +144,9 @@ const pathname = usePathname()
                 )}
               </div>
               <div>
-                <p className="text-white font-medium">{user?.name || 'Admin User'}</p>
+                <p className="text-white font-medium">
+                  {user?.name || "Admin User"}
+                </p>
                 <p className="text-gray-400 text-sm">Admin</p>
               </div>
             </div>
@@ -169,7 +182,7 @@ const pathname = usePathname()
       <div className="flex-1 overflow-y-auto no-scrollbar">
         <nav className="p-4">
           <ul className="space-y-1">
-            {menuItems.map(({ item, path,icon,name}) => (
+            {menuItems.map(({ item, path, icon, name }) => (
               <li key={path}>
                 <Link
                   href={path}
@@ -181,11 +194,10 @@ const pathname = usePathname()
                   }}
                   className={`flex  items-center gap-3 px-4 py-3 rounded-lg  font-semibold
                     hover:bg-[#2a2c36] hover:text-white transition-colors duration-200  ${
-                    pathname === path
-                    ? ' bg-[#2a2c36] !text-red-400  font-bold'
-                      : '!text-gray-300 hover:text-blue-400'
-                }`}
-                     
+                      pathname === path
+                        ? " bg-[#2a2c36] !text-red-400  font-bold"
+                        : "!text-gray-300 hover:text-blue-400"
+                    }`}
                 >
                   <span className="text-lg flex-shrink-0">{icon}</span>
                   <span className="text-base whitespace-nowrap">{name}</span>
@@ -210,11 +222,11 @@ const pathname = usePathname()
         .no-scrollbar::-webkit-scrollbar {
           display: none;
         }
-        
+
         /* Hide scrollbar for IE, Edge and Firefox */
         .no-scrollbar {
-          -ms-overflow-style: none;  /* IE and Edge */
-          scrollbar-width: none;  /* Firefox */
+          -ms-overflow-style: none; /* IE and Edge */
+          scrollbar-width: none; /* Firefox */
         }
 
         /* Show custom scrollbar only on desktop */

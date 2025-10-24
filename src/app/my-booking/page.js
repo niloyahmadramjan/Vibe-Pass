@@ -129,34 +129,36 @@ function MyBooking() {
     setActionMenuOpen(null)
   }
 
-  // const handleRefund = async (booking) => {
-  //   Swal.fire({
-  //     title: 'Request Refund?',
-  //     text: 'Are you sure you want to request a refund for this booking?',
-  //     icon: 'question',
-  //     showCancelButton: true,
-  //     confirmButtonColor: '#3085d6',
-  //     cancelButtonColor: '#d33',
-  //     confirmButtonText: 'Yes, request refund',
-  //   }).then(async (result) => {
-  //     if (result.isConfirmed) {
-  //       try {
-  //         // Add your refund API call here
-  //         await axiosSecure.post(`/api/ticket/${booking._id}/refund`)
-  //         Swal.fire('Success!', 'Refund request has been submitted.', 'success')
-  //         // Refresh bookings
-  //         const { data } = await axiosSecure.get(
-  //           `api/ticket/my-bookings?userEmail=${userEmail}`
-  //         )
-  //         setBookings(data)
-  //       } catch (error) {
-  //         console.error('Error processing refund:', error)
-  //         Swal.fire('Error!', 'Failed to process refund request.', 'error')
-  //       }
-  //       setActionMenuOpen(null)
-  //     }
-  //   })
-  // }
+
+  // refound 
+  const handleRefund = async (booking) => {
+    Swal.fire({
+      title: 'Request Refund?',
+      text: 'Are you sure you want to request a refund for this booking?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, request refund',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          // Add your refund API call here
+          await axiosSecure.post(`/api/ticket/${booking._id}/refund`)
+          Swal.fire('Success!', 'Refund request has been submitted.', 'success')
+          // Refresh bookings
+          const { data } = await axiosSecure.get(
+            `api/ticket/my-bookings?userEmail=${userEmail}`
+          )
+          setBookings(data)
+        } catch (error) {
+          console.error('Error processing refund:', error)
+          Swal.fire('Error!', 'Failed to process refund request.', 'error')
+        }
+        setActionMenuOpen(null)
+      }
+    })
+  }
 
   const getStatusBadge = (status) => {
     const baseClasses =
@@ -177,16 +179,20 @@ function MyBooking() {
     const baseClasses =
       'px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-medium capitalize'
     switch (paymentStatus) {
-      case 'paid':
-        return `${baseClasses} bg-blue-500/20 text-blue-400 border border-blue-500/30`
-      case 'unpaid':
-        return `${baseClasses} bg-yellow-500/20 text-yellow-400 border border-yellow-500/30`
-      case 'failed':
-        return `${baseClasses} bg-red-500/20 text-red-400 border border-red-500/30`
-      case 'refunded':
-        return `${baseClasses} bg-purple-500/20 text-purple-400 border border-purple-500/30`
+      case "paid":
+        return `${baseClasses} bg-blue-500/20 text-blue-400 border border-blue-500/30`;
+      case "unpaid":
+        return `${baseClasses} bg-yellow-500/20 text-yellow-400 border border-yellow-500/30`;
+      case "failed":
+        return `${baseClasses} bg-red-500/20 text-red-400 border border-red-500/30`;
+      case "refund_rejected":
+        return `${baseClasses} bg-red-500/20 text-red-400 border border-red-500/30`;
+      case "refunded_request":
+        return `${baseClasses} bg-gray-800 text-purple-300 border border-purple-500/30`;
+      case "refunded_confirm":
+        return `${baseClasses} bg-green-800 text-white border border-purple-500/30`;
       default:
-        return `${baseClasses} bg-gray-500/20 text-gray-400 border border-gray-500/30`
+        return `${baseClasses} bg-gray-500/20 text-gray-400 border border-gray-500/30`;
     }
   }
 
@@ -268,13 +274,13 @@ function MyBooking() {
           <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
             <div className="text-gray-400 text-sm mb-1">Paid</div>
             <div className="text-2xl font-bold text-green-400">
-              {bookings.filter((b) => b.paymentStatus === 'paid').length}
+              {bookings.filter((b) => b.paymentStatus === "paid").length}
             </div>
           </div>
           <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
             <div className="text-gray-400 text-sm mb-1">Unpaid</div>
             <div className="text-2xl font-bold text-yellow-400">
-              {bookings.filter((b) => b.paymentStatus === 'unpaid').length}
+              {bookings.filter((b) => b.paymentStatus === "unpaid").length}
             </div>
           </div>
           <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
@@ -302,8 +308,9 @@ function MyBooking() {
                       </span>
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-white font-semibold truncate text-sm md:text-base">
-                        {booking.movieTitle}
+                      <h3 className="text-white font-semibold text-sm md:text-base truncate">
+                        {booking.movieTitle.split(" ").slice(0, 2).join(" ")}
+                        {booking.movieTitle.split(" ").length > 2 ? "..." : ""}
                       </h3>
                       <p className="text-gray-400 text-xs md:text-sm truncate">
                         {booking.theaterName}
@@ -312,30 +319,30 @@ function MyBooking() {
                   </div>
 
                   {/* Action Menu for Mobile */}
-                  <div className="relative flex-shrink-0 ml-2">
+                  <div className="relative flex-shrink-0 ml-2 ">
                     <button
                       onClick={() =>
                         setActionMenuOpen(
                           actionMenuOpen === booking._id ? null : booking._id
                         )
                       }
-                      className="p-2 rounded-lg hover:bg-gray-700/50 transition-colors"
+                      className="p-2 rounded-lg hover:bg-gray-700/50 transition-colors "
                     >
-                      <FiMoreVertical className="text-gray-400" size={18} />
+                      <FiMoreVertical className="text-gray-400 " size={18} />
                     </button>
 
                     {actionMenuOpen === booking._id && (
-                      <div className="absolute right-0 top-10 z-10 bg-gray-700 border border-gray-600 rounded-xl shadow-2xl min-w-40">
+                      <div className="absolute right-7 -top-3 z-10 bg-gray-700 border border-gray-600 rounded-xl shadow-2xl min-w-40 ">
                         <div className="p-2 space-y-1">
                           <button
                             onClick={() => handleViewDetails(booking)}
-                            className="w-full text-left px-3 py-2 text-sm text-white hover:bg-gray-600 rounded-lg flex items-center space-x-2"
+                            className="w-full text-left px-3 py-2 text-sm text-white hover:bg-gray-600 rounded-lg flex items-center space-x-2 "
                           >
                             <FiEye size={14} />
                             <span>View Details</span>
                           </button>
 
-                          {booking.paymentStatus === 'unpaid' && (
+                          {booking.paymentStatus === "unpaid" && (
                             <button
                               onClick={() => handlePayNow(booking)}
                               className="w-full text-left px-3 py-2 text-sm text-green-400 hover:bg-gray-600 rounded-lg flex items-center space-x-2"
@@ -345,8 +352,8 @@ function MyBooking() {
                             </button>
                           )}
 
-                          {/* {booking.paymentStatus === 'paid' &&
-                            booking.status !== 'cancelled' && (
+                          {booking.paymentStatus === "paid" &&
+                            booking.status !== "cancelled" && (
                               <button
                                 onClick={() => handleRefund(booking)}
                                 className="w-full text-left px-3 py-2 text-sm text-purple-400 hover:bg-gray-600 rounded-lg flex items-center space-x-2"
@@ -354,14 +361,14 @@ function MyBooking() {
                                 <FiArrowLeft size={14} />
                                 <span>Request Refund</span>
                               </button>
-                            )} */}
+                            )}
 
                           {/* Always show delete button, but disable for paid bookings that aren't cancelled */}
                           <button
                             onClick={() => handleDelete(booking._id)}
                             disabled={
-                              (booking.paymentStatus === 'paid' &&
-                                booking.status !== 'cancelled') ||
+                              (booking.paymentStatus === "paid" &&
+                                booking.status !== "cancelled") ||
                               deleteLoading === booking._id
                             }
                             className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-gray-600 rounded-lg flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -369,11 +376,11 @@ function MyBooking() {
                             <FiTrash2 size={14} />
                             <span>
                               {deleteLoading === booking._id
-                                ? 'Deleting...'
-                                : booking.paymentStatus === 'paid' &&
-                                  booking.status !== 'cancelled'
-                                ? 'Cannot Delete'
-                                : 'Delete'}
+                                ? "Deleting..."
+                                : booking.paymentStatus === "paid" &&
+                                  booking.status !== "cancelled"
+                                ? "Cannot Delete"
+                                : "Delete"}
                             </span>
                           </button>
                         </div>
@@ -400,7 +407,7 @@ function MyBooking() {
                 </div>
 
                 {/* Pay Now Button for Mobile */}
-                {booking.paymentStatus === 'unpaid' && (
+                {booking.paymentStatus === "unpaid" && (
                   <button
                     onClick={() => handlePayNow(booking)}
                     className="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg font-medium transition-colors text-sm md:text-base"
@@ -451,7 +458,12 @@ function MyBooking() {
                         </div>
                         <div>
                           <div className="text-white font-medium group-hover:text-blue-400 transition-colors">
-                            {booking.movieTitle}
+                            {booking.movieTitle.split(" ").length > 5
+                              ? booking.movieTitle
+                                  .split(" ")
+                                  .slice(0, 5)
+                                  .join(" ") + "..."
+                              : booking.movieTitle}
                           </div>
                         </div>
                       </div>
@@ -471,7 +483,7 @@ function MyBooking() {
                         >
                           {booking.paymentStatus}
                         </span>
-                        {booking.paymentStatus === 'unpaid' && (
+                        {booking.paymentStatus === "unpaid" && (
                           <button
                             onClick={() => handlePayNow(booking)}
                             className="px-3 py-1 rounded-full text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors"
@@ -479,6 +491,18 @@ function MyBooking() {
                             Pay Now
                           </button>
                         )}
+
+                        {/* Refund Button for paid bookings */}
+                        {booking.paymentStatus === "paid" &&
+                          booking.status !== "cancelled" && (
+                            <button
+                              onClick={() => handleRefund(booking)}
+                              className="rounded-lg px-3 py-1  text-sm hover:bg-purple-500/20 border border-purple-500/30 hover:border-purple-400 transition-all duration-200 group bg-purple-500/30 ml-2 "
+                              title="Request Refund"
+                            >
+                              Refound
+                            </button>
+                          )}
                       </div>
                     </td>
                     <td className="py-4 px-6">
@@ -495,35 +519,20 @@ function MyBooking() {
                           />
                         </button>
 
-                        {/* Refund Button for paid bookings
-                        {booking.paymentStatus === 'paid' &&
-                          booking.status !== 'cancelled' && (
-                            <button
-                              onClick={() => handleRefund(booking)}
-                              className="p-2 rounded-lg hover:bg-purple-500/20 border border-purple-500/30 hover:border-purple-400 transition-all duration-200 group"
-                              title="Request Refund"
-                            >
-                              <FiArrowLeft
-                                size={18}
-                                className="text-purple-400 group-hover:text-purple-300"
-                              />
-                            </button>
-                          )} */}
-
                         {/* Delete Button - Always visible but conditionally disabled */}
                         <button
                           onClick={() => handleDelete(booking._id)}
                           disabled={
-                            (booking.paymentStatus === 'paid' &&
-                              booking.status !== 'cancelled') ||
+                            (booking.paymentStatus === "paid" &&
+                              booking.status !== "cancelled") ||
                             deleteLoading === booking._id
                           }
                           className="p-2 rounded-lg hover:bg-red-500/20 border border-red-500/30 hover:border-red-400 transition-all duration-200 group disabled:opacity-50 disabled:cursor-not-allowed"
                           title={
-                            booking.paymentStatus === 'paid' &&
-                            booking.status !== 'cancelled'
-                              ? 'Cannot delete paid booking'
-                              : 'Delete Booking'
+                            booking.paymentStatus === "paid" &&
+                            booking.status !== "cancelled"
+                              ? "Cannot delete paid booking"
+                              : "Delete Booking"
                           }
                         >
                           <FiTrash2
@@ -543,8 +552,6 @@ function MyBooking() {
         {/* Pagination Controls */}
         {totalPages > 1 && (
           <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
-            
-
             <div className="flex items-center gap-2">
               {/* Previous Button */}
               <button
@@ -566,7 +573,7 @@ function MyBooking() {
                   )
                   .map((page, index, array) => {
                     const showEllipsis =
-                      index > 0 && page - array[index - 1] > 1
+                      index > 0 && page - array[index - 1] > 1;
                     return (
                       <div key={page} className="flex items-center">
                         {showEllipsis && (
@@ -576,14 +583,14 @@ function MyBooking() {
                           onClick={() => paginate(page)}
                           className={`px-3 py-2 rounded-lg border transition-colors text-sm ${
                             currentPage === page
-                              ? 'bg-purple-500/20 border-purple-500/50 text-purple-400'
-                              : 'bg-gray-800/50 border-gray-600 text-gray-300 hover:bg-gray-700/50'
+                              ? "bg-purple-500/20 border-purple-500/50 text-purple-400"
+                              : "bg-gray-800/50 border-gray-600 text-gray-300 hover:bg-gray-700/50"
                           }`}
                         >
                           {page}
                         </button>
                       </div>
-                    )
+                    );
                   })}
               </div>
 
@@ -605,8 +612,8 @@ function MyBooking() {
         <PaymentModal
           bookingData={selectedBooking}
           onClose={() => {
-            setShowPaymentModal(false)
-            setSelectedPaymentMethod(null)
+            setShowPaymentModal(false);
+            setSelectedPaymentMethod(null);
           }}
           selectedPaymentMethod={selectedPaymentMethod}
           setSelectedPaymentMethod={setSelectedPaymentMethod}
@@ -624,7 +631,7 @@ function MyBooking() {
         />
       )}
     </div>
-  )
+  );
 }
 
 // Payment Modal Component (same as before)
