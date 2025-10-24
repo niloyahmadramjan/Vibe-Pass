@@ -144,7 +144,7 @@ export default function MovieDetailsPage() {
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white">
       {/* Enhanced Banner */}
-      <div className="w-full h-[40vh] lg:h-[100vh] bg-cover bg-center relative flex items-center"
+      <div className="w-full h-[40vh] lg:h-[70vh] bg-cover bg-center relative flex items-center"
       
         style={{
           backgroundImage: movie.poster_path
