@@ -10,14 +10,14 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
 export default function AdminNavbar({ toggleSidebar }) {
-    const router = useRouter()
-  
-   const { data: session, status } = useSession()
+  const router = useRouter()
+
+  const { data: session, status } = useSession()
   const { user, logout } = useAuth()
 
-    const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-    const dropdownRef = useRef(null);
-  
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
   // console.log(user
 
 
@@ -88,11 +88,11 @@ export default function AdminNavbar({ toggleSidebar }) {
                     >
                       Profile
                     </Link>
-                   
+
                     <button
                       onClick={handleLogout}
                       className="block px-4 py-3 !text-white hover:bg-[#2a2c36] hover:text-white"
-                      
+
                     >
                       Logout
                     </button>
