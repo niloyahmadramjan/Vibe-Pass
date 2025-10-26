@@ -132,7 +132,7 @@ function ColumnRenderer({ item, column }) {
         case 'date':
             return (
                 <div className="flex items-center space-x-2">
-                    <FiCalendar className="text-purple-400 text-sm" />
+                    {/* <FiCalendar className="text-purple-400 text-sm" /> */}
                     <span className="text-white text-sm">
                         {new Date(value).toLocaleDateString()}
                     </span>
@@ -191,9 +191,7 @@ function ColumnRenderer({ item, column }) {
         case 'avatar':
             return (
                 <div className="flex items-center space-x-3">
-                    <div className="w-10 h-14 bg-gray-700 rounded-lg flex items-center justify-center">
-                        {column.avatarIcon || <FiCalendar className="text-gray-400" />}
-                    </div>
+                  
                     <div>
                         <p className="text-white font-medium">{value}</p>
                         <p className="text-gray-400 text-sm">{column.subtitle ? item[column.subtitle] : ''}</p>

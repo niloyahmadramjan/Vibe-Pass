@@ -169,9 +169,9 @@ export default function AdminChatPage() {
     };
 
     return (
-        <div className="h-full p-4 md:p-6">
+        <div className="h-full ">
             {/* Chat Interface - Full Screen */}
-            <div className="bg-gray-800 rounded-lg border border-gray-700 h-[calc(100vh-80px)] md:h-[calc(100vh-100px)] overflow-hidden">
+            <div className="bg-gray-800 rounded-lg border border-gray-700 h-[calc(100vh-80px)] md:h-[calc(100vh-130px)] overflow-hidden">
                 <div className="h-full flex flex-col">
                     {/* Chat Header */}
                     <div className="p-3 md:p-4 border-b border-gray-700 bg-gradient-to-r from-blue-600/20 to-purple-600/20">
@@ -238,6 +238,8 @@ export default function AdminChatPage() {
                             md:flex md:w-1/3 
                             border-r border-gray-700 bg-gray-800 
                             overflow-y-auto flex-col w-full
+                            [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]
+                           
                         `}>
                             {users.length === 0 ? (
                                 <div className="text-center p-4">
