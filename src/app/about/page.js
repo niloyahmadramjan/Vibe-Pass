@@ -403,9 +403,9 @@ export default function AboutSection() {
           whileInView={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="text-center"
+          className="text-center mt-10"
         >
-          <div className="relative bg-gradient-to-br from-purple-900/40 to-red-900/40 rounded-4xl p-16 border border-gray-700 shadow-2xl overflow-hidden">
+          <div className="relative bg-gradient-to-br  from-purple-900/40 to-red-900/40 rounded-4xl p-16 border border-gray-700 shadow-2xl overflow-hidden">
             {/* Background Pattern */}
             <div className="absolute inset-0 opacity-10">
               <div className="absolute top-0 left-0 w-72 h-72 bg-purple-500 rounded-full blur-3xl" />

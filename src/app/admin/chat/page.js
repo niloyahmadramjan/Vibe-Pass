@@ -4,6 +4,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
 import axiosSecure from '@/app/api/axiosHook/useAxiosSecure';
+import Image from 'next/image';
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 const SPECIFIC_ADMIN_ID = '68e53b9752ef9ea3f4aa5566';
@@ -20,7 +21,7 @@ export default function AdminChatPage() {
     const [isMobile, setIsMobile] = useState(false);
     const [showChat, setShowChat] = useState(false);
     const endRef = useRef(null);
-
+    console.log(users)
     // Check screen size for mobile view
     useEffect(() => {
         const checkScreenSize = () => {
@@ -256,12 +257,27 @@ export default function AdminChatPage() {
                                         onClick={() => handleUserSelect(user)}
                                     >
                                         <div className="flex items-center space-x-3">
-                                            <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm md:text-base flex-shrink-0">
-                                                {user.name?.charAt(0)?.toUpperCase() || 'U'}
+                                            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full flex-shrink-0 overflow-hidden relative">
+                                                {user.senderImage || user.Userimage ? (
+                                                    <Image
+                                                        src={user.senderImage || user.Userimage}
+                                                        alt={user.name || "User"}
+                                                        fill
+                                                        className="object-cover rounded-full"
+                                                        sizes="40px"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm md:text-base">
+                                                        {user.name?.charAt(0)?.toUpperCase() || 'U'}
+                                                    </div>
+                                                )}
                                             </div>
+
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center justify-between">
-                                                    <h3 className="text-sm font-semibold text-white truncate">{user.name}</h3>
+                                                    <h3 className="text-sm font-semibold text-white truncate">
+                                                        {user.name}
+                                                    </h3>
                                                     {user.unreadCount > 0 && (
                                                         <span className="bg-red-500 text-white rounded-full px-1.5 py-0.5 md:px-2 md:py-1 text-xs min-w-4 md:min-w-5 text-center">
                                                             {user.unreadCount}

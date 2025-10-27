@@ -8,6 +8,7 @@ import { FaUsers, FaChartLine, FaSearch, FaFileAlt } from 'react-icons/fa';
 
 import { Send } from 'lucide-react'
 import AdminLoading from '../components/AdminLoading'
+import Swal from 'sweetalert2'
 
 export default function SubscriptionTable() {
     const [subscriptions, setSubscriptions] = useState([])
@@ -101,31 +102,67 @@ export default function SubscriptionTable() {
     }
 
     const handleDelete = async (id) => {
-        if (!confirm('Are you sure you want to delete this subscription?')) {
-            return
-        }
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'You want to delete this subscription?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        })
+
+        if (!result.isConfirmed) return
 
         try {
             const response = await axiosSecure.delete(`/api/newsletter/subscribe/${id}`)
+
             if (response.data.success) {
                 setSubscriptions(prev => prev.filter(sub => sub._id !== id))
-                showNotification('Subscription deleted successfully!')
+
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Subscription deleted successfully!',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                })
             } else {
-                showNotification(response.data.message || 'Failed to delete subscription', 'error')
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: response.data.message || 'Failed to delete subscription',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                })
             }
         } catch (error) {
             console.error('Error deleting subscription:', error)
             const errorMessage = error.response?.data?.message || 'Failed to delete subscription'
-            showNotification(errorMessage, 'error')
+
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'error',
+                title: errorMessage,
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true,
+            })
         }
     }
+
 
     const handleSendAnnouncement = async (e) => {
         e.preventDefault()
         setSending(true)
 
         try {
-            const response = await axiosSecure.post('/api/notification/send', {
+            const response = await axiosSecure.post('/api/announcemnet/send', {
                 subject: subject,
                 message: message
             })
