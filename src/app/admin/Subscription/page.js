@@ -36,7 +36,7 @@ export default function SubscriptionTable() {
         try {
             setLoading(true)
             const response = await axiosSecure.get('/api/newsletter')
-            // console.log('Full API response:', response) // Debug log
+            console.log('Full API response:', response) // Debug log
 
             // Handle the response structure from your controller
             if (response.data && response.data.success) {
