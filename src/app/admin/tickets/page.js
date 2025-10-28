@@ -558,7 +558,7 @@ export default function TicketManagement() {
                             </div>
 
                             {/* Action Buttons */}
-                            <div className="flex gap-3 pt-6 border-t border-gray-700">
+                            {/* <div className="flex gap-3 pt-6 border-t border-gray-700">
                                 <button
                                     onClick={() => handleDownloadTicket(selectedTicket)}
                                     className="flex-1 px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors flex items-center justify-center gap-2 font-semibold"
@@ -572,7 +572,7 @@ export default function TicketManagement() {
                                 >
                                     Close
                                 </button>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>

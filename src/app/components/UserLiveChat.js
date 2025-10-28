@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, useCallback } from 'react'
 import { io } from 'socket.io-client'
 import { useAuth } from '@/app/context/AuthContext'
 import axiosSecure from '@/app/api/axiosHook/useAxiosSecure'
+import { User } from 'lucide-react'
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 const SPECIFIC_ADMIN_ID = '68e53b9752ef9ea3f4aa5566'
@@ -18,6 +19,8 @@ export default function AdminChat({ isOpen, onClose, embedded = false }) {
   const [connectionStatus, setConnectionStatus] = useState('disconnected')
   const endRef = useRef(null)
 
+
+  console.log("user INfaormaiton ",user)
   // Initialize socket connection when modal opens and user is available
   useEffect(() => {
     if (!user?._id || !isOpen) return
@@ -38,21 +41,21 @@ export default function AdminChat({ isOpen, onClose, embedded = false }) {
     })
 
     newSocket.on('disconnect', (reason) => {
-      // console.log('❌ User: Socket Disconnected:', reason)
+      // console.log(' User: Socket Disconnected:', reason)
       setConnectionStatus('disconnected')
     })
 
     newSocket.on('connect_error', (error) => {
-      console.error('❌ User: Connection Error:', error)
+      console.error(' User: Connection Error:', error)
       setConnectionStatus('error')
     })
 
     newSocket.on('registration_confirmed', (data) => {
-      // console.log('✅ User: Registration Confirmed:', data)
+      // console.log(' User: Registration Confirmed:', data)
     })
 
     newSocket.on('receive_message', (msg) => {
-      // console.log('📩 User: Received message:', msg)
+      // console.log(' User: Received message:', msg)
       setMessages((prev) => {
         if (prev.find((m) => m._id === msg._id)) return prev
         const newMessages = [...prev, msg]
@@ -113,6 +116,8 @@ export default function AdminChat({ isOpen, onClose, embedded = false }) {
       senderId: user._id,
       senderName: user.name || 'User',
       senderRole: 'user',
+      senderImage:  user?.image,
+
       receiverId: SPECIFIC_ADMIN_ID,
       receiverName: SPECIFIC_ADMIN_NAME,
       text: text.trim(),
