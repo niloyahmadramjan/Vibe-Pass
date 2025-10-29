@@ -169,6 +169,7 @@ function MyBooking() {
         showTime: selectedBooking.showTime,
         selectedSeats: selectedBooking.selectedSeats,
       }
+      console.log(selectedBooking)
 
       await axiosSecure.post('/api/refund/request', refundData)
       
@@ -523,16 +524,40 @@ function MyBooking() {
                         )}
 
                         {/* Refund Button for paid bookings */}
-                        {booking.paymentStatus === "paid" &&
-                          booking.status !== "cancelled" && (
-                            <button
-                              onClick={() => handleRefund(booking)}
-                              className="rounded-lg px-3 py-1 text-sm hover:bg-purple-500/20 border border-purple-500/30 hover:border-purple-400 transition-all duration-200 group bg-purple-500/30 ml-2 cursor-pointer"
-                              title="Request Refund"
-                            >
-                              Refund
-                            </button>
-                          )}
+                       {booking.paymentStatus === "paid" && booking.status !== "cancelled" && (
+  <>
+    {booking.refundStatus !== "none" ? (
+      <span
+        className={`rounded-lg px-3 py-1 text-sm ml-2 border transition-all duration-200 ${
+          booking.refundStatus === "requested"
+            ? "bg-yellow-500/20 border-yellow-500/30 text-yellow-400"
+            : booking.refundStatus === "approved"
+            ? "bg-green-500/20 border-green-500/30 text-green-400"
+            : booking.refundStatus === "rejected"
+            ? "bg-red-500/20 border-red-500/30 text-red-400"
+            : booking.refundStatus === "cancelled"
+            ? "bg-gray-500/20 border-gray-500/30 text-gray-400"
+            : booking.refundStatus === "processed"
+            ? "bg-blue-500/20 border-blue-500/30 text-blue-400"
+            : "bg-purple-500/20 border-purple-500/30 text-purple-400"
+        }`}
+      >
+        {booking.refundStatus.charAt(0).toUpperCase() +
+          booking.refundStatus.slice(1)}{" "}
+        {/* Capitalize first letter */}
+      </span>
+    ) : (
+      <button
+        onClick={() => handleRefund(booking)}
+        className="rounded-lg px-3 py-1 text-sm hover:bg-purple-500/20 border border-purple-500/30 hover:border-purple-400 transition-all duration-200 group bg-purple-500/30 ml-2 cursor-pointer"
+        title="Request Refund"
+      >
+        Refund
+      </button>
+    )}
+  </>
+)}
+
                       </div>
                     </td>
                     <td className="py-4 px-6">
