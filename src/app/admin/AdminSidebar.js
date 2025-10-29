@@ -21,7 +21,7 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { RiCoupon2Fill } from "react-icons/ri";
 import { usePathname } from "next/navigation";
-import { Subscript, SubscriptIcon } from "lucide-react";
+import { MoveIcon, Subscript, SubscriptIcon } from "lucide-react";
 import { MdSubscriptions } from "react-icons/md";
 
 export default function AdminSidebar({ toggleSidebar, isOpen }) {
@@ -42,7 +42,8 @@ export default function AdminSidebar({ toggleSidebar, isOpen }) {
 
   const menuItems = [
     { name: "Dashboard", path: "/admin", icon: <FiHome /> },
-    { name: "Movies", path: "/admin/add-movies", icon: <FiFilm /> },
+    { name: "Add Movie", path: "/admin/add-movies", icon: <FiFilm /> },
+    { name: "Movies", path: "/admin/movies", icon: <MoveIcon /> },
     { name: "Tickets", path: "/admin/tickets", icon: <FiTag /> },
     { name: "Bookings", path: "/admin/bookings", icon: <FiTag /> },
     { name: "Payments", path: "/admin/payment", icon: <FiCreditCard /> },
