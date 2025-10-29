@@ -18,6 +18,7 @@ import {
   FiArrowLeft,
   FiChevronLeft,
   FiChevronRight,
+  FiInfo,
 } from 'react-icons/fi'
 import LoadingSpinner from '../hooks/LoadingSpiner'
 import Swal from 'sweetalert2'
@@ -31,8 +32,10 @@ function MyBooking() {
   const [selectedBooking, setSelectedBooking] = useState(null)
   const [showDetailsModal, setShowDetailsModal] = useState(false)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [showRefundModal, setShowRefundModal] = useState(false)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null)
   const [actionMenuOpen, setActionMenuOpen] = useState(null)
+  const [refundReason, setRefundReason] = useState('')
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
@@ -59,6 +62,18 @@ function MyBooking() {
 
     fetchBookings()
   }, [userEmail])
+
+  // Close action menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setActionMenuOpen(null)
+    }
+
+    document.addEventListener('click', handleClickOutside)
+    return () => {
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [])
 
   // Pagination calculations
   const indexOfLastItem = currentPage * itemsPerPage
@@ -129,35 +144,48 @@ function MyBooking() {
     setActionMenuOpen(null)
   }
 
+  const handleRefund = (booking) => {
+    setSelectedBooking(booking)
+    setShowRefundModal(true)
+    setActionMenuOpen(null)
+  }
 
-  // refound 
-  const handleRefund = async (booking) => {
-    Swal.fire({
-      title: 'Request Refund?',
-      text: 'Are you sure you want to request a refund for this booking?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, request refund',
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          // Add your refund API call here
-          await axiosSecure.post(`/api/ticket/${booking._id}/refund`)
-          Swal.fire('Success!', 'Refund request has been submitted.', 'success')
-          // Refresh bookings
-          const { data } = await axiosSecure.get(
-            `api/ticket/my-bookings?userEmail=${userEmail}`
-          )
-          setBookings(data)
-        } catch (error) {
-          console.error('Error processing refund:', error)
-          Swal.fire('Error!', 'Failed to process refund request.', 'error')
-        }
-        setActionMenuOpen(null)
+  const submitRefundRequest = async () => {
+    if (!refundReason.trim()) {
+      Swal.fire('Error!', 'Please provide a refund reason.', 'warning')
+      return
+    }
+
+    try {
+      const refundData = {
+        bookingId: selectedBooking._id,
+        transactionId: selectedBooking.transactionId,
+        amount: selectedBooking.totalAmount,
+        reason: refundReason,
+        userEmail: selectedBooking.userEmail,
+        userName: selectedBooking.userName,
+        movieTitle: selectedBooking.movieTitle,
+        theaterName: selectedBooking.theaterName,
+        showTime: selectedBooking.showTime,
+        selectedSeats: selectedBooking.selectedSeats,
       }
-    })
+      console.log(selectedBooking)
+
+      await axiosSecure.post('/api/refund/request', refundData)
+      
+      Swal.fire('Success!', 'Refund request submitted successfully!', 'success')
+      setShowRefundModal(false)
+      setRefundReason('')
+      
+      // Refresh bookings to update status
+      const { data } = await axiosSecure.get(
+        `api/ticket/my-bookings?userEmail=${userEmail}`
+      )
+      setBookings(data)
+    } catch (error) {
+      console.error('Error submitting refund request:', error)
+      Swal.fire('Error!', 'Failed to submit refund request.', 'error')
+    }
   }
 
   const getStatusBadge = (status) => {
@@ -319,24 +347,28 @@ function MyBooking() {
                   </div>
 
                   {/* Action Menu for Mobile */}
-                  <div className="relative flex-shrink-0 ml-2 ">
+                  <div className="relative flex-shrink-0 ml-2">
                     <button
-                      onClick={() =>
+                      onClick={(e) => {
+                        e.stopPropagation()
                         setActionMenuOpen(
                           actionMenuOpen === booking._id ? null : booking._id
                         )
-                      }
-                      className="p-2 rounded-lg hover:bg-gray-700/50 transition-colors "
+                      }}
+                      className="p-2 rounded-lg hover:bg-gray-700/50 transition-colors"
                     >
-                      <FiMoreVertical className="text-gray-400 " size={18} />
+                      <FiMoreVertical className="text-gray-400" size={18} />
                     </button>
 
                     {actionMenuOpen === booking._id && (
-                      <div className="absolute right-7 -top-3 z-10 bg-gray-700 border border-gray-600 rounded-xl shadow-2xl min-w-40 ">
+                      <div 
+                        className="absolute right-0 top-12 z-50 bg-gray-700 border border-gray-600 rounded-xl shadow-2xl min-w-40"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <div className="p-2 space-y-1">
                           <button
                             onClick={() => handleViewDetails(booking)}
-                            className="w-full text-left px-3 py-2 text-sm text-white hover:bg-gray-600 rounded-lg flex items-center space-x-2 "
+                            className="w-full text-left px-3 py-2 text-sm text-white hover:bg-gray-600 rounded-lg flex items-center space-x-2 cursor-pointer"
                           >
                             <FiEye size={14} />
                             <span>View Details</span>
@@ -345,7 +377,7 @@ function MyBooking() {
                           {booking.paymentStatus === "unpaid" && (
                             <button
                               onClick={() => handlePayNow(booking)}
-                              className="w-full text-left px-3 py-2 text-sm text-green-400 hover:bg-gray-600 rounded-lg flex items-center space-x-2"
+                              className="w-full text-left px-3 py-2 text-sm text-green-400 hover:bg-gray-600 rounded-lg flex items-center space-x-2 cursor-pointer"
                             >
                               <FiCreditCard size={14} />
                               <span>Pay Now</span>
@@ -356,14 +388,13 @@ function MyBooking() {
                             booking.status !== "cancelled" && (
                               <button
                                 onClick={() => handleRefund(booking)}
-                                className="w-full text-left px-3 py-2 text-sm text-purple-400 hover:bg-gray-600 rounded-lg flex items-center space-x-2"
+                                className="w-full text-left px-3 py-2 text-sm text-purple-400 hover:bg-gray-600 rounded-lg flex items-center space-x-2 cursor-pointer"
                               >
                                 <FiArrowLeft size={14} />
                                 <span>Request Refund</span>
                               </button>
                             )}
 
-                          {/* Always show delete button, but disable for paid bookings that aren't cancelled */}
                           <button
                             onClick={() => handleDelete(booking._id)}
                             disabled={
@@ -371,7 +402,7 @@ function MyBooking() {
                                 booking.status !== "cancelled") ||
                               deleteLoading === booking._id
                             }
-                            className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-gray-600 rounded-lg flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-gray-600 rounded-lg flex items-center space-x-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <FiTrash2 size={14} />
                             <span>
@@ -410,7 +441,7 @@ function MyBooking() {
                 {booking.paymentStatus === "unpaid" && (
                   <button
                     onClick={() => handlePayNow(booking)}
-                    className="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg font-medium transition-colors text-sm md:text-base"
+                    className="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg font-medium transition-colors text-sm md:text-base cursor-pointer"
                   >
                     Pay Now - ৳{booking.totalAmount}
                   </button>
@@ -486,23 +517,47 @@ function MyBooking() {
                         {booking.paymentStatus === "unpaid" && (
                           <button
                             onClick={() => handlePayNow(booking)}
-                            className="px-3 py-1 rounded-full text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors"
+                            className="px-3 py-1 rounded-full text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors cursor-pointer"
                           >
                             Pay Now
                           </button>
                         )}
 
                         {/* Refund Button for paid bookings */}
-                        {booking.paymentStatus === "paid" &&
-                          booking.status !== "cancelled" && (
-                            <button
-                              onClick={() => handleRefund(booking)}
-                              className="rounded-lg px-3 py-1  text-sm hover:bg-purple-500/20 border border-purple-500/30 hover:border-purple-400 transition-all duration-200 group bg-purple-500/30 ml-2 "
-                              title="Request Refund"
-                            >
-                              Refound
-                            </button>
-                          )}
+                       {booking.paymentStatus === "paid" && booking.status !== "cancelled" && (
+  <>
+    {booking.refundStatus !== "none" ? (
+      <span
+        className={`rounded-lg px-3 py-1 text-sm ml-2 border transition-all duration-200 ${
+          booking.refundStatus === "requested"
+            ? "bg-yellow-500/20 border-yellow-500/30 text-yellow-400"
+            : booking.refundStatus === "approved"
+            ? "bg-green-500/20 border-green-500/30 text-green-400"
+            : booking.refundStatus === "rejected"
+            ? "bg-red-500/20 border-red-500/30 text-red-400"
+            : booking.refundStatus === "cancelled"
+            ? "bg-gray-500/20 border-gray-500/30 text-gray-400"
+            : booking.refundStatus === "processed"
+            ? "bg-blue-500/20 border-blue-500/30 text-blue-400"
+            : "bg-purple-500/20 border-purple-500/30 text-purple-400"
+        }`}
+      >
+        {booking.refundStatus.charAt(0).toUpperCase() +
+          booking.refundStatus.slice(1)}{" "}
+        {/* Capitalize first letter */}
+      </span>
+    ) : (
+      <button
+        onClick={() => handleRefund(booking)}
+        className="rounded-lg px-3 py-1 text-sm hover:bg-purple-500/20 border border-purple-500/30 hover:border-purple-400 transition-all duration-200 group bg-purple-500/30 ml-2 cursor-pointer"
+        title="Request Refund"
+      >
+        Refund
+      </button>
+    )}
+  </>
+)}
+
                       </div>
                     </td>
                     <td className="py-4 px-6">
@@ -510,7 +565,7 @@ function MyBooking() {
                         {/* View Details Button */}
                         <button
                           onClick={() => handleViewDetails(booking)}
-                          className="p-2 rounded-lg hover:bg-blue-500/20 border border-blue-500/30 hover:border-blue-400 transition-all duration-200 group"
+                          className="p-2 rounded-lg hover:bg-blue-500/20 border border-blue-500/30 hover:border-blue-400 transition-all duration-200 group cursor-pointer"
                           title="View Details"
                         >
                           <FiEye
@@ -557,7 +612,7 @@ function MyBooking() {
               <button
                 onClick={prevPage}
                 disabled={currentPage === 1}
-                className="p-2 rounded-lg bg-gray-800/50 border border-gray-600 text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/50 transition-colors"
+                className="p-2 rounded-lg bg-gray-800/50 border border-gray-600 text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/50 transition-colors cursor-pointer"
               >
                 <FiChevronLeft size={18} />
               </button>
@@ -581,7 +636,7 @@ function MyBooking() {
                         )}
                         <button
                           onClick={() => paginate(page)}
-                          className={`px-3 py-2 rounded-lg border transition-colors text-sm ${
+                          className={`px-3 py-2 rounded-lg border transition-colors text-sm cursor-pointer ${
                             currentPage === page
                               ? "bg-purple-500/20 border-purple-500/50 text-purple-400"
                               : "bg-gray-800/50 border-gray-600 text-gray-300 hover:bg-gray-700/50"
@@ -598,7 +653,7 @@ function MyBooking() {
               <button
                 onClick={nextPage}
                 disabled={currentPage === totalPages}
-                className="p-2 rounded-lg bg-gray-800/50 border border-gray-600 text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/50 transition-colors"
+                className="p-2 rounded-lg bg-gray-800/50 border border-gray-600 text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700/50 transition-colors cursor-pointer"
               >
                 <FiChevronRight size={18} />
               </button>
@@ -630,11 +685,27 @@ function MyBooking() {
           getPaymentBadge={getPaymentBadge}
         />
       )}
+
+      {/* Refund Request Modal */}
+      {showRefundModal && selectedBooking && (
+        <RefundModal
+          booking={selectedBooking}
+          onClose={() => {
+            setShowRefundModal(false);
+            setRefundReason('');
+          }}
+          refundReason={refundReason}
+          setRefundReason={setRefundReason}
+          onSubmit={submitRefundRequest}
+          getStatusBadge={getStatusBadge}
+          getPaymentBadge={getPaymentBadge}
+        />
+      )}
     </div>
-  );
+  )
 }
 
-// Payment Modal Component (same as before)
+// Payment Modal Component
 const PaymentModal = ({
   bookingData,
   onClose,
@@ -661,7 +732,7 @@ const PaymentModal = ({
             </h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-gray-700/50"
+              className="text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-gray-700/50 cursor-pointer"
             >
               <svg
                 className="w-5 h-5"
@@ -748,7 +819,7 @@ const PaymentModal = ({
           <div className="flex space-x-2 md:space-x-3">
             <button
               onClick={onClose}
-              className="flex-1 py-2 md:py-3 px-3 md:px-4 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors font-semibold text-sm md:text-base"
+              className="flex-1 py-2 md:py-3 px-3 md:px-4 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors font-semibold text-sm md:text-base cursor-pointer"
             >
               Cancel
             </button>
@@ -757,7 +828,7 @@ const PaymentModal = ({
               disabled={!selectedPaymentMethod}
               className={`flex-1 py-2 md:py-3 px-3 md:px-4 rounded-lg font-semibold transition-all text-sm md:text-base ${
                 selectedPaymentMethod
-                  ? 'bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 transform hover:scale-105 text-white'
+                  ? 'bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 transform hover:scale-105 text-white cursor-pointer'
                   : 'bg-gray-600 text-gray-400 cursor-not-allowed'
               }`}
             >
@@ -770,7 +841,7 @@ const PaymentModal = ({
   )
 }
 
-// Details Modal Component (same as before)
+// Details Modal Component
 const DetailsModal = ({
   booking,
   onClose,
@@ -788,7 +859,7 @@ const DetailsModal = ({
             </h3>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-700 rounded-lg transition-colors cursor-pointer"
             >
               <FiXCircle className="text-gray-400 text-lg md:text-xl" />
             </button>
@@ -869,9 +940,137 @@ const DetailsModal = ({
         <div className="p-4 md:p-6 border-t border-gray-700/50">
           <button
             onClick={onClose}
-            className="w-full bg-gray-700 hover:bg-gray-600 text-white py-2 md:py-3 px-4 rounded-lg font-medium transition-colors text-sm md:text-base"
+            className="w-full bg-gray-700 hover:bg-gray-600 text-white py-2 md:py-3 px-4 rounded-lg font-medium transition-colors text-sm md:text-base cursor-pointer"
           >
             Close
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Refund Modal Component
+const RefundModal = ({
+  booking,
+  onClose,
+  refundReason,
+  setRefundReason,
+  onSubmit,
+  getStatusBadge,
+  getPaymentBadge,
+}) => {
+  return (
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div className="bg-gray-800 rounded-2xl max-w-2xl w-full border border-gray-700/50 shadow-2xl max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="p-6 border-b border-gray-700/50">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-bold text-white">Request Refund</h3>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-700 rounded-lg transition-colors cursor-pointer"
+            >
+              <FiXCircle className="text-gray-400 text-xl" />
+            </button>
+          </div>
+          <p className="text-gray-400 mt-2">Request a refund for your booking</p>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 space-y-6">
+          {/* Booking Information */}
+          <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600/50">
+            <h4 className="text-white font-semibold mb-3">Booking Information</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <p className="text-gray-400">Movie</p>
+                <p className="text-white font-medium">{booking.movieTitle}</p>
+              </div>
+              <div>
+                <p className="text-gray-400">Theater</p>
+                <p className="text-white font-medium">{booking.theaterName}</p>
+              </div>
+              <div>
+                <p className="text-gray-400">Show Time</p>
+                <p className="text-white font-medium">{booking.showTime}</p>
+              </div>
+              <div>
+                <p className="text-gray-400">Seats</p>
+                <p className="text-white font-medium">
+                  {booking.selectedSeats?.join(', ') || 'N/A'}
+                </p>
+              </div>
+              <div>
+                <p className="text-gray-400">Amount</p>
+                <p className="text-green-400 font-semibold">৳{booking.totalAmount}</p>
+              </div>
+              <div>
+                <p className="text-gray-400">Transaction ID</p>
+                <p className="text-white font-mono text-xs">
+                  {booking.transactionId || 'N/A'}
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex flex-wrap gap-2 mt-3">
+              <span className={getStatusBadge(booking.status)}>
+                Status: {booking.status}
+              </span>
+              <span className={getPaymentBadge(booking.paymentStatus)}>
+                Payment: {booking.paymentStatus}
+              </span>
+            </div>
+          </div>
+
+          {/* Refund Reason Input */}
+          <div>
+            <label className="block text-gray-400 text-sm font-medium mb-2">
+              Refund Reason *
+            </label>
+            <textarea
+              value={refundReason}
+              onChange={(e) => setRefundReason(e.target.value)}
+              placeholder="Please explain why you are requesting a refund. Be as detailed as possible..."
+              className="w-full h-32 bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 resize-none"
+              required
+            />
+            <p className="text-gray-500 text-xs mt-1">
+              Please provide a detailed reason for your refund request. This helps us process your request faster.
+            </p>
+          </div>
+
+          {/* Refund Information */}
+          <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
+            <div className="flex items-start space-x-3">
+              <FiInfo className="text-purple-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-purple-400 font-medium text-sm mb-1">Refund Process</p>
+                <p className="text-purple-300 text-xs">
+                  • Refund requests are typically processed within 5-7 business days<br/>
+                  • The refunded amount will be credited back to your original payment method<br/>
+                  • You will receive email notifications about your refund status<br/>
+                  • For urgent queries, please contact our customer support
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="p-6 border-t border-gray-700/50 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
+          <button
+            onClick={onClose}
+            className="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-3 px-4 rounded-lg font-medium transition-colors cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onSubmit}
+            disabled={!refundReason.trim()}
+            className="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 px-4 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          >
+            Submit Refund Request
           </button>
         </div>
       </div>
