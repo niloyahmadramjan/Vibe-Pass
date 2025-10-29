@@ -115,7 +115,7 @@ export default function ChatIcon() {
             {showChatPanel && (
                 <div
                     className={`fixed z-50 ${isMobile
-                        ? 'inset-0 flex items-end justify-center px-4 pt-4  bg-black/50'
+                        ? 'inset-0 flex items-end justify-center p-4 bg-black/50'
                         : 'inset-0 flex items-end justify-end p-4 bg-black/50 md:justify-end'
                         }`}
                     onClick={handleClose} // Close when clicking backdrop
