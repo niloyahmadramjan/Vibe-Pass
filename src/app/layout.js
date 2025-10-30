@@ -24,7 +24,12 @@ export const metadata = {
   icons: {
     icon: '/favicon.png',
   },
-}
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#34A853' },
+    { media: '(prefers-color-scheme: dark)', color: '#1E1E1E' },
+  ],
+};
+
 
 export default function RootLayout({ children }) {
   return (
