@@ -1,151 +1,207 @@
-'use client'
+"use client";
 
-import Image from 'next/image'
-import Link from 'next/link'
-import { useState, useEffect } from 'react'
-import { signIn, useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
-import Swal from 'sweetalert2'
-import LoadingSpinner from '../hooks/LoadingSpiner'
-import { useAuth } from '../context/AuthContext'
-import { FaArrowLeft } from 'react-icons/fa'
-import axiosPublic from '../api/axiosHook/useAxiosPublic'
+import Image from "next/image";
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
+import LoadingSpinner from "../hooks/LoadingSpiner";
+import { useAuth } from "../context/AuthContext";
+import { FaArrowLeft, FaUser } from "react-icons/fa";
+import axiosPublic from "../api/axiosHook/useAxiosPublic";
+import { MdAdminPanelSettings } from "react-icons/md";
 
 const mockSlides = [
   {
     id: 1,
-    img: 'https://i.ibb.co/gLvq12yd/photo-1517604931442-7e0c8ed2963c-q-80-w-1170-auto-format-fit-crop-ixlib-rb-4-1.jpg',
-    title: 'Experience Movies Together',
+    img: "https://i.ibb.co/gLvq12yd/photo-1517604931442-7e0c8ed2963c-q-80-w-1170-auto-format-fit-crop-ixlib-rb-4-1.jpg",
+    title: "Experience Movies Together",
     description:
-      'Join thousands of movie lovers enjoying premium cinema experiences',
+      "Join thousands of movie lovers enjoying premium cinema experiences",
   },
   {
     id: 2,
-    img: 'https://i.ibb.co/rRg5pd69/photo-1608170825938-a0ea0305d46c-q-80-w-1025-auto-format-fit-crop-ixlib-rb-4-1.jpg',
-    title: 'Perfect Date Nights',
-    description: 'Create unforgettable moments with your loved ones',
+    img: "https://i.ibb.co/rRg5pd69/photo-1608170825938-a0ea0305d46c-q-80-w-1025-auto-format-fit-crop-ixlib-rb-4-1.jpg",
+    title: "Perfect Date Nights",
+    description: "Create unforgettable moments with your loved ones",
   },
   {
     id: 3,
-    img: 'https://i.ibb.co/chWQ58NS/pexels-photo-7991269.jpg',
-    title: 'Premium Cinema Experience',
-    description: 'Luxury seating, crystal-clear sound, and stunning visuals',
+    img: "https://i.ibb.co/chWQ58NS/pexels-photo-7991269.jpg",
+    title: "Premium Cinema Experience",
+    description: "Luxury seating, crystal-clear sound, and stunning visuals",
   },
   {
     id: 4,
-    img: 'https://i.ibb.co/fVYg2W8L/VT0.jpg',
-    title: 'Family Entertainment',
-    description: 'Movies that bring families together for magical moments',
+    img: "https://i.ibb.co/fVYg2W8L/VT0.jpg",
+    title: "Family Entertainment",
+    description: "Movies that bring families together for magical moments",
   },
-]
+];
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [current, setCurrent] = useState(0)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [current, setCurrent] = useState(0);
 
-  const { data: session, status } = useSession()
-  const router = useRouter()
-  const { login, user, loading, setLoading } = useAuth()
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const { login, user, loading, setLoading } = useAuth();
 
   // Auto slide every 4s (increased for better reading)
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % mockSlides.length)
-    }, 4000)
-    return () => clearInterval(interval)
-  }, [])
+      setCurrent((prev) => (prev + 1) % mockSlides.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleLogin = async (e) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
-      const res = await axiosPublic.post('api/auth/login', {
+      const res = await axiosPublic.post("api/auth/login", {
         email,
         password,
-      })
+      });
 
       // Save user + token in context/localStorage
-      login(res.data)
+      login(res.data);
 
       // Enhanced SweetAlert success popup
       Swal.fire({
-        icon: 'success',
-        title: 'Welcome Back! ',
-        text: 'Login successful! Redirecting to your dashboard...',
+        icon: "success",
+        title: "Welcome Back! ",
+        text: "Login successful! Redirecting to your dashboard...",
         timer: 2000,
         showConfirmButton: false,
-        background: '#1E1E1E',
-        color: '#FFFFFF',
-        iconColor: '#4CAF50',
-      })
+        background: "#1E1E1E",
+        color: "#FFFFFF",
+        iconColor: "#4CAF50",
+      });
 
       // Redirect after login
       setTimeout(() => {
-        router.push('/')
-      }, 2000)
+        router.push("/");
+      }, 2000);
     } catch (err) {
       const errorMessage =
         err.response?.data?.message ||
-        'Login failed. Please check your credentials.'
-      setError(errorMessage)
+        "Login failed. Please check your credentials.";
+      setError(errorMessage);
 
       Swal.fire({
-        icon: 'error',
-        title: 'Login Failed',
+        icon: "error",
+        title: "Login Failed",
         text: errorMessage,
         timer: 3000,
         showConfirmButton: false,
-        background: '#1E1E1E',
-        color: '#FFFFFF',
-        iconColor: '#D32F2F',
-      })
+        background: "#1E1E1E",
+        color: "#FFFFFF",
+        iconColor: "#D32F2F",
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
+
+  ///////////////////////////////////////////////////////
+  // ⚡ Demo login function
+  const handleDemoLogin = async (role) => {
+    setError("");
+    setLoading(true);
+
+    // Demo credentials
+    const demoCredentials =
+      role === "admin"
+        ? { email: "vibepass@admin.com", password: "vibepass" }
+        : { email: "vibepass@user.com", password: "vibepass" };
+
+    try {
+      const res = await axiosPublic.post("api/auth/login", demoCredentials);
+
+      // Save user + token in context/localStorage
+      login(res.data);
+
+      Swal.fire({
+        icon: "success",
+        title: `${role === "admin" ? "Admin" : "User"} Demo Login Successful`,
+        text: "Redirecting to dashboard...",
+        timer: 2000,
+        showConfirmButton: false,
+        background: "#1E1E1E",
+        color: "#FFFFFF",
+        iconColor: "#4CAF50",
+      });
+
+      setTimeout(() => {
+        router.push("/");
+      }, 2000);
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.message || "Demo login failed. Try again later.";
+
+      setError(errorMessage);
+
+      Swal.fire({
+        icon: "error",
+        title: "Demo Login Failed",
+        text: errorMessage,
+        timer: 3000,
+        showConfirmButton: false,
+        background: "#1E1E1E",
+        color: "#FFFFFF",
+        iconColor: "#D32F2F",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // /////////////////////////////////////////////////////
 
   // Redirect if already logged in
   useEffect(() => {
-    if (status === 'authenticated' || user) {
-      router.push('/')
+    if (status === "authenticated" || user) {
+      router.push("/");
     }
-  }, [status, user, router])
+  }, [status, user, router]);
 
   // Watch session change for social logins
   useEffect(() => {
-    if (status === 'authenticated' && session?.user) {
+    if (status === "authenticated" && session?.user) {
       Swal.fire({
-        icon: 'success',
-        title: 'Welcome! ',
+        icon: "success",
+        title: "Welcome! ",
         text: `Successfully logged in as ${
           session.user.name || session.user.email
         }`,
         timer: 2000,
         showConfirmButton: false,
-        background: '#1E1E1E',
-        color: '#FFFFFF',
-        iconColor: '#4CAF50',
-      })
+        background: "#1E1E1E",
+        color: "#FFFFFF",
+        iconColor: "#4CAF50",
+      });
 
       // Redirect after social login success
       setTimeout(() => {
-        router.push('/')
-      }, 2000)
+        router.push("/");
+      }, 2000);
     }
-  }, [status, session, router])
+  }, [status, session, router]);
 
   // Global loading states
-  if (loading || status === 'loading') {
-    return <LoadingSpinner />
+  if (loading || status === "loading") {
+    return <LoadingSpinner />;
   }
 
   // If user already logged in, redirect (prevent flicker)
-  if (user || status === 'authenticated') {
-    return <LoadingSpinner />
+  if (user || status === "authenticated") {
+    return <LoadingSpinner />;
   }
 
   // Login Page (only if no user)
@@ -157,7 +213,7 @@ export default function LoginPage() {
           <div
             key={slide.id}
             className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === current ? 'opacity-100' : 'opacity-0'
+              index === current ? "opacity-100" : "opacity-0"
             }`}
           >
             <Image
@@ -182,8 +238,8 @@ export default function LoginPage() {
                       onClick={() => setCurrent(idx)}
                       className={`w-3 h-3 rounded-full transition-all ${
                         idx === current
-                          ? 'bg-[var(--color-primary)] w-8'
-                          : 'bg-white/50 hover:bg-white/70'
+                          ? "bg-[var(--color-primary)] w-8"
+                          : "bg-white/50 hover:bg-white/70"
                       }`}
                     />
                   ))}
@@ -266,7 +322,7 @@ export default function LoginPage() {
                   Signing In...
                 </span>
               ) : (
-                'Sign In to VibePass'
+                "Sign In to VibePass"
               )}
             </button>
           </form>
@@ -278,10 +334,28 @@ export default function LoginPage() {
             <div className="flex-1 border-t border-gray-600"></div>
           </div>
 
+          {/* demon account on click login  */}
+
+          <div className="flex justify-between mb-4">
+            <button
+              onClick={() => handleDemoLogin("user")}
+              className="w-1/2 btn-secondary mr-2 py-2 flex items-center justify-center gap-2 rounded-lg border border-blue-500 hover:bg-red-500 transition"
+            >
+              <FaUser className="text-indigo-600" />
+              <span>User Login</span>
+            </button>
+            <button
+              onClick={() => handleDemoLogin("admin")}
+              className="w-1/2 btn-secondary ml-2 py-2 flex items-center justify-center gap-2 rounded-lg border border-blue-500 hover:bg-red-500 transition"
+            >
+              <MdAdminPanelSettings className="text-indigo-600" />
+              <span>Admin Login</span>
+            </button>
+          </div>
           {/* Social Logins */}
           <div className="space-y-3">
             <button
-              onClick={() => signIn('google')}
+              onClick={() => signIn("google")}
               className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-100 text-gray-800 font-medium py-3 px-4 rounded-lg transition-all duration-300 border border-gray-300 hover:border-gray-400 shadow-sm"
             >
               <Image
@@ -293,7 +367,7 @@ export default function LoginPage() {
               Continue with Google
             </button>
             <button
-              onClick={() => signnI('github')}
+              onClick={() => signnI("github")}
               className="w-full flex items-center justify-center gap-3 bg-gray-800 hover:bg-gray-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 border border-gray-700 hover:border-gray-600 shadow-sm"
             >
               <Image
@@ -334,5 +408,5 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
