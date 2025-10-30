@@ -2,13 +2,15 @@
 import React, { useState, useRef, useEffect } from "react";
 import emailjs from "@emailjs/browser";
 import { FaHeadset, FaTimes } from "react-icons/fa";
+import toast from "react-hot-toast";
+
 
 export default function ContactSupportSection({ user }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [charCount, setCharCount] = useState(0);
   const [isSending, setIsSending] = useState(false);
-  const [toast, setToast] = useState({ show: false, message: "", type: "" });
+  
   const form = useRef();
 
   useEffect(() => {
@@ -19,18 +21,6 @@ export default function ContactSupportSection({ user }) {
     }
   }, [isOpen]);
 
-  useEffect(() => {
-    if (toast.show) {
-      const timer = setTimeout(() => {
-        setToast({ show: false, message: "", type: "" });
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [toast]);
-
-  const showToast = (message, type) => {
-    setToast({ show: true, message, type });
-  };
 
   const sendEmail = (e) => {
     e.preventDefault();
@@ -61,14 +51,14 @@ export default function ContactSupportSection({ user }) {
               }, 1000);
             });
           }
-          showToast("🎉 Message sent successfully!", "success");
+         toast.success("Message sent successfully!");
+
           e.target.reset();
           setCharCount(0);
           setIsOpen(false);
         },
         (error) => {
-          showToast("❌ Failed to send message.", "error");
-          console.log(error.text);
+          toast.success("Failed to send message.");
         }
       )
       .finally(() => {
@@ -93,11 +83,11 @@ export default function ContactSupportSection({ user }) {
         >
           <div className="flex items-center gap-3">
             <span className="text-xl">
-              {toast.type === "success" ? "✅" : "❌"}
+           
             </span>
             <div>
               <span className="font-semibold block">
-                {toast.type === "success" ? "Success!" : "Error!"}
+               
               </span>
               <span className="text-sm opacity-90">{toast.message}</span>
             </div>
