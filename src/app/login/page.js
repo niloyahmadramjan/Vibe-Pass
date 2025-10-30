@@ -263,9 +263,16 @@ export default function LoginPage() {
 
         <div className="max-w-sm mx-auto w-full">
           {/* Header */}
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl font-bold text-white">VP</span>
+          <div className="text-center mb-8 mt-5">
+            <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl font-bold text-white">
+                <Image
+                  src="/favicon.png"
+                  alt="VibePass Logo"
+                  width={50}
+                  height={50}
+                />
+              </span>
             </div>
             <h1 className="text-[var(--color-primary)] text-3xl font-bold mb-3">
               Welcome Back
@@ -367,7 +374,7 @@ export default function LoginPage() {
               Continue with Google
             </button>
             <button
-              onClick={() => signnI("github")}
+              onClick={() => signIn("github")}
               className="w-full flex items-center justify-center gap-3 bg-gray-800 hover:bg-gray-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 border border-gray-700 hover:border-gray-600 shadow-sm"
             >
               <Image
