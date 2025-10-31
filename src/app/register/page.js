@@ -261,8 +261,15 @@ export default function RegisterPage() {
         <div className="max-w-sm mx-auto w-full">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl font-bold text-white">VP</span>
+            <div className="w-16 h-16  rounded-full flex items-center justify-center mx-auto mb-4">
+             <span className="text-2xl font-bold text-white">
+                             <Image
+                               src="/favicon.png"
+                               alt="VibePass Logo"
+                               width={50}
+                               height={50}
+                             />
+                           </span>
             </div>
             <h1 className="text-[var(--color-primary)] text-3xl font-bold mb-3">
               Join VibePass

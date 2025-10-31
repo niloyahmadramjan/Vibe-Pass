@@ -16,6 +16,7 @@ import {
   FiChevronRight,
 } from "react-icons/fi";
 import LoadingSpinner from "../hooks/LoadingSpiner";
+import axiosSecure from "../api/axiosHook/useAxiosSecure";
 
 export default function PaymentHistory() {
   const { user } = useAuth();
@@ -28,45 +29,45 @@ export default function PaymentHistory() {
   const [itemsPerPage] = useState(5);
 
   useEffect(() => {
-    if (!userEmail) return;
+  if (!userEmail) return;
 
-    const fetchPayments = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/payments/user?userEmail=${userEmail}`
-        );
+  const fetchPayments = async () => {
+    try {
+      setIsLoading(true);
 
-        if (!response.ok) throw new Error("Payment fetch failed");
-        const data = await response.json();
-        setPayments(data);
+      const response = await axiosSecure.get(
+        `/api/payments/user?userEmail=${userEmail}`
+      );
 
-        // Calculate total expenses by currency
-        const usdExpense = data
-          .filter(
-            (payment) =>
-              payment.status === "paid" &&
-              (payment.currency === "usd" || !payment.currency)
-          )
-          .reduce((total, payment) => total + payment.amount, 0);
+      const data = response.data;
+      setPayments(data);
 
-        const bdtExpense = data
-          .filter(
-            (payment) => payment.status === "paid" && payment.currency === "BDT"
-          )
-          .reduce((total, payment) => total + payment.amount, 0);
+      // Calculate total expenses by currency
+      const usdExpense = data
+        .filter(
+          (payment) =>
+            payment.status === "paid" &&
+            (payment.currency === "usd" || !payment.currency)
+        )
+        .reduce((total, payment) => total + payment.amount, 0);
 
-        setTotalExpenseUSD(usdExpense);
-        setTotalExpenseBDT(bdtExpense);
-      } catch (error) {
-        console.error("❌ Fetch payments error:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      const bdtExpense = data
+        .filter(
+          (payment) => payment.status === "paid" && payment.currency === "BDT"
+        )
+        .reduce((total, payment) => total + payment.amount, 0);
 
-    fetchPayments();
-  }, [userEmail]);
+      setTotalExpenseUSD(usdExpense);
+      setTotalExpenseBDT(bdtExpense);
+    } catch (error) {
+      console.error("❌ Fetch payments error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  fetchPayments();
+}, [userEmail]);
 
   // console.log(payments);
 
