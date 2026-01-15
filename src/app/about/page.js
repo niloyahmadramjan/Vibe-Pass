@@ -79,7 +79,7 @@ const teamMembers = [
     role: 'Backend Developer',
     skills: ['Node.js', 'Express', 'MongoDB'],
     bio: 'Building robust server architectures that power seamless experiences with security and scalability at the core.',
-    photo: 'https://i.postimg.cc/wxXyQZQf/a-studio-portrait-photograph-of-a-young-nu-XA88c-XS5-C6u10u-FLo37g-Yre-LDNYa-TAax-Xyxp-NOL3h-A.jpg',
+    photo: 'https://i.ibb.co.com/DgG55VFt/confident-software-developer-coding-at-workstation-with-enthusiasm-free-photo.jpg',
     github: 'https://github.com/skrased2006',
     linkedin: 'https://www.linkedin.com/in/shaikh-rasedul-islam/',
     color: 'from-green-500 to-emerald-500',
